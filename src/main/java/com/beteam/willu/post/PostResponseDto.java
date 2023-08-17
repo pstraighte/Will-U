@@ -19,7 +19,7 @@ public class PostResponseDto extends ApiResponseDto {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
     private Long maxnum;
-    private Long score = 3L;
+    private Long score;
 
     public PostResponseDto(Post post) {
         this.title = post.getTitle();

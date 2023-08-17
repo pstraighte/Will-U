@@ -52,10 +52,10 @@ public class Post extends Timestamped {
      */
      public Post(PostRequestDto postRequestDto) {
          if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();
-         if (postRequestDto.getTitle() != null) this.content = postRequestDto.getContent();
-         if (postRequestDto.getTitle() != null) this.promiseTime = postRequestDto. getPromiseTime();
-         if (postRequestDto.getTitle() != null) this.promiseArea = postRequestDto.getPromiseArea();
-         if (postRequestDto.getTitle() != null) this.maxnum = postRequestDto.getMaxnum();
+         if (postRequestDto.getContent() != null) this.content = postRequestDto.getContent();
+         if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto. getPromiseTime();
+         if (postRequestDto.getPromiseArea() != null) this.promiseArea = postRequestDto.getPromiseArea();
+         if (postRequestDto.getMaxnum()!= null) this.maxnum = postRequestDto.getMaxnum();
      }
 
     /**
@@ -69,7 +69,7 @@ public class Post extends Timestamped {
     }
 
     public void update(PostRequestDto postRequestDto) {
-        this.title = postRequestDto.getTitle();;
+        this.title = postRequestDto.getTitle();
         this.content = postRequestDto.getContent();
         this.promiseTime = postRequestDto. getPromiseTime();
         this.promiseArea = postRequestDto.getPromiseArea();
