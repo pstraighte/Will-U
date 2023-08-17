@@ -1,7 +1,9 @@
 package com.beteam.willu.post;
 
 import com.beteam.willu.common.Timestamped;
+import com.beteam.willu.user.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,6 +38,8 @@ public class Post extends Timestamped {
     @Column(name = "post_area")
     private String promiseArea;
 
+    @Column(name = "post_maxnum")
+    private Long maxnum; //모집 최대 인원
     /**
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
      */
@@ -47,12 +51,12 @@ public class Post extends Timestamped {
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
      public Post(PostRequestDto postRequestDto) {
-         this.title = postRequestDto.getTitle();;
-         this.content = postRequestDto.getContent();
-         this.promiseTime = postRequestDto. getPromiseTime();
-         this.promiseArea = postRequestDto.getPromiseArea();
+         if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();
+         if (postRequestDto.getTitle() != null) this.content = postRequestDto.getContent();
+         if (postRequestDto.getTitle() != null) this.promiseTime = postRequestDto. getPromiseTime();
+         if (postRequestDto.getTitle() != null) this.promiseArea = postRequestDto.getPromiseArea();
+         if (postRequestDto.getTitle() != null) this.maxnum = postRequestDto.getMaxnum();
      }
-
 
     /**
      * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
@@ -69,5 +73,6 @@ public class Post extends Timestamped {
         this.content = postRequestDto.getContent();
         this.promiseTime = postRequestDto. getPromiseTime();
         this.promiseArea = postRequestDto.getPromiseArea();
+        this.maxnum = postRequestDto.getMaxnum();
     }
 }

@@ -3,6 +3,8 @@ package com.beteam.willu.post;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.Pageable;
 
+import com.beteam.willu.user.User;
+
 import java.util.List;
 
 public interface PostService {

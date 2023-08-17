@@ -1,11 +1,13 @@
 package com.beteam.willu.post;
 
+import com.beteam.willu.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.Update;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +51,7 @@ public class PostServiceImpl implements PostService {
     }
 
     // 게시글 수정
+    @Transactional
     @Override
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username) {
         Post post = findPost(id);
@@ -56,9 +59,8 @@ public class PostServiceImpl implements PostService {
             throw  new RejectedExecutionException("작성자만 수정 가능합니다.");
         }
         post.update(postRequestDto);
-        postRepository.save(post);
+        return new PostResponseDto(post);
     }
-
     // 게시글 삭제
     @Override
     public void deletePost(Long id, User user) {
