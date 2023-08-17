@@ -4,10 +4,16 @@ import com.beteam.willu.security.JwtUtil;
 import com.beteam.willu.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URLDecoder;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j(topic = "userService")
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -15,6 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public void userSignup(UserRequestDto requestDto) {
 
@@ -39,7 +46,19 @@ public class UserService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("로그인 실패 비밀번호 틀립니다!");
         }
-        jwtUtil.addJwtToCookie(jwtUtil.createToken(username), response);
+        jwtUtil.addJwtToCookie(jwtUtil.createAccessToken(username), response);
+
+    }
+
+    public void logout(String accessToken) {
+        accessToken = URLDecoder.decode(accessToken).substring(7);
+        log.info(accessToken);
+        //엑세스 토큰 남은 유효시간
+        Long expiration = jwtUtil.getExpiration(accessToken);
+        log.info("logout 진행 중. 토큰 남은 유효시간: " + expiration);
+
+        //Redis Cache 에 저장
+        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
 
     }
 

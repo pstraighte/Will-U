@@ -40,9 +40,11 @@ dependencies {
     // MySQL
     implementation 'mysql:mysql-connector-java:8.0.28'
 
-    // json
-    implementation 'org.json:json:20230227'
+/*    // json
+    implementation 'org.json:json:20230227'*/
 
+    //Redis cache
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
 }
 
