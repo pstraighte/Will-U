@@ -1,0 +1,13 @@
+package com.beteam.willu;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class WillUApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(WillUApplication.class, args);
+    }
+
+}
