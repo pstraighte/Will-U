@@ -45,7 +45,7 @@ public class JwtUtil {
     }
 
     // 토큰 생성
-    public String createToken(String username) {
+    public String createAccessToken(String username) {
         Date date = new Date();
 
         return BEARER_PREFIX +
@@ -100,7 +100,10 @@ public class JwtUtil {
 
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+        return Jwts.parserBuilder()
+                .setSigningKey(key).build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 
     // HttpServletRequest 에서 Cookie Value : JWT 가져오기
@@ -119,5 +122,13 @@ public class JwtUtil {
         }
         return null;
     }
+
+    //jwt 토큰의 남은 유효시간
+    public Long getExpiration(String accessToken) {
+        Date expiration = getUserInfoFromToken(accessToken).getExpiration();
+        Long now = new Date().getTime();
+        return expiration.getTime() - now;
+    }
+
 
 }
