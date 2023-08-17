@@ -1,11 +1,15 @@
 package com.beteam.willu.post;
 
+import com.beteam.willu.exception.RecruitmentStatusException;
+import com.beteam.willu.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.Update;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,20 +54,59 @@ public class PostServiceImpl implements PostService {
 
     // 게시글 수정
     @Override
+    @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username) {
         Post post = findPost(id);
         if(!post.getUser().getUsername().equals(username)){
-            throw  new RejectedExecutionException("작성자만 수정 가능합니다.");
+            throw new RejectedExecutionException("작성자만 수정 가능합니다.");
         }
         post.update(postRequestDto);
-        postRepository.save(post);
+        return new PostResponseDto(post);
     }
-
     // 게시글 삭제
+
     @Override
     public void deletePost(Long id, User user) {
         Post post = findPost(id);
+        if(!post.getUser().getId().equals(user.getId())){
+            throw new RejectedExecutionException("작성자만 삭제 가능합니다.");
+        }
         postRepository.delete(post);
+    }
+
+    // 모집완료 -> 모집중으로 변경
+    @Override
+    @Transactional
+    public void activateRecruitment(Long id, User user) {
+        Post post = findPost(id);
+
+        if(!post.getUser().getId().equals(user.getId())){
+            throw new RejectedExecutionException("작성자만 변경 가능합니다.");
+        }
+
+        if (post.getRecruitment()) {
+            throw new RecruitmentStatusException();
+        } else {
+         post.setRecruitment(true); // 저장 안 됨
+            System.out.println(post.getRecruitment());
+        }
+    }
+
+    // 모집중 -> 모집완료로 변경
+    @Override
+    @Transactional
+    public void completeRecruitment(Long id, User user) {
+        Post post = findPost(id);
+
+        if(!post.getUser().getId().equals(user.getId())){
+            throw new RejectedExecutionException("작성자만 변경 가능합니다.");
+        }
+
+        if (post.getRecruitment()) {
+            post.setRecruitment(false); // 저장 안 됨
+        } else {
+            throw new RecruitmentStatusException();
+        }
     }
 
     // 게시글 찾기
