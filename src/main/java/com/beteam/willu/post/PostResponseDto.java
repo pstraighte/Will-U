@@ -21,7 +21,7 @@ public class PostResponseDto extends ApiResponseDto {
 
     public PostResponseDto(Post post) {
         this.title = post.getTitle();
-        this.username = post.getUser.getUsername();
+        this.username = post.getUser().getUsername();
         this.content = post.getContent();
         this.promiseTime = post.getPromiseTime();
         this.promiseArea = post.getPromiseArea();
