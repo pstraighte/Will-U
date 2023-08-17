@@ -13,4 +13,5 @@ public class PostRequestDto {
     private String content;
     private LocalDateTime promiseTime;
     private String promiseArea;
+    private Long maxnum;
 }

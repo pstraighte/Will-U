@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 //import org.springframework.ui.Model;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -64,7 +65,8 @@ public class PostController {
     public ResponseEntity<ApiResponseDto> deletePost(@PathVariable Long id,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
-            postService.deletePost(id, userDetails.getUser());
+           postService.deletePost(id, userDetails.getUser());
+
             return ResponseEntity.ok().body(new ApiResponseDto("게시글이 삭제되었습니다",200));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));

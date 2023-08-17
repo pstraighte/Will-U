@@ -18,6 +18,8 @@ public class PostResponseDto extends ApiResponseDto {
     private String promiseArea;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
+    private Long maxnum;
+    private Long score;
 
     public PostResponseDto(Post post) {
         this.title = post.getTitle();
@@ -27,5 +29,7 @@ public class PostResponseDto extends ApiResponseDto {
         this.promiseArea = post.getPromiseArea();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
+        this.maxnum = post.getMaxnum();
+        this.score = post.getUser().getScore();
     }
 }

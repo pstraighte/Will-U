@@ -1,5 +1,6 @@
 package com.beteam.willu.post;
 
+
 import com.beteam.willu.exception.RecruitmentStatusException;
 import com.beteam.willu.user.User;
 import jakarta.persistence.EntityNotFoundException;
@@ -53,6 +54,7 @@ public class PostServiceImpl implements PostService {
     }
 
     // 게시글 수정
+    @Transactional
     @Override
     @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username) {
