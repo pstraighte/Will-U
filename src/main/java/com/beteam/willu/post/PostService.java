@@ -4,7 +4,6 @@ package com.beteam.willu.post;
 //import org.springframework.data.domain.Pageable;
 
 import com.beteam.willu.user.User;
-
 import java.util.List;
 
 public interface PostService {
@@ -53,4 +52,8 @@ public interface PostService {
      * @return      해당 게시글 정보
      */
     PostResponseDto getPost(Long id);
+
+    void activateRecruitment(Long id, User user);
+
+    void completeRecruitment(Long id, User user);
 }

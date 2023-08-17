@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +30,7 @@ public class Post extends Timestamped {
     @Column(name = "post_content")
     private String content;
 
-//    private category 배열
+    private Boolean recruitment = true;
 
     @Column(name = "post_time")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
@@ -68,11 +69,14 @@ public class Post extends Timestamped {
         this.user = user;
     }
 
+    public void setRecruitment(Boolean recruitment) {
+        this.recruitment = recruitment;
+    }
+
     public void update(PostRequestDto postRequestDto) {
-        this.title = postRequestDto.getTitle();
-        this.content = postRequestDto.getContent();
-        this.promiseTime = postRequestDto. getPromiseTime();
-        this.promiseArea = postRequestDto.getPromiseArea();
-        this.maxnum = postRequestDto.getMaxnum();
+        if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();;
+        if (postRequestDto.getContent() != null) this.content = postRequestDto.getContent();
+        if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto. getPromiseTime();
+        if (postRequestDto.getPromiseArea() != null) this.promiseArea = postRequestDto.getPromiseArea();
     }
 }
