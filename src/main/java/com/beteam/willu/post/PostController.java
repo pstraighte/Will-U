@@ -3,6 +3,7 @@ package com.beteam.willu.post;
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.exception.RecruitmentStatusException;
 import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 //import org.springframework.data.domain.Page;
