@@ -1,6 +1,5 @@
 package com.beteam.willu.interest;
 
-import com.beteam.willu.post.Post;
 import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,7 @@ public class InterestService {
         }
     }
     public void removeInterest(Long id1, Long id2) { //관심 유저 해제
-        Optional<Interest>existingInterest = interestRepository.findByid1Andid2(id1, id2);
+        Optional<Interest>existingInterest = interestRepository.findByIdAndId(id1, id2);
         if (existingInterest.isPresent()) {
             interestRepository.delete(existingInterest.get());
         } else {

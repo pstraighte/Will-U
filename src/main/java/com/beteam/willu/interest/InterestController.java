@@ -2,7 +2,6 @@ package com.beteam.willu.interest;
 
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.security.UserDetailsImpl;
-import com.beteam.willu.user.UserService;
 import com.sun.jdi.request.DuplicateRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,10 +15,9 @@ import org.springframework.web.bind.annotation.*;
 public class InterestController {
 
     private final InterestService interestService;
-    private final UserService userService;
 
     @PostMapping("/interest/{id}")
-    public ResponseEntity<ApiResponseDto> addInterest( @PathVariable Long Id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    public ResponseEntity<ApiResponseDto> addInterest(@PathVariable Long Id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
             interestService.addInterest(Id, userDetails.getUser().getId());
         } catch (DuplicateRequestException e) { //중복실행 방지
