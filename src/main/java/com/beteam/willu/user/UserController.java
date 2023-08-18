@@ -34,9 +34,9 @@ public class UserController {
     public ResponseEntity<ApiResponseDto> logout(@CookieValue(name = "Authorization") String accessToken, HttpServletResponse response) {
         userService.logout(accessToken);
         //쿠키 삭제
-        Cookie kc = new Cookie("Authorization", null); // choiceCookieName(쿠키 이름)에 대한 값을 null로 지정
-        kc.setMaxAge(0); // 유효시간을 0으로 설정
-        response.addCookie(kc); // 응답 헤더에 추가해서 없어지도록 함
+        Cookie cookie = new Cookie("Authorization", null); // choiceCookieName(쿠키 이름)에 대한 값을 null로 지정
+        cookie.setMaxAge(0); // 유효시간을 0으로 설정
+        response.addCookie(cookie); // 응답 헤더에 추가해서 없어지도록 함
         return ResponseEntity.ok().body(new ApiResponseDto("로그아웃 성공", 200));
     }
 
@@ -53,8 +53,8 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.deleteUser(id, userDetails.getUser());
         return ResponseEntity.ok(new ApiResponseDto("회원 탈퇴 성공", 200));
     }
 

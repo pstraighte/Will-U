@@ -1,7 +1,7 @@
 package com.beteam.willu.common;
 
+import com.beteam.willu.jwt.JwtUtil;
 import com.beteam.willu.security.JwtAuthorizationFilter;
-import com.beteam.willu.security.JwtUtil;
 import com.beteam.willu.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -26,7 +26,7 @@ public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisTemplate redisTemplate;
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
