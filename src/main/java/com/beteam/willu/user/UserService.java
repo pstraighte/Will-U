@@ -1,17 +1,17 @@
 package com.beteam.willu.user;
 
-import com.beteam.willu.security.JwtUtil;
+import com.beteam.willu.common.RedisUtil;
+import com.beteam.willu.jwt.JwtUtil;
 import com.beteam.willu.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
-import java.util.concurrent.TimeUnit;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j(topic = "userService")
 @Service
@@ -21,7 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
     public void userSignup(UserRequestDto requestDto) {
 
@@ -46,20 +46,32 @@ public class UserService {
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("로그인 실패 비밀번호 틀립니다!");
         }
-        jwtUtil.addJwtToCookie(jwtUtil.createAccessToken(username), response);
+        //토큰 생성
+        String accessToken = jwtUtil.createAccessToken(username);
+        String refreshToken = jwtUtil.createRefreshToken(username);
+        // refreshToken redis 저장
+        log.info("refresh token: " + refreshToken);
+        redisUtil.saveRefreshToken(username, refreshToken);
+        //redisUtil.saveRefreshToken(accessToken, refreshToken);
+        // accessToken cookie 저장
+        log.info("access token: " + accessToken);
+        jwtUtil.addJwtToCookie(accessToken, response);
 
     }
 
-    public void logout(String accessToken) {
-        accessToken = URLDecoder.decode(accessToken).substring(7);
-        log.info(accessToken);
-        //엑세스 토큰 남은 유효시간
-        Long expiration = jwtUtil.getExpiration(accessToken);
-        log.info("logout 진행 중. 토큰 남은 유효시간: " + expiration);
+    public void logout(String accessToken, HttpServletResponse response, String username) {
+        //쿠키에서 가져온 토큰추출
+        accessToken = URLDecoder.decode(accessToken, StandardCharsets.UTF_8).substring(7);
+        log.info("accessToken 값: " + accessToken);
 
-        //Redis Cache 에 저장
-        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
-
+        if (redisUtil.getRefreshToken(username) != null) {
+            log.info("로그아웃 시 리프레시 토큰이 존재하면 지워준다.");
+            redisUtil.deleteRefreshToken(username);
+        }
+        log.info("액세스 토큰 블랙리스트로 저장 : " + accessToken);
+        redisUtil.addBlackList(accessToken, jwtUtil.getExpiration(accessToken));
+        //쿠키 삭제
+        jwtUtil.expireCookie(response);
     }
 
     // 유저 조회 (프로파일)
@@ -77,8 +89,10 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
-        User user = findUser(id);
+    public void deleteUser(Long id, User user) {
+        if (!id.equals(user.getId()))
+            throw new IllegalArgumentException("본인이 아닙니다. 탈퇴할 수 없습니다.");
+
         userRepository.delete(user);
     }
 
