@@ -25,7 +25,6 @@ public interface PostService {
     PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username);
 
     /**
-     *
      * @param id    삭제할 게시글 아이디
      * @param user  게시글 작성 유저
      */
