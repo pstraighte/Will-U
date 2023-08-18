@@ -1,6 +1,7 @@
 package com.beteam.willu.post;
 
 import com.beteam.willu.common.Timestamped;
+import com.beteam.willu.user.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

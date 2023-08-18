@@ -43,6 +43,9 @@ dependencies {
     // json
     implementation 'org.json:json:20230227'
 
+    //thymeleaf
+    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+
 
 }
 

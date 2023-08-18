@@ -1,14 +1,11 @@
 package com.beteam.willu.post;
 
+import com.beteam.willu.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.sql.Update;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.RejectedExecutionException;
 
 @Service
@@ -57,6 +54,8 @@ public class PostServiceImpl implements PostService {
         }
         post.update(postRequestDto);
         postRepository.save(post);
+
+        return new PostResponseDto(post);
     }
 
     // 게시글 삭제

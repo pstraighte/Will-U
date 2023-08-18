@@ -14,4 +14,6 @@ public class UserRequestDto {
 
     private String nickname;
 
+    private String email;
+
 }

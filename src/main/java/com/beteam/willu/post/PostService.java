@@ -3,6 +3,8 @@ package com.beteam.willu.post;
 //import org.springframework.data.domain.Page;
 //import org.springframework.data.domain.Pageable;
 
+import com.beteam.willu.user.User;
+
 import java.util.List;
 
 public interface PostService {
@@ -24,9 +26,9 @@ public interface PostService {
     PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username);
 
     /**
-     *
-     * @param id    삭제할 게시글 아이디
-     * @param user  게시글 작성 유저
+     * @param id   삭제할 게시글 아이디
+     * @param user 게시글 작성 유저
+     * @return
      */
     void deletePost(Long id, User user);
 
