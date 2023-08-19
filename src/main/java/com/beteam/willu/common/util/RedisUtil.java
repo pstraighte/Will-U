@@ -1,4 +1,4 @@
-package com.beteam.willu.common;
+package com.beteam.willu.common.util;
 
 import com.beteam.willu.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;

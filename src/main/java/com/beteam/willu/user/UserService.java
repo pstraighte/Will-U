@@ -1,6 +1,6 @@
 package com.beteam.willu.user;
 
-import com.beteam.willu.common.RedisUtil;
+import com.beteam.willu.common.util.RedisUtil;
 import com.beteam.willu.jwt.JwtUtil;
 import com.beteam.willu.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
@@ -41,21 +41,26 @@ public class UserService {
     }
 
     public void userLogin(UserRequestDto requestDto, HttpServletResponse response) {
+        log.info("userService login 진입");
         String username = requestDto.getUsername();
         User user = findUser(username);
+
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("로그인 실패 비밀번호 틀립니다!");
         }
+
         //토큰 생성
         String accessToken = jwtUtil.createAccessToken(username);
         String refreshToken = jwtUtil.createRefreshToken(username);
-        // refreshToken redis 저장
+
         log.info("refresh token: " + refreshToken);
-        redisUtil.saveRefreshToken(username, refreshToken);
-        //redisUtil.saveRefreshToken(accessToken, refreshToken);
-        // accessToken cookie 저장
         log.info("access token: " + accessToken);
-        jwtUtil.addJwtToCookie(accessToken, response);
+        // refreshToken redis 저장
+        redisUtil.saveRefreshToken(username, refreshToken);
+
+        // accessToken, refreshToken cookie 저장
+        jwtUtil.addJwtToCookie(accessToken, JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(refreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
 
     }
 
@@ -71,7 +76,7 @@ public class UserService {
         log.info("액세스 토큰 블랙리스트로 저장 : " + accessToken);
         redisUtil.addBlackList(accessToken, jwtUtil.getExpiration(accessToken));
         //쿠키 삭제
-        jwtUtil.expireCookie(response);
+        jwtUtil.expireCookie(response, JwtUtil.AUTHORIZATION_HEADER);
     }
 
     // 유저 조회 (프로파일)
