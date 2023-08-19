@@ -1,17 +1,13 @@
 package com.beteam.willu.post;
 
 import com.beteam.willu.common.ApiResponseDto;
-import com.beteam.willu.exception.RecruitmentStatusException;
-import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.common.exception.RecruitmentStatusException;
+import com.beteam.willu.common.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-//import org.springframework.ui.Model;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,9 +51,9 @@ public class PostController {
     //게시글 수정
     @PutMapping("/posts/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails){
-            PostResponseDto result = postService.updatePost(id, postRequestDto, userDetails.getUsername());
-            return ResponseEntity.status((HttpStatus.OK)).body(result);
+                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        PostResponseDto result = postService.updatePost(id, postRequestDto, userDetails.getUsername());
+        return ResponseEntity.status((HttpStatus.OK)).body(result);
     }
 
     // 게시글 삭제
@@ -65,9 +61,9 @@ public class PostController {
     public ResponseEntity<ApiResponseDto> deletePost(@PathVariable Long id,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {
-           postService.deletePost(id, userDetails.getUser());
+            postService.deletePost(id, userDetails.getUser());
 
-            return ResponseEntity.ok().body(new ApiResponseDto("게시글이 삭제되었습니다",200));
+            return ResponseEntity.ok().body(new ApiResponseDto("게시글이 삭제되었습니다", 200));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
         }
@@ -76,10 +72,10 @@ public class PostController {
     // 모집완료 -> 모집중
     @PatchMapping("/posts/{id}/activate-recruitment")
     public ResponseEntity<ApiResponseDto> activateRecruitment(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                            @PathVariable Long id) {
+                                                              @PathVariable Long id) {
         try {
             postService.activateRecruitment(id, userDetails.getUser());
-            return ResponseEntity.ok().body(new ApiResponseDto("모집중으로 변경",200));
+            return ResponseEntity.ok().body(new ApiResponseDto("모집중으로 변경", 200));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
         } catch (RecruitmentStatusException e) {
@@ -89,11 +85,11 @@ public class PostController {
 
     // 모집중 -> 모집완료
     @PatchMapping("/posts/{id}/complete-recruitment")
-    public ResponseEntity<ApiResponseDto> completeRecruitment (@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                            @PathVariable Long id) {
+    public ResponseEntity<ApiResponseDto> completeRecruitment(@AuthenticationPrincipal UserDetailsImpl userDetails,
+                                                              @PathVariable Long id) {
         try {
             postService.completeRecruitment(id, userDetails.getUser());
-            return ResponseEntity.ok().body(new ApiResponseDto("모집완료",200));
+            return ResponseEntity.ok().body(new ApiResponseDto("모집완료", 200));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
         } catch (RecruitmentStatusException e) {

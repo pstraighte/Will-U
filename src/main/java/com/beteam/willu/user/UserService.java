@@ -1,8 +1,8 @@
 package com.beteam.willu.user;
 
-import com.beteam.willu.common.util.RedisUtil;
-import com.beteam.willu.jwt.JwtUtil;
-import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.redis.RedisUtil;
+import com.beteam.willu.common.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

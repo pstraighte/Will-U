@@ -1,6 +1,6 @@
-package com.beteam.willu.jwt;
+package com.beteam.willu.common.jwt;
 
-import com.beteam.willu.common.util.RedisUtil;
+import com.beteam.willu.common.redis.RedisUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -31,13 +31,11 @@ public class JwtUtil {
     public static final String BEARER_PREFIX = "Bearer ";
 
     // Access 토큰 만료시간
-    public static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 1000L; // 2분(재발급확인용)
+    public static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 30 * 1000L; // 2분(재발급확인용)
 
     // Refresh 토큰 만료 시간
-    public static final long REFRESH_TOKEN_EXPIRE_TIME = 3 * 24 * 60 * 60 * 1000L; // 3일
-
-    //    @Value("${jwt.secret.key}") // Base64 Encode 한 SecretKey
-//    private String secretKey;
+    public static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L; // 3일
+    
     private Key key;
     private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     private final RedisUtil redisUtil;
@@ -74,31 +72,6 @@ public class JwtUtil {
                         .signWith(key, signatureAlgorithm) // 암호화 알고리즘
                         .compact();
     }
-
-
-    // access token 재발급
-/*    public String reissueAccessToken(String token) {
-        log.info("액세스 토큰 재발급");
-        //access token이 만료되었거나 거의 임박했을 때
-        if (!validateToken(token)) {
-
-            *//*Claims info = getUserInfoFromToken(token);
-            String username = info.getSubject();
-            log.info("재발급 요청자 : " + username);*/
-    /*
-
-            // refresh token 가져오기
-            String refreshToken = redisUtil.getRefreshToken(username);
-            log.info("가져온 refresh token: " + refreshToken);
-
-            // refresh token 존재하고 유효하다면
-            if (StringUtils.hasText(refreshToken) && validateToken(substringToken(refreshToken))) {
-                log.info("리프레시 토큰 존재하고 유효함");
-                return createAccessToken(username);
-            }
-        }
-        return null;
-    }*/
 
     // JWT Cookie 에 저장
     public void addJwtToCookie(String token, String header, HttpServletResponse res) {
@@ -162,6 +135,24 @@ public class JwtUtil {
         return null;
     }
 
+    public String reissue(String refreshToken, HttpServletResponse response) {
+        String username = getUserInfoFromToken(refreshToken).getSubject();
+        // cookie 에서 가져온 refresh token 과 redis 의 refresh token 비교
+        String redisRT = redisUtil.getRefreshToken(username);
+        if (!StringUtils.hasText(redisRT)) {
+            throw new NullPointerException(username + " 에 해당하는 redis refresh token 존재하지 않습니다. 다시 로그인하세요.");
+        }
+        if (!refreshToken.equals(redisRT.substring(7))) {
+            throw new IllegalArgumentException("refresh 토큰이 일치하지 않습니다.");
+        }
+        //재발급 진행
+        String newAccessToken = createAccessToken(username);
+        expireCookie(response, JwtUtil.AUTHORIZATION_HEADER);
+        addJwtToCookie(newAccessToken, JwtUtil.AUTHORIZATION_HEADER, response);
+        return newAccessToken.substring(7);
+
+    }
+
     //jwt 토큰의 남은 유효시간
     public Long getExpiration(String accessToken) {
         Date expiration = getUserInfoFromToken(accessToken).getExpiration();
@@ -169,10 +160,6 @@ public class JwtUtil {
         return expiration.getTime() - now;
     }
 
-    public Boolean isTokenExpired(String token) {
-        final Date expiration = getUserInfoFromToken(token).getExpiration();
-        return expiration.before(new Date());
-    }
 
     public void expireCookie(HttpServletResponse response, String cookieHeader) {
         Cookie cookie = new Cookie(cookieHeader, null);

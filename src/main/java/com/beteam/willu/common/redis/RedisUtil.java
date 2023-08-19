@@ -1,6 +1,6 @@
-package com.beteam.willu.common.util;
+package com.beteam.willu.common.redis;
 
-import com.beteam.willu.jwt.JwtUtil;
+import com.beteam.willu.common.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;

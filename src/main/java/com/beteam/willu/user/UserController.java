@@ -2,7 +2,7 @@ package com.beteam.willu.user;
 
 
 import com.beteam.willu.common.ApiResponseDto;
-import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.common.security.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

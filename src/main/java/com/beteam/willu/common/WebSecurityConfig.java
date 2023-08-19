@@ -1,9 +1,8 @@
-package com.beteam.willu.common.config;
+package com.beteam.willu.common;
 
-import com.beteam.willu.common.util.RedisUtil;
-import com.beteam.willu.jwt.JwtUtil;
-import com.beteam.willu.security.JwtAuthorizationFilter;
-import com.beteam.willu.security.UserDetailsServiceImpl;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.security.JwtAuthorizationFilter;
+import com.beteam.willu.common.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -25,7 +24,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final RedisUtil redisUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
 
@@ -42,7 +40,7 @@ public class WebSecurityConfig {
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         // return 인증
-        return new JwtAuthorizationFilter(jwtUtil, redisUtil, userDetailsService);
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
     @Bean

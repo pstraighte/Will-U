@@ -1,7 +1,7 @@
 package com.beteam.willu.post;
 
 
-import com.beteam.willu.exception.RecruitmentStatusException;
+import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

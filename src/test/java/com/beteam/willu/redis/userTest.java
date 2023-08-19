@@ -45,7 +45,7 @@ public class userTest {
     @Test
     @Disabled
     @DisplayName(value = "redis 입력 테스트")
-    public void testStrings() throws Exception {
+    public void testStrings() {
 
         //given
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();

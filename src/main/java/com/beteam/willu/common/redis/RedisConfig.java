@@ -1,4 +1,4 @@
-package com.beteam.willu.common.config;
+package com.beteam.willu.common.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
