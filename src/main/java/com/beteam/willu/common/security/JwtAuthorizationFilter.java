@@ -30,7 +30,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String accessToken = jwtUtil.getTokenFromRequest(request, JwtUtil.AUTHORIZATION_HEADER);
-        String refreshToken = null;
+        String refreshToken;
         //Access 토큰이 존재하면
         if (StringUtils.hasText(accessToken)) {
             log.info(accessToken);
@@ -45,7 +45,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 }
                 //가져온 토큰 검증
                 if (jwtUtil.validateToken(refreshToken)) {
-                    jwtUtil.reissue(refreshToken, response);
+                    accessToken = jwtUtil.reissue(refreshToken, response);
                 }
             }
 
