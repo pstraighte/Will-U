@@ -1,6 +1,10 @@
-package com.beteam.willu.user;
+package com.beteam.willu.socialLogin;
 
 import com.beteam.willu.security.JwtUtil;
+import com.beteam.willu.socialLogin.GoogleUserInfoDto;
+import com.beteam.willu.socialLogin.KakaoUserInfoDto;
+import com.beteam.willu.user.User;
+import com.beteam.willu.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,7 +27,7 @@ import java.util.UUID;
 @Slf4j(topic = "KAKAO Login")
 @Service
 @RequiredArgsConstructor
-public class UserKakaoService {
+public class SocialKakaoService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -38,10 +42,10 @@ public class UserKakaoService {
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
         //3, 필요시 회원가입
-        User kakaoUser =  registerKakaoUserIfNeeded(kakaoUserInfo);
+        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
 
         // 4. JWT 토큰 반환
-        String createToken =  jwtUtil.createToken(kakaoUser.getUsername());
+        String createToken = jwtUtil.createAccessToken(kakaoUser.getUsername());
 
         // 쿠키 저장
         jwtUtil.addJwtToCookie(createToken, response);
@@ -65,7 +69,7 @@ public class UserKakaoService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "???");
+        body.add("client_id", "dbbecd2046b9dd7965998b3f5bfdf389");
         body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 
@@ -82,6 +86,7 @@ public class UserKakaoService {
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
+        System.out.println("kakaojsonNode = " + jsonNode);
         return jsonNode.get("access_token").asText();
     }
 
@@ -148,8 +153,8 @@ public class UserKakaoService {
 
                 // email: kakao email
                 String email = kakaoUserInfo.getEmail();
-
-                kakaoUser = User.builder().username(email).password(encodedPassword).email(email).kakaoId(kakaoId).build();
+                String userNickname = kakaoUserInfo.getNickname();
+                kakaoUser = User.builder().username(email).nickname(userNickname).password(encodedPassword).email(email).kakaoId(kakaoId).build();
             }
 
             userRepository.save(kakaoUser);
@@ -159,4 +164,5 @@ public class UserKakaoService {
 
         return kakaoUser;
     }
+
 }

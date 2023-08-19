@@ -53,6 +53,12 @@ public class User extends Timestamped {
     @Column(name = "kakaoId")
     private Long kakaoId;
 
+    @Column(name = "googleId")
+    private String googleId;
+
+    @Column(name = "naverId")
+    private String naverId;
+
     @Transactional
     public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
         this.username = updateRequestDto.getUsername();
@@ -66,6 +72,16 @@ public class User extends Timestamped {
     // 해당 메소드를 사용한 곳에서 업데이트한 유저 데이터를 바로 사용
     public User kakaoIdUpdate(Long kakaoId) {
         this.kakaoId = kakaoId;
+        return this;
+    }
+
+    public User googleIdUpdate(String googleId) {
+        this.googleId = googleId;
+        return this;
+    }
+
+    public User naverIdUpdate(String naverId) {
+        this.naverId = naverId;
         return this;
     }
 }

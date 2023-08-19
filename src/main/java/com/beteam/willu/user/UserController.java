@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    private final UserKakaoService userKakaoService;
     @PostMapping("/users/signup")
     public ResponseEntity<ApiResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
         userService.userSignup(requestDto);
@@ -59,20 +58,6 @@ public class UserController {
     public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(new ApiResponseDto("회원 탈퇴 성공", 200));
-    }
-
-    // 카카오 토큰 요청
-    // 카카오 로그인이 아닌 페이지 로그인 정보와 비교할 정보 정하기 ex) email
-    @GetMapping("/users/kakao/callback")
-    public ResponseEntity<ApiResponseDto> kakaoiLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-       userKakaoService.kakaoLogin(code, response);
-       return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
-    }
-
-    // 로그인 페이지
-    @GetMapping("/users/user-login")
-    public String getLoginPage() {
-        return "login";
     }
 
 
