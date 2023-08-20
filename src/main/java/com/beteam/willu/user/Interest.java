@@ -1,9 +1,12 @@
-package com.beteam.willu.interest;
+package com.beteam.willu.user;
 
 import com.beteam.willu.common.Timestamped;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -16,14 +19,14 @@ public class Interest extends Timestamped {
     private Long id;
 
     @Column(name = "reciver_id") //받는 사람
-    private Long reciver_id;
+    private Long receiver;
 
     @Column(name = "sender_id") //보내는 사람
-    private Long sender_id;
+    private Long sender;
 
-    public Interest(Long reciver_id, Long sender_id) {
-        this.reciver_id = reciver_id;
-        this.sender_id = sender_id;
+    public Interest(Long receiver, Long sender) {
+        this.receiver = receiver;
+        this.sender = sender;
     }
 
 }

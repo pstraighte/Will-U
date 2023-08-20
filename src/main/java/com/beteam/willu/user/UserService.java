@@ -2,6 +2,7 @@ package com.beteam.willu.user;
 
 import com.beteam.willu.security.JwtUtil;
 import com.beteam.willu.security.UserDetailsImpl;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j(topic = "userService")
@@ -19,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final InterestRepository interestRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
@@ -88,6 +91,28 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional  //관심유저 추가
+    public void addInterest(Long id, User user) {
+        User receiver = findUser(id);
+
+        if (interestRepository.existsByReceiverAndSender(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
+        } else {
+            Interest interest= new Interest(receiver.getId(), user.getId());
+            interestRepository.save(interest);
+        }
+    }
+    @Transactional
+    public void removeInterest(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Interest> interestOptional = interestRepository.findByReceiverAndSender(receiver.getId(), user.getId());
+        if (interestOptional.isPresent()) {
+            interestRepository.delete(interestOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
+        }
+    }
 
     private User findUser(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
