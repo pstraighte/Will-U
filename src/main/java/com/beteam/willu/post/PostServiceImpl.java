@@ -56,7 +56,6 @@ public class PostServiceImpl implements PostService {
     // 게시글 수정
     @Transactional
     @Override
-    @Transactional
     public PostResponseDto updatePost(Long id, PostRequestDto postRequestDto, String username) {
         Post post = findPost(id);
         if(!post.getUser().getUsername().equals(username)){
