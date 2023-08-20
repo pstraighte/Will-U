@@ -22,6 +22,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final InterestRepository interestRepository;
+    private final BlacklistRepository blacklistRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisTemplate<String, String> redisTemplate;
@@ -113,7 +114,30 @@ public class UserService {
             throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
         }
     }
+    @Transactional //차단 유저 추가
+    public void addBlacklist(Long id, User user) {
+        User receiver = findUser(id);
 
+        if (blacklistRepository.existsByReceiverAndSender(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 차단된 유저 입니다.");
+        } else {
+            Blacklist blacklist= new Blacklist(receiver.getId(), user.getId());
+            blacklistRepository.save(blacklist);
+        }
+    }
+
+    @Transactional  //차단 유저 해제
+    public void removeBlacklist(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverAndSender(receiver.getId(), user.getId());
+        if (blacklistOptional.isPresent()) {
+            blacklistRepository.delete(blacklistOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 차단해제 된 유저 입니다.");
+        }
+
+    }
     private User findUser(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
     }

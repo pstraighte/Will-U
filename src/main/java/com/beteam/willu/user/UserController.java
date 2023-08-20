@@ -99,4 +99,25 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("관심 유저를 삭제했습니다.", HttpStatus.ACCEPTED.value()));
     }
 
+    //차단 유저 추가
+    @PostMapping("/blacklist/{id}")
+    public ResponseEntity<ApiResponseDto> addBlacklist(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.addBlacklist(id, userDetails.getUser());
+        } catch (DuplicateRequestException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("해당 유저를 차단했습니다", HttpStatus.ACCEPTED.value()));
+    }
+
+    //차단 유저 해제
+    @DeleteMapping("/blacklist/{id}")
+    public ResponseEntity<ApiResponseDto> removeBlacklist(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.removeBlacklist(id, userDetails.getUser());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("차단을 해체했습니다.", HttpStatus.ACCEPTED.value()));
+    }
 }
