@@ -36,9 +36,9 @@ public class SocialLoginController {
 
     //네이버 토큰 요청
     @GetMapping("/users/naver/callback")
-    public void naverLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
+    public ResponseEntity<ApiResponseDto> naverLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
         socialNaverService.naverLogin(code,response);
-//        return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
+        return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
     }
 
 
