@@ -3,6 +3,7 @@ package com.beteam.willu.user;
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Slf4j(topic = "userService")
 @Service
@@ -19,6 +21,8 @@ import java.nio.charset.StandardCharsets;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final InterestRepository interestRepository;
+    private final BlacklistRepository blacklistRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final RedisUtil redisUtil;
@@ -108,7 +112,52 @@ public class UserService {
         userRepository.delete(user);
     }
 
+    @Transactional  //관심유저 추가
+    public void addInterest(Long id, User user) {
+        User receiver = findUser(id);
 
+        if (interestRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
+        } else {
+            Interest interest= new Interest(receiver, user);
+            interestRepository.save(interest);
+        }
+    }
+    @Transactional
+    public void removeInterest(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Interest> interestOptional = interestRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
+        if (interestOptional.isPresent()) {
+            interestRepository.delete(interestOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
+        }
+    }
+    @Transactional //차단 유저 추가
+    public void addBlacklist(Long id, User user) {
+        User receiver = findUser(id);
+
+        if (blacklistRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 차단된 유저 입니다.");
+        } else {
+            Blacklist blacklist= new Blacklist(receiver, user);
+            blacklistRepository.save(blacklist);
+        }
+    }
+
+    @Transactional  //차단 유저 해제
+    public void removeBlacklist(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
+        if (blacklistOptional.isPresent()) {
+            blacklistRepository.delete(blacklistOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 차단해제 된 유저 입니다.");
+        }
+
+    }
     private User findUser(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
     }
