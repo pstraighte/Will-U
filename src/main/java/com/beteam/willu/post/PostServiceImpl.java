@@ -59,8 +59,8 @@ public class PostServiceImpl implements PostService {
         post.update(postRequestDto);
         return new PostResponseDto(post);
     }
-    // 게시글 삭제
 
+    // 게시글 삭제
     @Override
     public void deletePost(Long id, User user) {
         Post post = findPost(id);

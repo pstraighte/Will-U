@@ -29,6 +29,10 @@ public class User extends Timestamped {
     @Column(name = "nickname", nullable = false, unique = true, length = 40)
     private String nickname;
 
+    // 이메일
+    @Column(name = "email",nullable = false, unique = true)
+    private String email;
+
     // 번호
     @Column(name = "phoneNumber")
     private String phoneNumber;
@@ -46,6 +50,9 @@ public class User extends Timestamped {
     @Builder.Default
     private Long score = 3L;
 
+    @Column(name = "kakaoId")
+    private Long kakaoId;
+
     @Transactional
     public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
         this.username = updateRequestDto.getUsername();
@@ -53,6 +60,13 @@ public class User extends Timestamped {
         this.phoneNumber = updateRequestDto.getPhoneNumber();
         this.area = updateRequestDto.getArea();
         this.picture = updateRequestDto.getPicture();
+    }
+
+    // 카카오 id 를 업데이트
+    // 해당 메소드를 사용한 곳에서 업데이트한 유저 데이터를 바로 사용
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
     }
 }
 
