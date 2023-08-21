@@ -5,9 +5,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.HashSet;
-import java.util.Set;
-
 @Entity
 @Getter
 @NoArgsConstructor
@@ -18,13 +15,15 @@ public class Interest extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "reciver_id") //받는 사람
-    private Long receiver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id") //받는 사람
+    private User receiver;
 
-    @Column(name = "sender_id") //보내는 사람
-    private Long sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender_id") //보내는 사람
+    private User sender;
 
-    public Interest(Long receiver, Long sender) {
+    public Interest(User receiver, User sender) {
         this.receiver = receiver;
         this.sender = sender;
     }

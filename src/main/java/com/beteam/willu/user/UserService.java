@@ -3,13 +3,10 @@ package com.beteam.willu.user;
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.security.UserDetailsImpl;
 import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j(topic = "userService")
 @Service
@@ -119,10 +115,10 @@ public class UserService {
     public void addInterest(Long id, User user) {
         User receiver = findUser(id);
 
-        if (interestRepository.existsByReceiverAndSender(receiver.getId(), user.getId())) {
+        if (interestRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
             throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
         } else {
-            Interest interest= new Interest(receiver.getId(), user.getId());
+            Interest interest= new Interest(receiver, user);
             interestRepository.save(interest);
         }
     }
@@ -130,7 +126,7 @@ public class UserService {
     public void removeInterest(Long id, User user) {
         User receiver = findUser(id);
 
-        Optional<Interest> interestOptional = interestRepository.findByReceiverAndSender(receiver.getId(), user.getId());
+        Optional<Interest> interestOptional = interestRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
         if (interestOptional.isPresent()) {
             interestRepository.delete(interestOptional.get());
         } else {
@@ -141,10 +137,10 @@ public class UserService {
     public void addBlacklist(Long id, User user) {
         User receiver = findUser(id);
 
-        if (blacklistRepository.existsByReceiverAndSender(receiver.getId(), user.getId())) {
+        if (blacklistRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
             throw new DuplicateRequestException("이미 차단된 유저 입니다.");
         } else {
-            Blacklist blacklist= new Blacklist(receiver.getId(), user.getId());
+            Blacklist blacklist= new Blacklist(receiver, user);
             blacklistRepository.save(blacklist);
         }
     }
@@ -153,7 +149,7 @@ public class UserService {
     public void removeBlacklist(Long id, User user) {
         User receiver = findUser(id);
 
-        Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverAndSender(receiver.getId(), user.getId());
+        Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
         if (blacklistOptional.isPresent()) {
             blacklistRepository.delete(blacklistOptional.get());
         } else {

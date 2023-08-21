@@ -15,13 +15,17 @@ public class Blacklist extends Timestamped {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "reciver_id") //받는 사람
-    private Long receiver;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "receiver_id") //받는 사람
+//    @Column(name = "receiver_id")
+    private User receiver;
 
-    @Column(name = "sender_id") //보내는 사람
-    private Long sender;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sender;_id") //보내는 사람
+//    @Column(name = "sender_id")
+    private User sender;
 
-    public Blacklist(Long receiver, Long sender) {
+    public Blacklist(User receiver, User sender) {
         this.receiver = receiver;
         this.sender = sender;
     }
