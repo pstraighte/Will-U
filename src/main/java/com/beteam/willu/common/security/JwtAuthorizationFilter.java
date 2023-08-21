@@ -1,13 +1,13 @@
-package com.beteam.willu.security;
+package com.beteam.willu.common.security;
 
-import com.beteam.willu.exception.BlackListedTokenException;
+import com.beteam.willu.common.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -19,46 +19,45 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Slf4j(topic = "JWT 검증 및 인가")
+@RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisTemplate redisTemplate;
 
-    public JwtAuthorizationFilter(JwtUtil jwtUtil, UserDetailsServiceImpl userDetailsService, RedisTemplate redisTemplate) {
-        this.jwtUtil = jwtUtil;
-        this.userDetailsService = userDetailsService;
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String tokenValue = jwtUtil.getTokenFromRequest(request);
-        try {
-            if (StringUtils.hasText(tokenValue)) {
-                // JWT 토큰 substring
-                tokenValue = jwtUtil.substringToken(tokenValue);
-                log.info(tokenValue);
+        String accessToken = jwtUtil.getTokenFromRequest(request, JwtUtil.AUTHORIZATION_HEADER);
+        String refreshToken;
+        //Access 토큰이 존재하면
+        if (StringUtils.hasText(accessToken)) {
+            log.info(accessToken);
 
-                //로그아웃된 토큰인지 검사
-                validBlackToken(tokenValue);
-
-                if (!jwtUtil.validateToken(tokenValue)) {
-                    log.error("Token Error");
-                    return;
+            // access token 이 유효하지 않을 때
+            if (!jwtUtil.validateToken(accessToken)) {
+                log.info("access token 만료");
+                //refresh token request cookie 에서 가져오기
+                refreshToken = jwtUtil.getTokenFromRequest(request, JwtUtil.REFRESH_TOKEN_HEADER);
+                if (!StringUtils.hasText(refreshToken)) {
+                    throw new IllegalArgumentException("refresh 토큰이 존재하지 않습니다.");
                 }
-
-                Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
-
-                setAuthentication(info.getSubject());
-
+                //가져온 토큰 검증
+                if (jwtUtil.validateToken(refreshToken)) {
+                    accessToken = jwtUtil.reissue(refreshToken, response);
+                }
             }
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return;
-        }
 
+            Claims info = jwtUtil.getUserInfoFromToken(accessToken);
+            try {
+                log.info(info.getSubject());
+                setAuthentication(info.getSubject());
+            } catch (Exception e) {
+                log.info("오류 발생");
+                return;
+            }
+        }
         filterChain.doFilter(request, response);
     }
 
@@ -77,13 +76,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 
-    //레디스에 존재하는 토큰인지 확인
-    private void validBlackToken(String accessToken) {
-        //Redis 에 있는 엑세스 토큰인 경우 로그아웃 처리된 엑세스 토큰임.
-        String blackToken = (String) redisTemplate.opsForValue().get(accessToken);
-        log.info(blackToken);
-        if (StringUtils.hasText(blackToken))
-            throw new BlackListedTokenException("로그아웃 처리된 엑세스 토큰입니다.");
-    }
 
 }

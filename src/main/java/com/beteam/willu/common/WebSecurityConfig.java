@@ -1,13 +1,12 @@
 package com.beteam.willu.common;
 
-import com.beteam.willu.security.JwtAuthorizationFilter;
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.security.UserDetailsServiceImpl;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.security.JwtAuthorizationFilter;
+import com.beteam.willu.common.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -26,7 +25,7 @@ public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
-    private final RedisTemplate redisTemplate;
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -41,7 +40,7 @@ public class WebSecurityConfig {
     @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         // return 인증
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService, redisTemplate);
+        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
     }
 
     @Bean
@@ -58,7 +57,7 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
                         .requestMatchers("/").permitAll() // 메인 페이지 요청
-                        .requestMatchers("/api/users/**").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
+                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/users/logout").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
                         .anyRequest().authenticated()
         );
         // form 로그인 사용하지 않음
