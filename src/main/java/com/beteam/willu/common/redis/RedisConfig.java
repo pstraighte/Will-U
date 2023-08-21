@@ -1,4 +1,4 @@
-package com.beteam.willu.common;
+package com.beteam.willu.common.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,10 +14,6 @@ public class RedisConfig {
     private String host;
     @Value("${spring.data.redis.port}")
     private int port;
-//    @Value("${spring.data.redis.password}")
-//    private String password;
-//    @Value("${spring.data.redis.username}")
-//    private String username;
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {

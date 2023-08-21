@@ -2,11 +2,6 @@ package com.beteam.willu.user;
 
 
 import com.beteam.willu.common.ApiResponseDto;
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.security.UserDetailsImpl;
-import jakarta.servlet.http.Cookie;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +29,9 @@ public class UserController {
 
     //로그아웃 확인용 API  redis 에 토큰을 추가하는 행위임으로 POST 사용
     @PostMapping("/users/logout")
-    public ResponseEntity<ApiResponseDto> logout(@CookieValue(name = "Authorization") String accessToken, HttpServletResponse response) {
-        userService.logout(accessToken);
-        //쿠키 삭제
-        Cookie kc = new Cookie("Authorization", null); // choiceCookieName(쿠키 이름)에 대한 값을 null로 지정
-        kc.setMaxAge(0); // 유효시간을 0으로 설정
-        response.addCookie(kc); // 응답 헤더에 추가해서 없어지도록 함
+    public ResponseEntity<ApiResponseDto> logout(@CookieValue(name = "Authorization") String accessToken, HttpServletResponse response, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.logout(accessToken, response, userDetails.getUsername());
+
         return ResponseEntity.ok().body(new ApiResponseDto("로그아웃 성공", 200));
     }
 
@@ -56,8 +48,8 @@ public class UserController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<ApiResponseDto> deleteUser(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.deleteUser(id, userDetails.getUser());
         return ResponseEntity.ok(new ApiResponseDto("회원 탈퇴 성공", 200));
     }
 
