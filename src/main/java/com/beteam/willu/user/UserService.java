@@ -83,6 +83,7 @@ public class UserService {
         redisUtil.addBlackList(accessToken, jwtUtil.getExpiration(accessToken));
         //쿠키 삭제
         jwtUtil.expireCookie(response, JwtUtil.AUTHORIZATION_HEADER);
+        jwtUtil.expireCookie(response, JwtUtil.REFRESH_TOKEN_HEADER);
     }
 
     // 유저 조회 (프로파일)

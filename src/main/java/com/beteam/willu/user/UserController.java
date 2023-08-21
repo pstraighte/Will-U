@@ -2,6 +2,8 @@ package com.beteam.willu.user;
 
 
 import com.beteam.willu.common.ApiResponseDto;
+import com.beteam.willu.common.security.UserDetailsImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
     private final UserKakaoService userKakaoService;
+
     @PostMapping("/users/signup")
     public ResponseEntity<ApiResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
         userService.userSignup(requestDto);
@@ -57,8 +60,8 @@ public class UserController {
     // 카카오 로그인이 아닌 페이지 로그인 정보와 비교할 정보 정하기 ex) email
     @GetMapping("/users/kakao/callback")
     public ResponseEntity<ApiResponseDto> kakaoiLogin(@RequestParam String code, HttpServletResponse response) throws JsonProcessingException {
-       userKakaoService.kakaoLogin(code, response);
-       return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
+        userKakaoService.kakaoLogin(code, response);
+        return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
     }
 
     // 로그인 페이지

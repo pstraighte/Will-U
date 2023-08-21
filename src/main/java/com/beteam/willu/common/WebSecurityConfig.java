@@ -56,7 +56,7 @@ public class WebSecurityConfig {
         http.authorizeHttpRequests((authorizeHttpRequests) -> // 이 코드 자체가 인가를 처리하는 부분
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
-                        .requestMatchers("/").permitAll() // 메인 페이지 요청
+                        .requestMatchers("/api/users/**").permitAll() // 메인 페이지 요청
                         .requestMatchers("/api/users/signup", "/api/users/login", "/api/users/logout").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
                         .anyRequest().authenticated()
         );
