@@ -32,7 +32,7 @@ public class userTest {
     @BeforeAll
     public void init() {
         user = User.builder().username("sim34121").password("123").nickname("nick1").build();
-        requestDto = new UserRequestDto(user.getUsername(), user.getPassword(), user.getNickname());
+        requestDto = new UserRequestDto(user.getUsername(), user.getPassword(), user.getNickname(),user.getEmail());
     }
 
     @Test
