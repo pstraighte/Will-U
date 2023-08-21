@@ -1,6 +1,8 @@
 package com.beteam.willu.post;
 
 import com.beteam.willu.common.ApiResponseDto;
+import com.beteam.willu.common.exception.RecruitmentStatusException;
+import com.beteam.willu.common.security.UserDetailsImpl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

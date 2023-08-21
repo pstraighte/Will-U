@@ -2,8 +2,12 @@ package com.beteam.willu.user;
 
 
 import com.beteam.willu.common.ApiResponseDto;
+import com.beteam.willu.common.security.UserDetailsImpl;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -67,5 +71,47 @@ public class UserController {
         return "login";
     }
 
+    //관심 유저 추가
+    @PostMapping("/interest/{id}")
+    public ResponseEntity<ApiResponseDto> addInterest(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.addInterest(id, userDetails.getUser());
+        } catch (DuplicateRequestException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("관심 유저를 추가했습니다", HttpStatus.ACCEPTED.value()));
+    }
 
+//관심 유저 삭제
+    @DeleteMapping("/interest/{id}")
+    public ResponseEntity<ApiResponseDto> removeInterest(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.removeInterest(id, userDetails.getUser());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("관심 유저를 삭제했습니다.", HttpStatus.ACCEPTED.value()));
+    }
+
+    //차단 유저 추가
+    @PostMapping("/blacklist/{id}")
+    public ResponseEntity<ApiResponseDto> addBlacklist(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.addBlacklist(id, userDetails.getUser());
+        } catch (DuplicateRequestException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("해당 유저를 차단했습니다", HttpStatus.ACCEPTED.value()));
+    }
+
+    //차단 유저 해제
+    @DeleteMapping("/blacklist/{id}")
+    public ResponseEntity<ApiResponseDto> removeBlacklist(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        try {
+            userService.removeBlacklist(id, userDetails.getUser());
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+        }
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("차단을 해체했습니다.", HttpStatus.ACCEPTED.value()));
+    }
 }

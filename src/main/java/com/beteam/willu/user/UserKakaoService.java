@@ -1,6 +1,7 @@
 package com.beteam.willu.user;
 
-import com.beteam.willu.security.JwtUtil;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.redis.RedisUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,26 +29,24 @@ public class UserKakaoService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final RedisUtil redisUtil;
     private final JwtUtil jwtUtil;
 
     public void kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         String accessToken = getToken(code);
-
         // 2. 토큰으로 카카오 API 호출 : "액세스 토큰"으로 "카카오 사용자 정보" 가져오기
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
-
         //3, 필요시 회원가입
         User kakaoUser =  registerKakaoUserIfNeeded(kakaoUserInfo);
-
         // 4. JWT 토큰 반환
-        String createToken =  jwtUtil.createToken(kakaoUser.getUsername());
-
+        String createAccessToken =  jwtUtil.createAccessToken(kakaoUser.getUsername());
+        String createRefreshToken =  jwtUtil.createRefreshToken(kakaoUser.getUsername());
+        redisUtil.saveRefreshToken(kakaoUser.getUsername(), createRefreshToken);
         // 쿠키 저장
-        jwtUtil.addJwtToCookie(createToken, response);
-
+        jwtUtil.addJwtToCookie(createAccessToken,JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(createRefreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
     }
-
     private String getToken(String code) throws JsonProcessingException {
         log.info("인가코드 : " + code);
         // 요청 URL 만들기
@@ -65,7 +64,7 @@ public class UserKakaoService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "???");
+        body.add("client_id", "dbbecd2046b9dd7965998b3f5bfdf389");
         body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 
@@ -149,7 +148,7 @@ public class UserKakaoService {
                 // email: kakao email
                 String email = kakaoUserInfo.getEmail();
 
-                kakaoUser = User.builder().username(email).password(encodedPassword).email(email).kakaoId(kakaoId).build();
+                kakaoUser = User.builder().username(email).nickname(kakaoUserInfo.getNickname()).password(encodedPassword).email(email).kakaoId(kakaoId).build();
             }
 
             userRepository.save(kakaoUser);
