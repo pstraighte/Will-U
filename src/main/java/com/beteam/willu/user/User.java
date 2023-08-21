@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -58,6 +61,7 @@ public class User extends Timestamped {
 
     @Column(name = "naverId")
     private String naverId;
+
 
     @Transactional
     public void profileUpdate(UserUpdateRequestDto updateRequestDto) {

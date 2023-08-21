@@ -48,4 +48,10 @@ public class SocialLoginController {
         return "login";
     }
 
+    // 로그인 페이지
+    @GetMapping("/users/chat")
+    public String getChatPage() {
+        return "chatting";
+    }
+
 }
