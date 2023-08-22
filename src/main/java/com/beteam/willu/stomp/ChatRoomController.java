@@ -4,6 +4,8 @@ import com.beteam.willu.security.UserDetailsImpl;
 import com.beteam.willu.stomp.dto.ChatRoomNameResponseDto;
 import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
 import com.beteam.willu.stomp.entity.Chat;
+import com.beteam.willu.stomp.entity.UserChatRoom;
+import com.beteam.willu.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +25,19 @@ public class ChatRoomController {
         chatRoomService.createRoom(id,userDetails);
     }
 
-    // 생성된 채팅룸 불러오기
+    // 사용자가 속한 채팅방(모두) 불러오기
+    @GetMapping("/chat/users/{id}")
+    public  List<UserChatRoom> getRooms(@PathVariable Long id){
+       return chatRoomService.getRooms(id);
+    }
+
+    // 사용자의 id 가져오기
+    @GetMapping("/chat/userss/{id}")
+    public Long getUser(@PathVariable String id){
+     return chatRoomService.getUser(id);
+    }
+
+    // 특정 채팅룸 불러오기
     @GetMapping("/chat/posts/{id}")
     public ChatRoomNameResponseDto getRoom(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails){
        return chatRoomService.getRoom(id, userDetails);
@@ -41,6 +55,8 @@ public class ChatRoomController {
       return chatRoomService.getChat(id);
 
     }
+
+    // 유저 초대 기능
 
 
 }

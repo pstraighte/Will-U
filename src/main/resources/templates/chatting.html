@@ -72,22 +72,24 @@
 <script>
   $(document).ready(function () {
     // 채팅내용 조회
-    $.ajax({
-      url: `/api/chat/chatRooms/2`, // 요청을 보낼 서버의 URL
-      method: 'GET', // 요청 메소드 (GET, POST 등)
-      success: function (response) {
-       console.log(response[0].chatContent);
-        $(`<div id="testChat" class="testChat">${response[0].chatContent}</div>`).appendTo(`#chatting`);
-        $(`<div id="testChat" class="testChat">${response[1].chatContent}</div>`).appendTo(`#chatting`);
-      },
-      error: function (xhr, status, error) {
-        alert("불러오기 실패")
-        console.log(xhr);
-      }
-    });
+    // $.ajax({
+    //   url: `/api/chat/chatRooms/2`, // 요청을 보낼 서버의 URL
+    //   method: 'GET', // 요청 메소드 (GET, POST 등)
+    //   success: function (response) {
+    //    console.log(response[0].chatContent);
+    //     $(`<div id="testChat" class="testChat">${response[0].chatContent}</div>`).appendTo(`#chatting`);
+    //     $(`<div id="testChat" class="testChat">${response[1].chatContent}</div>`).appendTo(`#chatting`);
+    //   },
+    //   error: function (xhr, status, error) {
+    //     alert("불러오기 실패")
+    //     console.log(xhr);
+    //   }
+    // });
 
   })
-
+  urlSearch = new URLSearchParams(location.search);
+  userName = urlSearch.get('number')
+  alert(userName);
   var roomNumber;
 
   // 쿠키값에서 유저 값 가져오기
@@ -97,7 +99,7 @@
 
     // 채팅방 조회
     $.ajax({
-      url: `/api/chat/posts/1`, // 요청을 보낼 서버의 URL
+      url: `/api/chat/posts/${userName}`, // 요청을 보낼 서버의 URL
       method: 'GET', // 요청 메소드 (GET, POST 등)
       success: function (response) {
         roomNumber=response['roomName'];
