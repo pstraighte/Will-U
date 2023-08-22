@@ -21,7 +21,7 @@ public class UserChatRoom {
     @JoinColumn(name= "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name= "chatRooms_id")
     private ChatRoom chatRooms;
 

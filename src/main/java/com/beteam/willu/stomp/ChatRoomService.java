@@ -82,4 +82,17 @@ public class ChatRoomService {
         List<Chat> chatList = chatRepository.findAllByChatRoomsId(id);
         return chatList;
     }
+
+    // 사용자의 채팅방들 조회
+    public  List<UserChatRoom> getRooms(Long id) {
+       List<UserChatRoom> userChatRooms = userChatRoomsRepository.findByUserId(id);
+
+       return userChatRooms;
+    }
+
+
+    public Long getUser(String id) {
+        Optional<User> user = userRepository.findByUsername(id);
+        return user.get().getId();
+    }
 }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+</head>
+<body>
+<div id="chatRoom" class="chatRoom">채팅방 리스트
+
+</div>
+<script>
+        // 해당 유저의 이름으로 id를 가져오고 그 아이디로 챗룸을 가져온다?
+        let token = Cookies.get('Authorization');
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userAuth = payloads.sub;
+
+
+        $.ajax({
+            url: `/api/chat/userss/${userAuth}`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                $.ajax({
+                    url: `/api/chat/users/${response}`, // 요청을 보낼 서버의 URL
+                    method: 'GET', // 요청 메소드 (GET, POST 등)
+                    success: function (response) {
+                        console.log(response);
+
+
+                        if(!response.length == 0){
+                            alert("속한 채팅방 많음")
+                        }
+
+                        $(`<div id="userChatRoom-${1}" class="userChatRoom" onclick="chatRoom(${1})">1</div>`).appendTo(`.chatRoom`);
+                        $(`<div id="userChatRoom-${2}" class="userChatRoom" onclick="chatRoom(${2})">2</div>`).appendTo(`.chatRoom`);
+
+                    },
+                    error: function (xhr, status, error) {
+                        alert("불러오기 실패")
+                        console.log(xhr);
+                    }
+                });
+            },
+            error: function (xhr, status, error) {
+                alert("불러오기 실패")
+                console.log(xhr);
+            }
+        });
+
+      function  chatRoom(id){
+          window.location.href = `/api/users/chat?number=${id}`;
+      }
+
+</script>
+</body>
+</html>

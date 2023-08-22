@@ -6,6 +6,9 @@ import com.beteam.willu.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Builder
@@ -29,5 +32,12 @@ public class ChatRoom extends Timestamped {
     // 상태
     @Column(name = "activated")
     private boolean activated;
+
+    // 게시물 삭제시 해당 채팅방, 채팅메시지, 채팅유저 삭제
+    @OneToMany(mappedBy = "chatRooms", cascade = CascadeType.REMOVE)
+    private List<UserChatRoom> userChatRoomList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "chatRooms", cascade = CascadeType.REMOVE)
+    private List<Chat> chatList = new ArrayList<>();
 
 }
