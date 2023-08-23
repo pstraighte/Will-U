@@ -1,17 +1,19 @@
 package com.beteam.willu.user;
 
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.redis.RedisUtil;
+import com.beteam.willu.common.security.UserDetailsImpl;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
-import java.util.concurrent.TimeUnit;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 @Slf4j(topic = "userService")
 @Service
@@ -19,9 +21,11 @@ import java.util.concurrent.TimeUnit;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final InterestRepository interestRepository;
+    private final BlacklistRepository blacklistRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
 
     public void userSignup(UserRequestDto requestDto) {
 
@@ -47,25 +51,42 @@ public class UserService {
     }
 
     public void userLogin(UserRequestDto requestDto, HttpServletResponse response) {
+        log.info("userService login 진입");
         String username = requestDto.getUsername();
         User user = findUser(username);
+
         if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("로그인 실패 비밀번호 틀립니다!");
         }
-        jwtUtil.addJwtToCookie(jwtUtil.createAccessToken(username), response);
+
+        //토큰 생성
+        String accessToken = jwtUtil.createAccessToken(username);
+        String refreshToken = jwtUtil.createRefreshToken(username);
+
+        log.info("refresh token: " + refreshToken);
+        log.info("access token: " + accessToken);
+        // refreshToken redis 저장
+        redisUtil.saveRefreshToken(username, refreshToken);
+
+        // accessToken, refreshToken cookie 저장
+        jwtUtil.addJwtToCookie(accessToken, JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(refreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
 
     }
 
-    public void logout(String accessToken) {
-        accessToken = URLDecoder.decode(accessToken).substring(7);
-        log.info(accessToken);
-        //엑세스 토큰 남은 유효시간
-        Long expiration = jwtUtil.getExpiration(accessToken);
-        log.info("logout 진행 중. 토큰 남은 유효시간: " + expiration);
+    public void logout(String accessToken, HttpServletResponse response, String username) {
+        //쿠키에서 가져온 토큰추출
+        accessToken = URLDecoder.decode(accessToken, StandardCharsets.UTF_8).substring(7);
+        log.info("accessToken 값: " + accessToken);
 
-        //Redis Cache 에 저장
-        redisTemplate.opsForValue().set(accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
-
+        if (redisUtil.getRefreshToken(username) != null) {
+            log.info("로그아웃 시 리프레시 토큰이 존재하면 지워준다.");
+            redisUtil.deleteRefreshToken(username);
+        }
+        log.info("액세스 토큰 블랙리스트로 저장 : " + accessToken);
+        redisUtil.addBlackList(accessToken, jwtUtil.getExpiration(accessToken));
+        //쿠키 삭제
+        jwtUtil.expireCookie(response, JwtUtil.AUTHORIZATION_HEADER);
     }
 
     // 유저 조회 (프로파일)
@@ -83,12 +104,59 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(Long id) {
-        User user = findUser(id);
+    public void deleteUser(Long id, User user) {
+        if (!id.equals(user.getId()))
+            throw new IllegalArgumentException("본인이 아닙니다. 탈퇴할 수 없습니다.");
+
         userRepository.delete(user);
     }
 
+    @Transactional  //관심유저 추가
+    public void addInterest(Long id, User user) {
+        User receiver = findUser(id);
 
+        if (interestRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
+        } else {
+            Interest interest= new Interest(receiver, user);
+            interestRepository.save(interest);
+        }
+    }
+    @Transactional
+    public void removeInterest(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Interest> interestOptional = interestRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
+        if (interestOptional.isPresent()) {
+            interestRepository.delete(interestOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
+        }
+    }
+    @Transactional //차단 유저 추가
+    public void addBlacklist(Long id, User user) {
+        User receiver = findUser(id);
+
+        if (blacklistRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
+            throw new DuplicateRequestException("이미 차단된 유저 입니다.");
+        } else {
+            Blacklist blacklist= new Blacklist(receiver, user);
+            blacklistRepository.save(blacklist);
+        }
+    }
+
+    @Transactional  //차단 유저 해제
+    public void removeBlacklist(Long id, User user) {
+        User receiver = findUser(id);
+
+        Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverIdAndSenderId(receiver.getId(), user.getId());
+        if (blacklistOptional.isPresent()) {
+            blacklistRepository.delete(blacklistOptional.get());
+        } else {
+            throw new IllegalArgumentException("이미 차단해제 된 유저 입니다.");
+        }
+
+    }
     private User findUser(String username) {
         return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
     }

@@ -1,4 +1,4 @@
-package com.beteam.willu.security;
+package com.beteam.willu.common.security;
 
 import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;

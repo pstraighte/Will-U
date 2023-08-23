@@ -4,11 +4,9 @@ import com.beteam.willu.common.Timestamped;
 import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.user.User;
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,7 +46,7 @@ public class Post extends Timestamped {
      * 연관관계 - Foreign Key 값을 따로 컬럼으로 정의하지 않고 연관 관계로 정의합니다.
      */
     @ManyToOne
-    @JoinColumn(name= "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
@@ -57,13 +55,13 @@ public class Post extends Timestamped {
     /**
      * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
      */
-     public Post(PostRequestDto postRequestDto) {
-         if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();
-         if (postRequestDto.getContent() != null) this.content = postRequestDto.getContent();
-         if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto. getPromiseTime();
-         if (postRequestDto.getPromiseArea() != null) this.promiseArea = postRequestDto.getPromiseArea();
-         if (postRequestDto.getMaxnum()!= null) this.maxnum = postRequestDto.getMaxnum();
-     }
+    public Post(PostRequestDto postRequestDto) {
+        if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();
+        if (postRequestDto.getContent() != null) this.content = postRequestDto.getContent();
+        if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto.getPromiseTime();
+        if (postRequestDto.getPromiseArea() != null) this.promiseArea = postRequestDto.getPromiseArea();
+        if (postRequestDto.getMaxnum() != null) this.maxnum = postRequestDto.getMaxnum();
+    }
 
     /**
      * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
@@ -80,9 +78,9 @@ public class Post extends Timestamped {
     }
 
     public void update(PostRequestDto postRequestDto) {
-        if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();;
+        if (postRequestDto.getTitle() != null) this.title = postRequestDto.getTitle();
         if (postRequestDto.getContent() != null) this.content = postRequestDto.getContent();
-        if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto. getPromiseTime();
+        if (postRequestDto.getPromiseTime() != null) this.promiseTime = postRequestDto.getPromiseTime();
         if (postRequestDto.getPromiseArea() != null) this.promiseArea = postRequestDto.getPromiseArea();
     }
 }

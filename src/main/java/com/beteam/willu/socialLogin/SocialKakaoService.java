@@ -1,4 +1,4 @@
-package com.beteam.willu.socialLogin;
+package com.beteam.willu.user;
 
 import com.beteam.willu.security.JwtUtil;
 import com.beteam.willu.socialLogin.GoogleUserInfoDto;
@@ -27,11 +27,12 @@ import java.util.UUID;
 @Slf4j(topic = "KAKAO Login")
 @Service
 @RequiredArgsConstructor
-public class SocialKakaoService {
+public class UserKakaoService {
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final RedisUtil redisUtil;
     private final JwtUtil jwtUtil;
 
     public void kakaoLogin(String code, HttpServletResponse response) throws JsonProcessingException {
@@ -42,14 +43,14 @@ public class SocialKakaoService {
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
         //3, 필요시 회원가입
-        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
-
+        User kakaoUser =  registerKakaoUserIfNeeded(kakaoUserInfo);
         // 4. JWT 토큰 반환
-        String createToken = jwtUtil.createAccessToken(kakaoUser.getUsername());
-
+        String createAccessToken =  jwtUtil.createAccessToken(kakaoUser.getUsername());
+        String createRefreshToken =  jwtUtil.createRefreshToken(kakaoUser.getUsername());
+        redisUtil.saveRefreshToken(kakaoUser.getUsername(), createRefreshToken);
         // 쿠키 저장
-        jwtUtil.addJwtToCookie(createToken, response);
-
+        jwtUtil.addJwtToCookie(createAccessToken,JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(createRefreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
     }
 
     private String getToken(String code) throws JsonProcessingException {
@@ -86,7 +87,6 @@ public class SocialKakaoService {
 
         // HTTP 응답 (JSON) -> 액세스 토큰 파싱
         JsonNode jsonNode = new ObjectMapper().readTree(response.getBody());
-        System.out.println("kakaojsonNode = " + jsonNode);
         return jsonNode.get("access_token").asText();
     }
 
