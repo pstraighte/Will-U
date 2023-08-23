@@ -1,6 +1,5 @@
 package com.beteam.willu.stomp.entity;
 
-import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -18,11 +17,11 @@ public class UserChatRoom {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name= "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name= "chatRooms_id")
+    @ManyToOne
+    @JoinColumn(name = "chatRooms_id")
     private ChatRoom chatRooms;
 
     //권한

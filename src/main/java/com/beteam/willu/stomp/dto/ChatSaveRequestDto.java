@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 public class ChatSaveRequestDto {
     private String userId;
     private String chatContent;
-    private String roomName;
+    private Long roomId;
 }

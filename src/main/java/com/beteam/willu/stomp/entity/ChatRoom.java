@@ -2,7 +2,6 @@ package com.beteam.willu.stomp.entity;
 
 import com.beteam.willu.common.Timestamped;
 import com.beteam.willu.post.Post;
-import com.beteam.willu.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -22,12 +21,16 @@ public class ChatRoom extends Timestamped {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name= "post_id")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     // 방이름
     @Column(name = "roomName")
     private String roomName;
+
+    // 채팅방 제목
+    @Column(name = "chatTitle")
+    private String chatTitle;
 
     // 상태
     @Column(name = "activated")
