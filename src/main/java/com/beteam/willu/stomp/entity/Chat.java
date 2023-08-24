@@ -18,11 +18,11 @@ public class Chat extends Timestamped {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name= "user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @ManyToOne
-    @JoinColumn(name= "chatRooms_id")
+    @JoinColumn(name = "chatRooms_id")
     private ChatRoom chatRooms;
 
     // 채팅 내용

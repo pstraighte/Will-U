@@ -19,7 +19,6 @@ public class StompController {
     @SendTo     //수신메세지를 어떤 topic으로 보낼지
     public void sendMsg(@Payload Map<String, Object> data) {
         simpMessagingTemplate.convertAndSend("/topic/" + data.get("roomNumber"), data);
-
-        System.out.println("채팅방 id : " + data.get("roomNumber"));
+        System.out.println("data = " + data);
     }
 }

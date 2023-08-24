@@ -24,10 +24,6 @@ public class ChatRoom extends Timestamped {
     @JoinColumn(name = "post_id")
     private Post post;
 
-    // 방이름
-    @Column(name = "roomName")
-    private String roomName;
-
     // 채팅방 제목
     @Column(name = "chatTitle")
     private String chatTitle;

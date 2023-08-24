@@ -20,20 +20,21 @@
 
 
     $.ajax({
-        url: `/api/chat/getUsers/${userAuth}`, // 요청을 보낼 서버의 URL
+        url: `/api/chat/getUsers/${userAuth}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
+            // response 사용자의 id
             $.ajax({
-                url: `/api/chat/users/${response}`, // 요청을 보낼 서버의 URL
+                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
                 method: 'GET', // 요청 메소드 (GET, POST 등)
                 success: function (response) {
                     console.log(response.chatRoomList.length)
-                    console.log(response.chatRoomList[0].chatName);
-
+                    // console.log(response.chatRoomList[0].chatName);
 
                     if (response.chatRoomList.length == 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
                         alert("채팅방 없음");
+                        $(`<div id="userChatRoom-1" class="userChatRoom" onclick="chatRoom(1)">1</div>`).appendTo(`.chatRoom`);
                     }
 
                     // 해당 사용자가 속한 채팅방이 있다면
@@ -55,6 +56,7 @@
     });
 
     function chatRoom(id) {
+        // 해당 채팅방의 id 전달 (채팅방 입장)
         window.location.href = `/api/users/chat?number=${id}`;
     }
 

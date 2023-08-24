@@ -1,8 +1,8 @@
-package com.beteam.willu.user;
+package com.beteam.willu.socialLogin;
 
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.socialLogin.GoogleUserInfoDto;
-import com.beteam.willu.socialLogin.KakaoUserInfoDto;
+
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -43,13 +43,13 @@ public class UserKakaoService {
         KakaoUserInfoDto kakaoUserInfo = getKakaoUserInfo(accessToken);
 
         //3, 필요시 회원가입
-        User kakaoUser =  registerKakaoUserIfNeeded(kakaoUserInfo);
+        User kakaoUser = registerKakaoUserIfNeeded(kakaoUserInfo);
         // 4. JWT 토큰 반환
-        String createAccessToken =  jwtUtil.createAccessToken(kakaoUser.getUsername());
-        String createRefreshToken =  jwtUtil.createRefreshToken(kakaoUser.getUsername());
+        String createAccessToken = jwtUtil.createAccessToken(kakaoUser.getUsername());
+        String createRefreshToken = jwtUtil.createRefreshToken(kakaoUser.getUsername());
         redisUtil.saveRefreshToken(kakaoUser.getUsername(), createRefreshToken);
         // 쿠키 저장
-        jwtUtil.addJwtToCookie(createAccessToken,JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(createAccessToken, JwtUtil.AUTHORIZATION_HEADER, response);
         jwtUtil.addJwtToCookie(createRefreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
     }
 
@@ -70,7 +70,7 @@ public class UserKakaoService {
         // HTTP Body 생성
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
-        body.add("client_id", "dbbecd2046b9dd7965998b3f5bfdf389");
+        body.add("client_id", "53fd8dda11511575d7ad1ce60895dd5e");
         body.add("redirect_uri", "http://localhost:8080/api/users/kakao/callback");
         body.add("code", code);
 

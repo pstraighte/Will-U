@@ -2,13 +2,11 @@ package com.beteam.willu.user;
 
 
 import com.beteam.willu.common.ApiResponseDto;
-import com.beteam.willu.security.JwtUtil;
-import com.beteam.willu.security.UserDetailsImpl;
-import jakarta.servlet.http.Cookie;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.Cookie;
+import com.beteam.willu.common.security.UserDetailsImpl;
+import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -19,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
+
     @PostMapping("/users/signup")
     public ResponseEntity<ApiResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
         userService.userSignup(requestDto);
@@ -68,7 +67,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("관심 유저를 추가했습니다", HttpStatus.ACCEPTED.value()));
     }
 
-//관심 유저 삭제
+    //관심 유저 삭제
     @DeleteMapping("/interest/{id}")
     public ResponseEntity<ApiResponseDto> removeInterest(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         try {

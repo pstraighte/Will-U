@@ -69,6 +69,7 @@
                 <th><input id="msg" placeholder="보내실 메시지를 입력하세요."></th>
                 <th>
                     <button onclick="send()" id="sendBtn">보내기</button>
+                    <button onclick="disconnect()" id="disconnectBtn">끊기</button>
                 </th>
             </tr>
         </table>
@@ -79,11 +80,41 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
 <script>
     $(document).ready(function () {
+        let token = Cookies.get('Authorization');
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userAuth = payloads.sub;
+
         // 쿼리스트링 값 불러오기
         urlSearch = new URLSearchParams(location.search);
 
         // 채팅방 id
         roomNumber = urlSearch.get('number')
+
+        // 채팅방에 속한 사용자 인지 확인
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                console.log(response.chatRoomList.length);
+                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                var chackUser;
+                for (var i = 0; i < response.chatRoomList.length; i++) {
+                    if (userAuth == response.chatRoomList[i].userName) {
+                        // 해당 채팅방에 속한 사용자
+                        console.log(true);
+                        chackUser = true;
+                    }
+                }
+                if (!chackUser == true) {
+                    window.location.href = "/api/users/chatList"
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("해당 채팅방 사용자가 아닙니다.")
+                console.log(xhr);
+                window.location.href = "/api/users/chatList"
+            }
+        });
 
         // 채팅내용 조회
         $.ajax({
@@ -117,28 +148,38 @@
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth
 
+    var socket = new SockJS("/chatting");
+    stompClient = Stomp.over(socket);
+
     function connect() {
         //StompConfig.java에 설정된 endpoint로 SockJS 객체, StompClient 객체 생성
-        var socket = new SockJS("/chatting");
-        stompClient = Stomp.over(socket);
 
+        console.log("socket", socket);
+        console.log("stompClient", stompClient);
 
         // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
-
         // connect(header,연결 성공시 콜백,에러발생시 콜백)
         stompClient.connect({}, function () {
                 //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
                 sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
+
+                    console.log("e : ", e);
                     showMessage(JSON.parse(e.body));
                 });
+
             },
             function (e) {
-                alert('통신끊기');
+                alert('통신끊김');
             }
         );
+
     }
 
     connect();
+
+    function disconnect() {
+        stompClient.disconnect();
+    }
 
     //엔터 눌렀을때 전송
     $('#msg').keypress(function (e) {
