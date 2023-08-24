@@ -1,6 +1,6 @@
 package com.beteam.willu.stomp;
 
-import com.beteam.willu.security.UserDetailsImpl;
+import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
 import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
 import com.beteam.willu.stomp.dto.ChatsResponseDto;
@@ -34,11 +34,11 @@ public class ChatRoomController {
         return chatRoomService.getUser(id);
     }
 
-//    // 특정 채팅룸 불러오기
-//    @GetMapping("/chat/chatRooms/{id}")
-//    public ChatRoomNameResponseDto getRoom(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-//        return chatRoomService.getRoom(id, userDetails);
-//    }
+    //    // 특정 채팅룸 불러오기
+    //    @GetMapping("/chat/chatRooms/{id}")
+    //    public ChatRoomNameResponseDto getRoom(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    //        return chatRoomService.getRoom(id, userDetails);
+    //    }
 
     // 생성된 채팅 저장 (확인 완료)
     @PostMapping("/chat/chatRooms")
@@ -54,11 +54,14 @@ public class ChatRoomController {
 
     //(할것)
     // 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
+    @PostMapping("chat/join/{post_id}/{chatRoom_id}")
+    public void userJoin(@PathVariable long post_id, @PathVariable long chatRoom_id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        chatRoomService.userJoin(post_id, chatRoom_id, userDetails);
+    }
 
     // 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
 
     // 사용자 채팅방 나가기 (USER 용) -> 인원이 있을때 방장이 나갔다 / 채팅방에 사람이 아예 없을때
 
-    
     // 채팅방 비활성화
 }
