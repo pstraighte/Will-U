@@ -116,7 +116,7 @@
             }
         });
 
-        // 채팅내용 조회
+        // 채팅방에 저장된 채팅내용 조회
         $.ajax({
             url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
@@ -160,6 +160,8 @@
         // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
         // connect(header,연결 성공시 콜백,에러발생시 콜백)
         stompClient.connect({}, function () {
+                // 소켓을 연결 시키기 전에 채팅방의 활성화 필드가 true 인지 확인 후 false 라면 연결 x
+
                 //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
                 sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
 
