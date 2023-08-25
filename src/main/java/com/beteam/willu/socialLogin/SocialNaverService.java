@@ -1,6 +1,5 @@
 package com.beteam.willu.socialLogin;
 
-
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.user.User;

@@ -44,7 +44,6 @@ public class SocialGoogleService {
         //3, 필요시 회원가입
         User googleUser = registerGoogleIfNeeded(googleUserInfoDto);
 
-
         // 4. JWT 토큰 반환
         String createAccessToken = jwtUtil.createAccessToken(googleUser.getUsername());
         String createRefreshToken = jwtUtil.createRefreshToken(googleUser.getUsername());
