@@ -3,7 +3,8 @@ package com.beteam.willu.user;
 
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.common.security.UserDetailsImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.beteam.willu.user.review.dto.ReviewRequestDto;
+import com.beteam.willu.user.review.dto.ReviewResponseDto;
 import com.sun.jdi.request.DuplicateRequestException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -99,5 +100,17 @@ public class UserController {
             return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
         }
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponseDto("차단을 해체했습니다.", HttpStatus.ACCEPTED.value()));
+    }
+
+    // 리뷰 작성
+    @PostMapping("/review/users/{id}")
+    public void createReview(@PathVariable Long id, @RequestBody ReviewRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        userService.createReview(id, requestDto, userDetails);
+    }
+
+    // 리뷰 데이터 조회
+    @GetMapping("/review/users/{id}")
+    public ReviewResponseDto getReviews(@PathVariable Long id) {
+        return userService.getReviews(id);
     }
 }

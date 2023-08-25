@@ -1,6 +1,7 @@
 package com.beteam.willu.socialLogin;
 
-import com.beteam.willu.security.JwtUtil;
+import com.beteam.willu.common.jwt.JwtUtil;
+import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -30,6 +31,7 @@ public class SocialGoogleService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final RedisUtil redisUtil;
     private final JwtUtil jwtUtil;
 
     public void googleLogin(String code, HttpServletResponse response) throws JsonProcessingException {
@@ -40,13 +42,15 @@ public class SocialGoogleService {
         GoogleUserInfoDto googleUserInfoDto = getgoogleUserInfo(accessToken);
 
         //3, 필요시 회원가입
-        User googleUser =  registerGoogleIfNeeded(googleUserInfoDto);
+        User googleUser = registerGoogleIfNeeded(googleUserInfoDto);
 
         // 4. JWT 토큰 반환
-        String createToken = jwtUtil.createAccessToken(googleUser.getUsername());
-
+        String createAccessToken = jwtUtil.createAccessToken(googleUser.getUsername());
+        String createRefreshToken = jwtUtil.createRefreshToken(googleUser.getUsername());
+        redisUtil.saveRefreshToken(googleUser.getUsername(), createRefreshToken);
         // 쿠키 저장
-        jwtUtil.addJwtToCookie(createToken, response);
+        jwtUtil.addJwtToCookie(createAccessToken, JwtUtil.AUTHORIZATION_HEADER, response);
+        jwtUtil.addJwtToCookie(createRefreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
 
     }
 

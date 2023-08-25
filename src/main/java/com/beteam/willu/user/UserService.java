@@ -13,11 +13,24 @@ import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.notification.NotificationType;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
+import com.beteam.willu.user.review.ReviewRepository;
+import com.beteam.willu.user.review.dto.ReviewRequestDto;
+import com.beteam.willu.user.review.dto.ReviewResponseDto;
+import com.beteam.willu.user.review.entity.Review;
 import com.sun.jdi.request.DuplicateRequestException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
+
 
 @Slf4j(topic = "userService")
 @Service
@@ -180,13 +193,24 @@ public class UserService {
 
 	}
 
-	private User findUser(String username) {
-		return userRepository.findByUsername(username)
-			.orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-	}
+    public void createReview(Long id, ReviewRequestDto requestDto, UserDetailsImpl userDetails) {
+      // 작성자
+      User sender = userDetails.getUser();
+      // 수신자
+      User receiver = findUser(id);
 
-	private User findUser(Long id) {
-		return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-	}
+      //리뷰 데이터 생성
+      Review review = new Review(receiver, sender, requestDto.getContent(), requestDto.getScore());
 
+      //리뷰 데이터 저장
+      reviewRepository.save(review);
+    }
+
+    // 리뷰 데이터 조회 (사용자 자신한테 저장된 휴기 조회)
+    public ReviewResponseDto getReviews(Long id) {
+        // 해당 사용자에게 작성된 리뷰 데이터 조회
+        List<Review> reviewList = reviewRepository.findAllByReceiverId(id);
+
+        return new ReviewResponseDto(reviewList);
+    }
 }
