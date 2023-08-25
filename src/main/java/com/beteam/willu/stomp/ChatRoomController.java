@@ -56,7 +56,10 @@ public class ChatRoomController {
 
     //(할것)
     // 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
-
+    @PostMapping("chat/join/{post_id}/{chatRoom_id}")
+    public void userJoin(@PathVariable long post_id, @PathVariable long chatRoom_id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        chatRoomService.userJoin(post_id, chatRoom_id, userDetails);
+    }
 
     // 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
     // 특청 사용자의 id를 이용해 테이블에서 유저 삭제

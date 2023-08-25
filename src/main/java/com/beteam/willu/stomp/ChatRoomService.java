@@ -16,6 +16,7 @@ import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,13 +35,15 @@ public class ChatRoomService {
     // 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
 
     public void createRoom(Long id, UserDetailsImpl userDetails) {
+        Post post = findPost(id);
 
-        Optional<Post> post = postRepository.findById(id);
-
-        String chatTitle = post.get().getTitle();
-
+        String chatTitle = post.getTitle();
         // 게시글 생성 과 함께 채팅방 개설
-        ChatRoom chatRoom = ChatRoom.builder().post(post.get()).chatTitle(chatTitle).activated(true).build();
+        ChatRoom chatRoom = ChatRoom.builder()
+                .post(post)
+                .chatTitle(chatTitle)
+                .activated(true)
+                .build();
 
         chatRoomRepository.save(chatRoom);
 
@@ -96,9 +99,12 @@ public class ChatRoomService {
         // 채팅을 보낸 유저 조회
         Optional<User> user = userRepository.findByUsername(chatSaveRequestDto.getUserId());
         // 채팅을 저장할 채팅방
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(chatSaveRequestDto.getRoomId());
-
-        Chat chat = Chat.builder().user(user.get()).chatRooms(chatRoom.get()).chatContent(chatSaveRequestDto.getChatContent()).build();
+        ChatRoom chatRoom = findChatRoom(chatSaveRequestDto.getRoomId());
+        Chat chat = Chat.builder()
+                .user(user.get())
+                .chatRooms(chatRoom)
+                .chatContent(chatSaveRequestDto.getChatContent())
+                .build();
 
         chatRepository.save(chat);
     }
@@ -109,8 +115,31 @@ public class ChatRoomService {
 
         return new ChatsResponseDto(chatList);
     }
-    // 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
 
+    // 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
+    @Transactional
+    public void userJoin(Long post_id, Long chatRoom_id, UserDetailsImpl userDetails) {
+        Post post = findPost(post_id);
+        ChatRoom chatRoom = findChatRoom(chatRoom_id);
+
+        //중복참여 방지
+        User user = userDetails.getUser();
+
+        if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
+            throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
+        } else if (userChatRoomsRepository.existsByUserAndChatRooms(user, chatRoom)) {
+            throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
+        }
+
+//		유저 채팅방 초대
+        UserChatRoom guestChatRoom = UserChatRoom.builder()
+                .user(user)
+                .chatRooms(chatRoom)
+                .role("GUEST")
+                .build();
+
+        userChatRoomsRepository.save(guestChatRoom);
+    }
 
     // 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
     // 특청 사용자의 id를 이용해 테이블에서 유저 삭제
@@ -163,5 +192,13 @@ public class ChatRoomService {
         }
 
         return new ChatRoomsResponseDto(chatRoomUsers);
+    }
+
+    private Post findPost(Long id) {
+        return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
+    }
+
+    private ChatRoom findChatRoom(Long id) {
+        return chatRoomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
     }
 }
