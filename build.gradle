@@ -49,6 +49,12 @@ dependencies {
     //Redis cache
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    //google
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    //websocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
     // S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 
