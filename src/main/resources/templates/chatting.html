@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 500px;
+            margin: 0 auto;
+            padding: 25px
+        }
+
+        .container h1 {
+            text-align: left;
+            padding: 5px 5px 5px 5px;
+            color: black;
+            margin-bottom: 20px;
+        }
+
+        .chatting {
+            border: 1px solid gray;
+            width: 700px;
+            height: 700px;
+            overflow: auto;
+        }
+
+        .chatting p {
+            text-align: left;
+        }
+
+        input {
+            width: 450px;
+            height: 50px;
+        }
+
+        th {
+            width: 100px;
+        }
+
+        #yourMsg {
+            width: 700px;
+        }
+
+        .me {
+            color: blue;
+        }
+
+        .other {
+            color: red;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+</head>
+<body>
+<div class="container" id="container">
+    <h1 id="title_room">채팅방제목</h1>
+    <div id="chatting" class="chatting">
+    </div>
+    <div id="yourMsg">
+        <table class="inputTable">
+            <tr>
+                <th>메시지</th>
+                <th><input id="msg" placeholder="보내실 메시지를 입력하세요."></th>
+                <th>
+                    <button onclick="send()" id="sendBtn">보내기</button>
+                    <button onclick="disconnect()" id="disconnectBtn">끊기</button>
+                </th>
+            </tr>
+        </table>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let token = Cookies.get('Authorization');
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userAuth = payloads.sub;
+
+        // 쿼리스트링 값 불러오기
+        urlSearch = new URLSearchParams(location.search);
+
+        // 채팅방 id
+        roomNumber = urlSearch.get('number')
+
+        // 채팅방에 속한 사용자 인지 확인
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                console.log(response.chatRoomList.length);
+                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                var chackUser;
+                for (var i = 0; i < response.chatRoomList.length; i++) {
+                    if (userAuth == response.chatRoomList[i].userName) {
+                        // 해당 채팅방에 속한 사용자
+                        console.log(true);
+                        chackUser = true;
+                    }
+                }
+                if (!chackUser == true) {
+                    window.location.href = "/api/users/chatList"
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("해당 채팅방 사용자가 아닙니다.")
+                console.log(xhr);
+                window.location.href = "/api/users/chatList"
+            }
+        });
+
+        // 채팅방에 저장된 채팅내용 조회
+        $.ajax({
+            url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+
+                for (var i = 0; i < response.chatContentList.length; i++) {
+                    $(`<div id="chatContent" class="testChat">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatting`);
+                    $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatting`);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("채팅 내용 불러오기 실패")
+                console.log(xhr);
+            }
+        });
+
+    })
+    // 쿼리스트링 값 불러오기
+    urlSearch = new URLSearchParams(location.search);
+
+    // 채팅방 id
+    roomNumber = urlSearch.get('number')
+
+    // 쿠키값에서 유저 값 가져오기
+    let token = Cookies.get('Authorization');
+    const payloads = JSON.parse(atob(token.split(".")[1]));
+    const userAuth = payloads.sub;
+
+    // 쿠키값에서 유저이름 가져오기
+    var userId = userAuth
+
+    var socket = new SockJS("/chatting");
+    stompClient = Stomp.over(socket);
+
+    function connect() {
+        //StompConfig.java에 설정된 endpoint로 SockJS 객체, StompClient 객체 생성
+
+        console.log("socket", socket);
+        console.log("stompClient", stompClient);
+
+        // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
+        // connect(header,연결 성공시 콜백,에러발생시 콜백)
+        stompClient.connect({}, function () {
+                // 소켓을 연결 시키기 전에 채팅방의 활성화 필드가 true 인지 확인 후 false 라면 연결 x
+
+                //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
+                sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
+
+                    console.log("e : ", e);
+                    showMessage(JSON.parse(e.body));
+                });
+
+            },
+            function (e) {
+                alert('통신끊김');
+            }
+        );
+
+    }
+
+    connect();
+
+    function disconnect() {
+        stompClient.disconnect();
+    }
+
+    //엔터 눌렀을때 전송
+    $('#msg').keypress(function (e) {
+        if (e.keyCode === 13) send();
+    });
+
+    //화면에 메시지를 표시하는 함수
+    function showMessage(data) {
+        if (data.sender === userId) {
+            $('#chatting').append("<p class='me'>" + data.sender + " : " + data.contents + "</p>");
+        } else {
+            $('#chatting').append("<p class='other'>" + data.sender + " : " + data.contents + "</p>");
+        }
+    }
+
+    //메시지 브로커로 메시지 전송
+    function send() {
+        data = {
+            'sender': userId,
+            'contents': $("#msg").val(),
+            'roomNumber': roomNumber
+        };
+        // send(destination,헤더,페이로드)
+        stompClient.send("/app/chat/send", {}, JSON.stringify(data));
+
+
+        //보낼때 채팅 저장
+        $.ajax({
+            url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
+            method: 'POST', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            data: JSON.stringify({userId: userId, chatContent: $("#msg").val(), roomId: roomNumber}),
+            success: function (response) {
+                alert("저장완료");
+                $("#msg").val('');
+            },
+            error: function (xhr, status, error) {
+                alert("저장 실패")
+                console.log(xhr);
+            }
+        });
+
+    }
+
+</script>
+</body>
+</html>

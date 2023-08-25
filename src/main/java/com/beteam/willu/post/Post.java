@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.beteam.willu.common.Timestamped;
+import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.user.User;
 
 import jakarta.persistence.Column;
@@ -57,6 +58,9 @@ public class Post extends Timestamped {
 
 	private String username;
 
+  @OneToOne(mappedBy = "post", cascade = CascadeType.REMOVE)
+    private ChatRoom chatRoom;
+  
 	/**
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
 	 */

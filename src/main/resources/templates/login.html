@@ -2,11 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <title>Title</title>
 </head>
 <body>
-<button id="login-kakao-btn" onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=dbbecd2046b9dd7965998b3f5bfdf389&redirect_uri=http://localhost:8080/api/users/kakao/callback&response_type=code'">
-  카카오로 로그인하기
+<button id="login-kakao-btn"
+        onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=53fd8dda11511575d7ad1ce60895dd5e&redirect_uri=http://localhost:8080/api/users/kakao/callback&response_type=code'">
+    카카오로 로그인하기
 </button>
+<button id="login-gogle-btn"
+        onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-ika35lgnjbmu7hvi51r10er1qjjcqmbh.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile'">
+    구글 로그인하기
+</button>
+<button id="login-naver-btn"
+        onclick="location.href='https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://localhost:8080/api/users/naver/callback&response_type=code;'">
+    네이버 로그인하기
+</button>
+
+<div>
+    <input id="idInput" type="text"/>
+    <input id="passInput" type="text"/>
+    <button onclick="login()">사이트 로그인</button>
+</div>
+<script>
+    function login() {
+        $.ajax({
+            url: `/api/users/login`, // 요청을 보낼 서버의 URL
+            method: 'POST', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            data: JSON.stringify({username: $("#idInput").val(), password: $("#passInput").val()}),
+            success: function (response) {
+                alert("로그인 성공")
+
+                window.location.href = "/notification-page";
+            },
+            error: function (xhr, status, error) {
+                alert("로그인 실패")
+                console.log(xhr);
+            }
+        });
+    }
+</script>
 </body>
 </html>
