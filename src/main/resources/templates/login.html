@@ -19,6 +19,7 @@
         onclick="location.href='https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://localhost:8080/api/users/naver/callback&response_type=code;'">
     네이버 로그인하기
 </button>
+
 <div>
     <input id="idInput" type="text"/>
     <input id="passInput" type="text"/>
@@ -33,6 +34,7 @@
             data: JSON.stringify({username: $("#idInput").val(), password: $("#passInput").val()}),
             success: function (response) {
                 alert("로그인 성공")
+
                 window.location.href = "/notification-page";
             },
             error: function (xhr, status, error) {

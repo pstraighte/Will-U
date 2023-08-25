@@ -1,7 +1,9 @@
-package com.beteam.willu.user;
+package com.beteam.willu.socialLogin;
 
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
+import com.beteam.willu.user.User;
+import com.beteam.willu.user.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -147,8 +149,8 @@ public class UserKakaoService {
 
                 // email: kakao email
                 String email = kakaoUserInfo.getEmail();
-
-                kakaoUser = User.builder().username(email).nickname(kakaoUserInfo.getNickname()).password(encodedPassword).email(email).kakaoId(kakaoId).build();
+                String userNickname = kakaoUserInfo.getNickname();
+                kakaoUser = User.builder().username(email).nickname(userNickname).password(encodedPassword).email(email).kakaoId(kakaoId).build();
             }
 
             userRepository.save(kakaoUser);
@@ -158,4 +160,5 @@ public class UserKakaoService {
 
         return kakaoUser;
     }
+
 }

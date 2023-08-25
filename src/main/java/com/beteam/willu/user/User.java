@@ -19,6 +19,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
+
 @Entity
 @Getter
 @Builder
@@ -64,8 +68,14 @@ public class User extends Timestamped {
 	@Builder.Default
 	private Long score = 3L;
 
-	@Column(name = "kakaoId")
-	private Long kakaoId;
+    @Column(name = "kakaoId")
+    private Long kakaoId;
+
+    @Column(name = "googleId")
+    private String googleId;
+
+    @Column(name = "naverId")
+    private String naverId;
 
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
@@ -76,12 +86,22 @@ public class User extends Timestamped {
 		this.picture = updateRequestDto.getPicture();
 	}
 
-	// 카카오 id 를 업데이트
-	// 해당 메소드를 사용한 곳에서 업데이트한 유저 데이터를 바로 사용
-	public User kakaoIdUpdate(Long kakaoId) {
-		this.kakaoId = kakaoId;
-		return this;
-	}
+  // 카카오 id 를 업데이트
+    // 해당 메소드를 사용한 곳에서 업데이트한 유저 데이터를 바로 사용
+    public User kakaoIdUpdate(Long kakaoId) {
+        this.kakaoId = kakaoId;
+        return this;
+    }
+
+    public User googleIdUpdate(String googleId) {
+        this.googleId = googleId;
+        return this;
+    }
+
+    public User naverIdUpdate(String naverId) {
+        this.naverId = naverId;
+        return this;
+    }
 
 	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
 		//type 에 따른 알림 내용 변경
