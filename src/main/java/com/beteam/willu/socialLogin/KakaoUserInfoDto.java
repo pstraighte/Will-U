@@ -1,4 +1,4 @@
-package com.beteam.willu.user;
+package com.beteam.willu.socialLogin;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
