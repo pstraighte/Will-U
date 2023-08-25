@@ -12,6 +12,7 @@ import com.beteam.willu.stomp.entity.UserChatRoom;
 import com.beteam.willu.stomp.repository.ChatRepository;
 import com.beteam.willu.stomp.repository.ChatRoomRepository;
 import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
+import com.beteam.willu.user.BlacklistRepository;
 import com.beteam.willu.user.User;
 import com.beteam.willu.user.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class ChatRoomService {
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final ChatRepository chatRepository;
+    private final BlacklistRepository blacklistRepository;
 
 
     // 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
@@ -124,7 +126,6 @@ public class ChatRoomService {
 
         //중복참여 방지
         User user = userDetails.getUser();
-
         if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
             throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
         } else if (userChatRoomsRepository.existsByUserAndChatRooms(user, chatRoom)) {

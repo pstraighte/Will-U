@@ -25,7 +25,6 @@
     <input id="passInput" type="text"/>
     <button onclick="login()">사이트 로그인</button>
 </div>
-
 <script>
     function login() {
         $.ajax({
@@ -35,6 +34,8 @@
             data: JSON.stringify({username: $("#idInput").val(), password: $("#passInput").val()}),
             success: function (response) {
                 alert("로그인 성공")
+
+                window.location.href = "/notification-page";
             },
             error: function (xhr, status, error) {
                 alert("로그인 실패")
