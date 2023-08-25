@@ -21,7 +21,7 @@ public class Blacklist extends Timestamped {
     private User receiver;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sender;_id") //보내는 사람
+    @JoinColumn(name = "sender_id") //보내는 사람
 //    @Column(name = "sender_id")
     private User sender;
 
