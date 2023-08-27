@@ -121,9 +121,9 @@ public class ChatRoomService {
 
 	// 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
 	@Transactional
-	public void userJoin(Long post_id, Long chatRoom_id, UserDetailsImpl userDetails) {
-		Post post = findPost(post_id);
-		ChatRoom chatRoom = findChatRoom(chatRoom_id);
+	public void userJoin(Long postId, Long chatRoomId, UserDetailsImpl userDetails) {
+		Post post = findPost(postId);
+		ChatRoom chatRoom = findChatRoom(chatRoomId);
 
 		//중복참여 방지
 		User user = userDetails.getUser();

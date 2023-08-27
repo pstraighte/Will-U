@@ -66,16 +66,21 @@ public class Post extends Timestamped {
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
 	 */
 	public Post(PostRequestDto postRequestDto) {
-		if (postRequestDto.getTitle() != null)
+		if (postRequestDto.getTitle() != null) {
 			this.title = postRequestDto.getTitle();
-		if (postRequestDto.getContent() != null)
+		}
+		if (postRequestDto.getContent() != null) {
 			this.content = postRequestDto.getContent();
-		if (postRequestDto.getPromiseTime() != null)
+		}
+		if (postRequestDto.getPromiseTime() != null) {
 			this.promiseTime = postRequestDto.getPromiseTime();
-		if (postRequestDto.getPromiseArea() != null)
+		}
+		if (postRequestDto.getPromiseArea() != null) {
 			this.promiseArea = postRequestDto.getPromiseArea();
-		if (postRequestDto.getMaxnum() != null)
+		}
+		if (postRequestDto.getMaxnum() != null) {
 			this.maxnum = postRequestDto.getMaxnum();
+		}
 	}
 
 	/**
@@ -93,13 +98,17 @@ public class Post extends Timestamped {
 	}
 
 	public void update(PostRequestDto postRequestDto) {
-		if (postRequestDto.getTitle() != null)
+		if (postRequestDto.getTitle() != null) {
 			this.title = postRequestDto.getTitle();
-		if (postRequestDto.getContent() != null)
+		}
+		if (postRequestDto.getContent() != null) {
 			this.content = postRequestDto.getContent();
-		if (postRequestDto.getPromiseTime() != null)
+		}
+		if (postRequestDto.getPromiseTime() != null) {
 			this.promiseTime = postRequestDto.getPromiseTime();
-		if (postRequestDto.getPromiseArea() != null)
+		}
+		if (postRequestDto.getPromiseArea() != null) {
 			this.promiseArea = postRequestDto.getPromiseArea();
+		}
 	}
 }

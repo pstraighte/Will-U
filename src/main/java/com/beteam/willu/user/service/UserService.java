@@ -114,9 +114,9 @@ public class UserService {
 
 	@Transactional
 	public void deleteUser(Long id, User user) {
-		if (!id.equals(user.getId()))
+		if (!id.equals(user.getId())) {
 			throw new IllegalArgumentException("본인이 아닙니다. 탈퇴할 수 없습니다.");
-
+		}
 		userRepository.delete(user);
 	}
 

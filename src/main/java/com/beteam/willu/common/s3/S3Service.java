@@ -21,7 +21,7 @@ public class S3Service {
 	}
 
 	public String uploadImage(MultipartFile imageFile) throws IOException {
-		String uniqueFileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();  // 고유한 파일 이름 생성
+		String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();  // 고유한 파일 이름 생성
 		String objectKey = "profile-images/" + uniqueFileName;  // S3에 저장할 객체 키 생성
 
 		ObjectMetadata metadata = new ObjectMetadata();

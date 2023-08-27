@@ -44,11 +44,12 @@ public class ChatRoomController {
 		return chatRoomService.getUser(id);
 	}
 
-	//    // 특정 채팅룸 불러오기
-	//    @GetMapping("/chat/chatRooms/{id}")
-	//    public ChatRoomNameResponseDto getRoom(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-	//        return chatRoomService.getRoom(id, userDetails);
-	//    }
+	// 특정 채팅룸 불러오기
+/*	@GetMapping("/chat/chatRooms/{id}")
+	public ChatRoomNameResponseDto getRoom(@PathVariable Long id,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		return chatRoomService.getRoom(id, userDetails);
+	}*/
 
 	// 생성된 채팅 저장 (확인 완료)
 	@PostMapping("/chat/chatRooms")
@@ -64,19 +65,19 @@ public class ChatRoomController {
 
 	//(할것)
 	// 게시글에서 신청 버튼 클릭시 사용자 채팅방 추가
-	@PostMapping("chat/join/{post_id}/{chatRoom_id}")
-	public void userJoin(@PathVariable long post_id, @PathVariable long chatRoom_id,
+	@PostMapping("chat/join/{postId}/{chatRoomId}")
+	public void userJoin(@PathVariable long postId, @PathVariable long chatRoomId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		chatRoomService.userJoin(post_id, chatRoom_id, userDetails);
+		chatRoomService.userJoin(postId, chatRoomId, userDetails);
 	}
 
 	// 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
 	// 특청 사용자의 id를 이용해 테이블에서 유저 삭제
 	// 강퇴된 유저가 다시 채팅방에 신청 했을 때 생각하기 (미구현)
-	@DeleteMapping("/chat/users/{userId}/chatRoom/{chatid}/kickout")
-	public void kickoutUser(@PathVariable Long userId, @PathVariable Long chatid,
+	@DeleteMapping("/chat/users/{userId}/chatRoom/{chatId}/kickout")
+	public void kickoutUser(@PathVariable(name = "userId") Long userId, @PathVariable Long chatId,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		chatRoomService.kickoutUser(userId, chatid, userDetails);
+		chatRoomService.kickoutUser(userId, chatId, userDetails);
 	}
 
 	// 사용자 채팅방 나가기 (USER 용) -> (인원이 있을때 방장이 나갔다 / 채팅방에 사람이 아예 없을때)
