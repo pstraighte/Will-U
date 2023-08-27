@@ -9,8 +9,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.beteam.willu.notification.Notification;
-import com.beteam.willu.notification.NotificationType;
+import com.beteam.willu.notification.entity.Notification;
+import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.notification.repository.EmitterRepository;
 import com.beteam.willu.notification.repository.EmitterRepositoryImpl;
 import com.beteam.willu.user.entity.User;

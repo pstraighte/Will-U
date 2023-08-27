@@ -1,4 +1,4 @@
-package com.beteam.willu.notification;
+package com.beteam.willu.notification.entity;
 
 public enum NotificationType {
 	JOIN_REQUEST("채팅방 참가 신청"),

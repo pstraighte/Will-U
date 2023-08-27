@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
-import com.beteam.willu.notification.NotificationType;
+import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.review.dto.ReviewRequestDto;
 import com.beteam.willu.review.dto.ReviewResponseDto;
 import com.beteam.willu.review.entity.Review;

@@ -1,4 +1,4 @@
-package com.beteam.willu.notification;
+package com.beteam.willu.notification.entity;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;

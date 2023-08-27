@@ -1,7 +1,7 @@
 package com.beteam.willu.notification.dto;
 
-import com.beteam.willu.notification.Notification;
-import com.beteam.willu.notification.NotificationType;
+import com.beteam.willu.notification.entity.Notification;
+import com.beteam.willu.notification.entity.NotificationType;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

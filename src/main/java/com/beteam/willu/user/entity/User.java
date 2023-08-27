@@ -4,8 +4,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.common.Timestamped;
-import com.beteam.willu.notification.NotificationType;
 import com.beteam.willu.notification.dto.NotificationRequestDto;
+import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.dto.UserUpdateRequestDto;
 
 import jakarta.persistence.Column;

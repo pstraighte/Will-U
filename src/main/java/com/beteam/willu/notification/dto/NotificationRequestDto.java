@@ -1,6 +1,6 @@
 package com.beteam.willu.notification.dto;
 
-import com.beteam.willu.notification.NotificationType;
+import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
