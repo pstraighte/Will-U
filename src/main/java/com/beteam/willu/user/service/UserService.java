@@ -2,10 +2,7 @@ package com.beteam.willu.user.service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,21 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
-import com.beteam.willu.notification.entity.NotificationType;
-import com.beteam.willu.review.dto.ReviewRequestDto;
-import com.beteam.willu.review.dto.ReviewResponseDto;
-import com.beteam.willu.review.entity.Review;
-import com.beteam.willu.review.repository.ReviewRepository;
 import com.beteam.willu.user.dto.UserRequestDto;
 import com.beteam.willu.user.dto.UserResponseDto;
 import com.beteam.willu.user.dto.UserUpdateRequestDto;
-import com.beteam.willu.user.entity.Blacklist;
-import com.beteam.willu.user.entity.Interest;
 import com.beteam.willu.user.entity.User;
-import com.beteam.willu.user.repository.BlacklistRepository;
-import com.beteam.willu.user.repository.InterestRepository;
 import com.beteam.willu.user.repository.UserRepository;
-import com.sun.jdi.request.DuplicateRequestException;
 
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class UserService {
 
 	private final UserRepository userRepository;
-	private final InterestRepository interestRepository;
-	private final BlacklistRepository blacklistRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtUtil jwtUtil;
 	private final RedisUtil redisUtil;
-	private final ApplicationEventPublisher eventPublisher;
-	private final ReviewRepository reviewRepository;
 
 	public void userSignup(UserRequestDto requestDto) {
 
@@ -99,10 +82,6 @@ public class UserService {
 		jwtUtil.addJwtToCookie(refreshToken, JwtUtil.REFRESH_TOKEN_HEADER, response);
 	}
 
-	private void notifyLoginInfo(User user, NotificationType type) {
-		user.publishEvent(eventPublisher, type);
-	}
-
 	public void logout(String accessToken, HttpServletResponse response, String username) {
 		//쿠키에서 가져온 토큰추출
 		accessToken = URLDecoder.decode(accessToken, StandardCharsets.UTF_8).substring(7);
@@ -141,81 +120,6 @@ public class UserService {
 		userRepository.delete(user);
 	}
 
-	@Transactional  //관심유저 추가
-	public void addInterest(Long id, User user) {
-		User receiver = findUser(id);
-
-		if (interestRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
-			throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
-		} else {
-			Interest interest = new Interest(receiver, user);
-			interestRepository.save(interest);
-			notifyLoginInfo(user, NotificationType.LOGIN_DONE);
-		}
-	}
-
-	@Transactional
-	public void removeInterest(Long id, User user) {
-		User receiver = findUser(id);
-
-		Optional<Interest> interestOptional = interestRepository.findByReceiverIdAndSenderId(receiver.getId(),
-			user.getId());
-		if (interestOptional.isPresent()) {
-			interestRepository.delete(interestOptional.get());
-		} else {
-			throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
-		}
-	}
-
-	@Transactional //차단 유저 추가
-	public void addBlacklist(Long id, User user) {
-		User receiver = findUser(id);
-
-		if (blacklistRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
-			throw new DuplicateRequestException("이미 차단된 유저 입니다.");
-		} else {
-			Blacklist blacklist = new Blacklist(receiver, user);
-			blacklistRepository.save(blacklist);
-		}
-		//sse 테스트용
-		notifyLoginInfo(user, NotificationType.LOGIN_DONE);
-	}
-
-	@Transactional  //차단 유저 해제
-	public void removeBlacklist(Long id, User user) {
-		User receiver = findUser(id);
-
-		Optional<Blacklist> blacklistOptional = blacklistRepository.findByReceiverIdAndSenderId(receiver.getId(),
-			user.getId());
-		if (blacklistOptional.isPresent()) {
-			blacklistRepository.delete(blacklistOptional.get());
-		} else {
-			throw new IllegalArgumentException("이미 차단해제 된 유저 입니다.");
-		}
-
-	}
-
-	public void createReview(Long id, ReviewRequestDto requestDto, UserDetailsImpl userDetails) {
-		// 작성자
-		User sender = userDetails.getUser();
-		// 수신자
-		User receiver = findUser(id);
-
-		//리뷰 데이터 생성
-		Review review = new Review(receiver, sender, requestDto.getContent(), requestDto.getScore());
-
-		//리뷰 데이터 저장
-		reviewRepository.save(review);
-	}
-
-	// 리뷰 데이터 조회 (사용자 자신한테 저장된 휴기 조회)
-	public ReviewResponseDto getReviews(Long id) {
-		// 해당 사용자에게 작성된 리뷰 데이터 조회
-		List<Review> reviewList = reviewRepository.findAllByReceiverId(id);
-
-		return new ReviewResponseDto(reviewList);
-	}
-
 	private User findUser(String username) {
 		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
@@ -224,4 +128,5 @@ public class UserService {
 	private User findUser(Long id) {
 		return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 	}
+
 }

@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.beteam.willu.blacklist.repository.BlacklistRepository;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
@@ -20,7 +21,6 @@ import com.beteam.willu.stomp.repository.ChatRepository;
 import com.beteam.willu.stomp.repository.ChatRoomRepository;
 import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
-import com.beteam.willu.user.repository.BlacklistRepository;
 import com.beteam.willu.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;

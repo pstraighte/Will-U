@@ -1,10 +1,10 @@
-package com.beteam.willu.user.repository;
+package com.beteam.willu.interest.repository;
 
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.beteam.willu.user.entity.Interest;
+import com.beteam.willu.interest.entity.Interest;
 
 public interface InterestRepository extends JpaRepository<Interest, Long> {
 	boolean existsByReceiverIdAndSenderId(Long receiver, Long sender);
