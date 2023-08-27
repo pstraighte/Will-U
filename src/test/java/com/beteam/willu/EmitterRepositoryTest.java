@@ -9,12 +9,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.beteam.willu.common.notification.EmitterRepository;
-import com.beteam.willu.common.notification.EmitterRepositoryImpl;
-import com.beteam.willu.common.notification.Notification;
-import com.beteam.willu.common.notification.NotificationType;
-import com.beteam.willu.user.User;
-import com.beteam.willu.user.UserRepository;
+import com.beteam.willu.notification.Notification;
+import com.beteam.willu.notification.NotificationType;
+import com.beteam.willu.notification.repository.EmitterRepository;
+import com.beteam.willu.notification.repository.EmitterRepositoryImpl;
+import com.beteam.willu.user.entity.User;
+import com.beteam.willu.user.repository.UserRepository;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
