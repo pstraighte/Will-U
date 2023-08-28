@@ -3,6 +3,8 @@ package com.beteam.willu.post.service;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -107,6 +109,28 @@ public class PostServiceImpl implements PostService {
 		} else {
 			throw new RecruitmentStatusException();
 		}
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment,
+		Pageable pageable) {
+		Page<Post> searchResultPage;
+		if (recruitment) {
+			searchResultPage = switch (criteria) {
+				case "username" -> postRepository.findByUsernameContainingAndRecruitmentIsTrue(keyword, pageable);
+				case "content" -> postRepository.findByContentContainingAndRecruitmentIsTrue(keyword, pageable);
+				default -> postRepository.findByTitleContainingAndRecruitmentIsTrue(keyword, pageable);
+			};
+		} else {
+			searchResultPage = switch (criteria) {
+				case "username" -> postRepository.findByUsernameContaining(keyword, pageable);
+				case "content" -> postRepository.findByContentContaining(keyword, pageable);
+				default -> postRepository.findByTitleContaining(keyword, pageable);
+			};
+		}
+
+		return searchResultPage.map(PostResponseDto::new);
 	}
 
 	// 게시글 찾기

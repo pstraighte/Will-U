@@ -2,6 +2,9 @@ package com.beteam.willu.post.controller;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.beteam.willu.common.ApiResponseDto;
@@ -109,5 +113,27 @@ public class PostController {
 		} catch (RecruitmentStatusException e) {
 			return ResponseEntity.badRequest().body(new ApiResponseDto("이미 모집완료 되었습니다.", 400));
 		}
+	}
+
+	// 게시글 검색
+	// TODO 파라매터 받아오는 방법 프론트엔드와 연결 시 확정 가능할 듯
+	// size를 선택할 수 있는 기능이 필요한가? ex) 10개, 20개, 30개
+	@GetMapping("/search/posts")
+	public ResponseEntity<Page<PostResponseDto>> searchPosts(
+		@RequestParam("keyword") String keyword, // 검색 키워드 파라미터
+		@RequestParam("criteria") String criteria, // 검색 조건 파라미터 (title, username, content 중 하나)
+		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
+		@RequestParam(value = "size", defaultValue = "10") int size, // 페이지당 항목 수 파라미터 (기본값: 10)
+		@RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment // 모집중인 게시글만 검색할 것인가?
+	) {
+		if (keyword.length() < 2) {
+			// 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
+			return ResponseEntity.badRequest().build();
+		}
+
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
+			pageable); // 서비스를 통해 검색 실행
+		return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
 	}
 }

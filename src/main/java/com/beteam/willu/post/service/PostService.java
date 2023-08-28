@@ -1,9 +1,9 @@
 package com.beteam.willu.post.service;
 
-//import org.springframework.data.domain.Page;
-//import org.springframework.data.domain.Pageable;
-
 import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
@@ -48,6 +48,16 @@ public interface PostService {
 	//     */
 	//    Page<PostResponseDto> getPosts(Pageable pageable);
 	List<PostResponseDto> getPosts();
+
+	/**
+	 *
+	 * @param keyword 검색 내용
+	 * @param criteria 검색 조건 = 제목, 내용, 글쓴이 / default = 3가지 모두
+	 * @param recruitment 모집중인 것만 검색할 것인가?
+	 * @param pageable 페이지 번호와 사이즈 정보
+	 * @return 검색결과
+	 */
+	Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment, Pageable pageable);
 
 	/**
 	 *
