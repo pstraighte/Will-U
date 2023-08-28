@@ -15,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 
 	// 작성자의 username으로 검색
-	Page<Post> findByUsernameContaining(String keyword, Pageable pageable);
+	Page<Post> findByUser_UsernameContaining(String keyword, Pageable pageable);
 
 	// 내용으로 검색
 	Page<Post> findByContentContaining(String keyword, Pageable pageable);
@@ -24,7 +24,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 	Page<Post> findByTitleContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
 
 	// 작성자의 username으로 검색하고 모집 상태가 true인 게시글만 검색
-	Page<Post> findByUsernameContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
+	Page<Post> findByUser_UsernameContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
 
 	// 내용으로 검색하고 모집 상태가 true인 게시글만 검색
 	Page<Post> findByContentContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);

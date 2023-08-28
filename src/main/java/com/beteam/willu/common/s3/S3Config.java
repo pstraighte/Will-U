@@ -17,13 +17,13 @@ public class S3Config {
 	private final String awsSecretKey = System.getenv("AWS_SECRET_ACCESS_KEY");  // 시스템 환경 변수에서 시크릿 키 값 가져오기
 	private final String awsRegion = System.getenv("AWS_REGION");  // 시스템 환경 변수에서 리전 값 가져오기*/
 
-	@Value("${AWS_ACCESS_KEY_ID}")  // 액세스 키 값 주입 받기
+	@Value("${cloud.aws.credentials.access-key}")  // 액세스 키 값 주입 받기
 	private String awsAccessKey;
 
-	@Value("${AWS_SECRET_ACCESS_KEY}")  // 시크릿 키 값 주입 받기
+	@Value("${cloud.aws.credentials.secret-key}")  // 시크릿 키 값 주입 받기
 	private String awsSecretKey;
 
-	@Value("${AWS_REGION}")      // 리전 값 주입 받기
+	@Value("${cloud.aws.region.static}")      // 리전 값 주입 받기
 	private String awsRegion;
 
 	@Bean
