@@ -118,13 +118,13 @@ public class PostServiceImpl implements PostService {
 		Page<Post> searchResultPage;
 		if (recruitment) {
 			searchResultPage = switch (criteria) {
-				case "username" -> postRepository.findByUsernameContainingAndRecruitmentIsTrue(keyword, pageable);
+				case "username" -> postRepository.findByUser_UsernameContainingAndRecruitmentIsTrue(keyword, pageable);
 				case "content" -> postRepository.findByContentContainingAndRecruitmentIsTrue(keyword, pageable);
 				default -> postRepository.findByTitleContainingAndRecruitmentIsTrue(keyword, pageable);
 			};
 		} else {
 			searchResultPage = switch (criteria) {
-				case "username" -> postRepository.findByUsernameContaining(keyword, pageable);
+				case "username" -> postRepository.findByUser_UsernameContaining(keyword, pageable);
 				case "content" -> postRepository.findByContentContaining(keyword, pageable);
 				default -> postRepository.findByTitleContaining(keyword, pageable);
 			};
