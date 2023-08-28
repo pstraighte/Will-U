@@ -46,8 +46,8 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-		Exception { // 프록시 레이어를 감싸고 있다 그래서 프록시 안에 세큐리티 필터들이 묶음으로 관리되고 있다
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		// 프록시 레이어를 감싸고 있다 그래서 프록시 안에 세큐리티 필터들이 묶음으로 관리되고 있다
 		// CSRF 설정 (csrf:(Cross-Site Request Forgery) 방어 기능 비활성화)
 		http.csrf(AbstractHttpConfigurer::disable);
 		//        http.httpBasic((basic) -> basic.disable());
@@ -60,8 +60,8 @@ public class WebSecurityConfig {
 			authorizeHttpRequests
 				.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
 				.requestMatchers("/").permitAll() // 메인 페이지 요청
-				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
 				.requestMatchers("/api/users/**").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
+				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
 				.requestMatchers("/api/search/**").permitAll()
 				.anyRequest().authenticated()
 		);
