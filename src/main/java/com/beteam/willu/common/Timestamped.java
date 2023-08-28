@@ -1,27 +1,31 @@
 package com.beteam.willu.common;
 
-import jakarta.persistence.*;
-import lombok.Getter;
+import java.time.LocalDateTime;
+
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import lombok.Getter;
 
 @Getter
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Timestamped {
 
-    @CreatedDate
-    @Column(name="created_date", updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+	@CreatedDate
+	@Column(name = "created_date", updatable = false)
+	@Temporal(TemporalType.TIMESTAMP)
+	private LocalDateTime createdAt;
 
-    @LastModifiedDate
-    @Column(name="last_modified_date")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime modifiedAt;
-
+	@LastModifiedDate
+	@Column(name = "last_modified_date")
+	@Temporal(TemporalType.TIMESTAMP)
+	private LocalDateTime modifiedAt;
 
 }
