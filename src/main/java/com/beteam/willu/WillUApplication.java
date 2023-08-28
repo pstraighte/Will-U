@@ -9,9 +9,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 @EnableWebSecurity
 @EnableJpaAuditing
 public class WillUApplication {
-
-    public static void main(String[] args) {
-        SpringApplication.run(WillUApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(WillUApplication.class, args);
+	}
 
 }

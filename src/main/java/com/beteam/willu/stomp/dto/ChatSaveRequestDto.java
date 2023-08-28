@@ -6,7 +6,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ChatSaveRequestDto {
-    private String userId;
-    private String chatContent;
-    private Long roomId;
+	private String userId;
+	private String chatContent;
+	private Long roomId;
 }
+
