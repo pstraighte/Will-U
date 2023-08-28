@@ -161,12 +161,9 @@ public class UserKakaoService {
 					.kakaoId(kakaoId)
 					.build();
 			}
-
 			userRepository.save(kakaoUser);
 		}
-
 		// 이미 카카오 id가 있는 유저 - 바로 쿠키를 저장할 데이터를 보내준다.
-
 		return kakaoUser;
 	}
 }

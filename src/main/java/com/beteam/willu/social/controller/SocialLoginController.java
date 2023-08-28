@@ -27,7 +27,7 @@ public class SocialLoginController {
 	// 카카오 토큰 요청
 	// 카카오 로그인이 아닌 페이지 로그인 정보와 비교할 정보 정하기 ex) email
 	@GetMapping("/users/kakao/callback")
-	public ResponseEntity<ApiResponseDto> kakaoiLogin(@RequestParam String code, HttpServletResponse response) throws
+	public ResponseEntity<ApiResponseDto> kakaoLogin(@RequestParam String code, HttpServletResponse response) throws
 		JsonProcessingException {
 		userKakaoService.kakaoLogin(code, response);
 		return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
@@ -38,7 +38,7 @@ public class SocialLoginController {
 	public ResponseEntity<ApiResponseDto> googleLogin(@RequestParam String code, HttpServletResponse response) throws
 		JsonProcessingException {
 		socialGoogleService.googleLogin(code, response);
-		return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
+		return ResponseEntity.ok().body(new ApiResponseDto("구글 토큰 요청 성공", 200));
 	}
 
 	//네이버 토큰 요청
@@ -46,7 +46,7 @@ public class SocialLoginController {
 	public ResponseEntity<ApiResponseDto> naverLogin(@RequestParam String code, HttpServletResponse response) throws
 		JsonProcessingException {
 		socialNaverService.naverLogin(code, response);
-		return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
+		return ResponseEntity.ok().body(new ApiResponseDto("네이버 토큰 요청 성공", 200));
 	}
 
 	// 로그인 페이지
@@ -55,13 +55,13 @@ public class SocialLoginController {
 		return "login";
 	}
 
-	// 로그인 페이지
+	// 채팅 페이지
 	@GetMapping("/users/chat")
 	public String getChatPage(@RequestParam(value = "number", required = false) int number) {
 		return "chatting";
 	}
 
-	// 로그인 페이지
+	// 채팅 목록 페이지
 	@GetMapping("/users/chatList")
 	public String chatList() {
 		return "chatTest";

@@ -12,9 +12,9 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 @Configuration
 public class S3Config {
 
-	private String awsAccessKey = System.getenv("AWS_ACCESS_KEY_ID");  // 시스템 환경 변수에서 액세스 키 값 가져오기
-	private String awsSecretKey = System.getenv("AWS_SECRET_ACCESS_KEY");  // 시스템 환경 변수에서 시크릿 키 값 가져오기
-	private String awsRegion = System.getenv("AWS_REGION");  // 시스템 환경 변수에서 리전 값 가져오기
+	private final String awsAccessKey = System.getenv("AWS_ACCESS_KEY_ID");  // 시스템 환경 변수에서 액세스 키 값 가져오기
+	private final String awsSecretKey = System.getenv("AWS_SECRET_ACCESS_KEY");  // 시스템 환경 변수에서 시크릿 키 값 가져오기
+	private final String awsRegion = System.getenv("AWS_REGION");  // 시스템 환경 변수에서 리전 값 가져오기
 
 	//    @Value("${AWS_ACCESS_KEY_ID\n}")  // 액세스 키 값 주입 받기
 	//    private String awsAccessKey;

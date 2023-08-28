@@ -73,6 +73,7 @@ public class PostController {
 	@DeleteMapping("/posts/{id}")
 	public ResponseEntity<ApiResponseDto> deletePost(@PathVariable Long id,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		//TODO 후에 전역 예외처리로 try catch 제거 필요
 		try {
 			postService.deletePost(id, userDetails.getUser());
 

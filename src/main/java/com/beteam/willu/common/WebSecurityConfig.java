@@ -45,8 +45,8 @@ public class WebSecurityConfig {
 	}
 
 	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws
-		Exception { // 프록시 레이어를 감싸고 있다 그래서 프록시 안에 세큐리티 필터들이 묶음으로 관리되고 있다
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		// 프록시 레이어를 감싸고 있다 그래서 프록시 안에 세큐리티 필터들이 묶음으로 관리되고 있다
 		// CSRF 설정 (csrf:(Cross-Site Request Forgery) 방어 기능 비활성화)
 		http.csrf(AbstractHttpConfigurer::disable);
 		//        http.httpBasic((basic) -> basic.disable());

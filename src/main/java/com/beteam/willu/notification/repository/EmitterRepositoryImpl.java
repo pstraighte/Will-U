@@ -27,16 +27,16 @@ public class EmitterRepositoryImpl implements EmitterRepository {
 	}
 
 	@Override
-	public Map<String, SseEmitter> findAllEmitterStartWithByUserId(String memberId) {
+	public Map<String, SseEmitter> findAllEmitterStartWithByUserId(String userId) {
 		return emitters.entrySet().stream()
-			.filter(entry -> entry.getKey().startsWith(memberId))
+			.filter(entry -> entry.getKey().startsWith(userId))
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
 	@Override
-	public Map<String, Object> findAllEventCacheStartWithByUserId(String memberId) {
+	public Map<String, Object> findAllEventCacheStartWithByUserId(String userId) {
 		return eventCache.entrySet().stream()
-			.filter(entry -> entry.getKey().startsWith(memberId))
+			.filter(entry -> entry.getKey().startsWith(userId))
 			.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 	}
 
@@ -46,10 +46,10 @@ public class EmitterRepositoryImpl implements EmitterRepository {
 	}
 
 	@Override
-	public void deleteAllEmitterStartWithId(String memberId) {
+	public void deleteAllEmitterStartWithId(String userId) {
 		emitters.forEach(
 			(key, emitter) -> {
-				if (key.startsWith(memberId)) {
+				if (key.startsWith(userId)) {
 					emitters.remove(key);
 				}
 			}
@@ -57,10 +57,10 @@ public class EmitterRepositoryImpl implements EmitterRepository {
 	}
 
 	@Override
-	public void deleteAllEventCacheStartWithId(String memberId) {
+	public void deleteAllEventCacheStartWithId(String userId) {
 		eventCache.forEach(
 			(key, emitter) -> {
-				if (key.startsWith(memberId)) {
+				if (key.startsWith(userId)) {
 					eventCache.remove(key);
 				}
 			}

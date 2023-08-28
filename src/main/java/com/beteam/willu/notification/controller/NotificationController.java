@@ -21,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 public class NotificationController {
 	private final NotificationService notificationService;
 
+	//현재 로그인한 ID에 대한(본인) 구독으로 EventStream 생성 하도록 함. 후에 수정 여지 있음
 	@GetMapping(value = "/subscribe", produces = "text/event-stream")
 	@ResponseBody
 	public SseEmitter subscribe(@AuthenticationPrincipal UserDetailsImpl userDetails,
@@ -28,13 +29,14 @@ public class NotificationController {
 		return notificationService.subscribe(userDetails.getUser().getId(), lastEventId);
 	}
 
+	//알림 읽음 상태 수정 안읽음 <-> 읽음
 	@PatchMapping("/api/notification/{id}")
 	public ResponseEntity<ApiResponseDto> updateNotification(@PathVariable long id) {
 		notificationService.updateRead(id);
 		return ResponseEntity.ok().body(new ApiResponseDto("읽음 상태 처리 완료", 200));
-
 	}
 
+	//알림 테스트 화면
 	@GetMapping("/notification-page")
 	public String notificationPage() {
 		return "Notification";

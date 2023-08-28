@@ -25,7 +25,7 @@ public class NotificationService {
 	private final NotificationRepository notificationRepository;
 
 	public SseEmitter subscribe(Long userId, String lastEventId) {
-		log.info("SSE subscribe");
+		log.info("SSE subscribe: USER ID: " + userId);
 
 		String emitterId = makeTimeIncludeId(userId);
 
@@ -40,6 +40,7 @@ public class NotificationService {
 		sendNotification(emitter, eventId, emitterId, "EventStream Created. [userId=" + userId + "]");
 
 		// 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
+		// TODO TEST 정상 동작하는지 확인 필요
 		if (hasLostData(lastEventId)) {
 			log.info("미수신 데이터 있음");
 			sendLostData(lastEventId, userId, emitterId, emitter);

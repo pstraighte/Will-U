@@ -40,8 +40,8 @@ public class UserService {
 			throw new IllegalArgumentException("중복된 username 입니다");
 		}
 
-		// 카카오 계정으로 사용된 email로 또 회원가입을 진행 할시
-		// 또는 중복된 email이 있는지 확인
+		// 카카오 계정으로 사용된 email 로 또 회원가입을 진행 할시
+		// 또는 중복된 email 이 있는지 확인
 		if (userRepository.findByEmail(requestDto.getEmail()).isPresent()) {
 			throw new IllegalArgumentException("중복된 email 입니다");
 		}

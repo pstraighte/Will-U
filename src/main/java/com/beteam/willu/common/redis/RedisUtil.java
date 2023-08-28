@@ -1,7 +1,5 @@
 package com.beteam.willu.common.redis;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -20,7 +18,6 @@ public class RedisUtil {
 	// AccessToken - logout 형태로 저장
 	private final StringRedisTemplate redisBlackListTemplate;
 	private static final String KEY_PREFIX = "RT:";
-	Set<String> keySet = new HashSet<>();
 
 	public String getRefreshToken(String username) {
 		return redisTemplate.opsForValue().get(KEY_PREFIX + username);

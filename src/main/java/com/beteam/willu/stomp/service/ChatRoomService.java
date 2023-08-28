@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.beteam.willu.blacklist.repository.BlacklistRepository;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
@@ -33,7 +32,6 @@ public class ChatRoomService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 	private final ChatRepository chatRepository;
-	private final BlacklistRepository blacklistRepository;
 
 	// 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
 
