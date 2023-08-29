@@ -41,4 +41,9 @@ public class NotificationController {
 	public String notificationPage() {
 		return "Notification";
 	}
+
+	@GetMapping("/sidebar")
+	public String sidebar() {
+		return "sidebar";
+	}
 }

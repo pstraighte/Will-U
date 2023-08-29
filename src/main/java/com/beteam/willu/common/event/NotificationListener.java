@@ -4,7 +4,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
-import com.beteam.willu.notification.dto.NotificationRequestDto;
+import com.beteam.willu.notification.dto.NotificationEvent;
 import com.beteam.willu.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
@@ -17,8 +17,8 @@ public class NotificationListener {
 
 	@TransactionalEventListener
 	@Async
-	public void handleNotification(NotificationRequestDto requestDto) {
-		notificationService.send(requestDto.getReceiver(), requestDto.getNotificationType(),
-			requestDto.getContent(), requestDto.getTitle());
+	public void handleNotification(NotificationEvent event) {
+		notificationService.send(event.getPublisher(), event.getReceiver(), event.getNotificationType(),
+			event.getContent(), event.getTitle());
 	}
 }

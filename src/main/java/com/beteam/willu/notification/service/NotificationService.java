@@ -48,10 +48,10 @@ public class NotificationService {
 		return emitter;
 	}
 
-	public void send(User receiver, NotificationType notificationType, String content, String title) {
+	public void send(User publisher, User receiver, NotificationType notificationType, String content, String title) {
 		log.info("send 실행");
 		Notification notification = notificationRepository.save(
-			createNotification(receiver, notificationType, content, title));
+			createNotification(publisher, receiver, notificationType, content, title));
 
 		String receiverId = String.valueOf(receiver.getId());
 		String eventId = receiverId + "_" + System.currentTimeMillis();
@@ -64,10 +64,12 @@ public class NotificationService {
 		);
 	}
 
-	private Notification createNotification(User receiver, NotificationType notificationType, String content,
+	private Notification createNotification(User publisher, User receiver, NotificationType notificationType,
+		String content,
 		String title) {
 		return Notification.builder()
 			.receiver(receiver)
+			.publisher(publisher)
 			.notificationType(notificationType)
 			.content(content)
 			.title(title)

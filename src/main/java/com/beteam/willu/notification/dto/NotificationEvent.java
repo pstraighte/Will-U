@@ -4,15 +4,19 @@ import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.entity.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class NotificationRequestDto {
+//이벤트 객체
+public class NotificationEvent {
 
 	private String content;
 
@@ -21,4 +25,5 @@ public class NotificationRequestDto {
 	private NotificationType notificationType;
 
 	private User receiver;
+	private User publisher;
 }

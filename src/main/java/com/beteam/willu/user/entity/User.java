@@ -1,11 +1,8 @@
 package com.beteam.willu.user.entity;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.common.Timestamped;
-import com.beteam.willu.notification.dto.NotificationRequestDto;
-import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.dto.UserUpdateRequestDto;
 
 import jakarta.persistence.Column;
@@ -98,13 +95,6 @@ public class User extends Timestamped {
 	public User naverIdUpdate(String naverId) {
 		this.naverId = naverId;
 		return this;
-	}
-
-	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
-		//type 에 따른 알림 내용 변경
-		NotificationRequestDto requestDto = new NotificationRequestDto(this.getNickname() + "님이 로그인하셨습니다.", "로그인 알림",
-			type, this);
-		eventPublisher.publishEvent(requestDto);
 	}
 }
 
