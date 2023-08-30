@@ -39,7 +39,7 @@ public class BlacklistService {
 		NotificationEvent event = NotificationEvent.builder()
 			.title("차단 유저 추가")
 			.notificationType(NotificationType.LOGIN_DONE)
-			.receiver(user)
+			.receiver(receiver)
 			.publisher(user)
 			.content(receiver.getNickname() + "님을 차단했습니다")
 			.build();

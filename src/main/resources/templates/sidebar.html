@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>sideBar</title>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+
+    </style>
+
+</head>
+
+<body>
+<h1 onclick="sse()">사이드바입니다</h1>
+<div class="alert-list"></div>
+<div class="chat-list"></div>
+<div class="profile-btn-container">
+    <h2 onclick="goProfile()">프로필</h2>
+</div>
+</body>
+</html>
+<script>
+    function sse() {
+        const eventSource = new EventSource(`/subscribe`);
+
+        eventSource.addEventListener("sse", function (event) {
+
+            console.log(event);
+            const {data: receivedConnectionData} = event;
+            console.log('connect event data: ', receivedConnectionData);
+
+        });
+    }
+
+
+    function goProfile() {
+        window.location.href = "/profile";
+    }
+
+
+</script>

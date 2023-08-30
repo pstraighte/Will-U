@@ -71,6 +71,10 @@ public class User extends Timestamped {
 	@Column(name = "naverId")
 	private String naverId;
 
+	public User(long id) {
+		super();
+	}
+
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
 		this.username = updateRequestDto.getUsername();

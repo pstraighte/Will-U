@@ -6,12 +6,15 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.common.security.UserDetailsImpl;
+import com.beteam.willu.notification.dto.NotificationRequestDto;
 import com.beteam.willu.notification.service.NotificationService;
 
 import lombok.RequiredArgsConstructor;
@@ -34,6 +37,13 @@ public class NotificationController {
 	public ResponseEntity<ApiResponseDto> updateNotification(@PathVariable long id) {
 		notificationService.updateRead(id);
 		return ResponseEntity.ok().body(new ApiResponseDto("읽음 상태 처리 완료", 200));
+	}
+
+	@PostMapping("/api/notifications")
+	public ResponseEntity<ApiResponseDto> sendJoinNotifcation(@RequestBody NotificationRequestDto requestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		notificationService.sendDirectNotification(requestDto, userDetails.getUser());
+		return ResponseEntity.ok().body(new ApiResponseDto("알림 전송 완료", 200));
 	}
 
 	//알림 테스트 화면
