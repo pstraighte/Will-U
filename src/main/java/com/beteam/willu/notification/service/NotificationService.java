@@ -132,11 +132,6 @@ public class NotificationService {
 	}
 
 	private void sendLostData(String lastEventId, Long userId, String emitterId, SseEmitter emitter) {
-		/*Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithById(
-			String.valueOf(userId));
-		eventCaches.entrySet().stream()
-			.filter(entry -> lastEventId.compareTo(entry.getKey()) < 0)
-			.forEach(entry -> sendNotification(emitter, entry.getKey(), entry.getValue()));*/
 		Map<String, Object> eventCaches = emitterRepository.findAllEventCacheStartWithById(
 			String.valueOf(userId));
 		log.info("eventCaches.size(): " + eventCaches.size());

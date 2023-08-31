@@ -23,12 +23,6 @@
 </body>
 </html>
 <script>
-    //사이드 바 페이지 로드 시에
-    //TODO 1 내가 받은 알림 목록 중 읽지 않은 목록 가져오기
-    //TODO 2 모집 완료 알림(chatroom 내 user들에게)->백에서 하는 게 맞을듯?
-    //API 연결
-    //HTML 추가
-    // +추가되는 목록은 새로 생긴 알림들 - 완료
     showMyNotification();
     const eventSource = new EventSource(`/subscribe`);
 

@@ -182,6 +182,7 @@ public class ChatRoomService {
 		eventPublisher.publishEvent(approveMessageEvent);
 		//추가 후 인원이 모두 찼는지 확인
 		if (chatRoom.getUserChatRoomList().size() + 1 >= post.getMaxnum()) {
+			post.setRecruitment(false);
 			//기존 chatRoom에 있는 유저 목록
 			List<User> users = new ArrayList<>(
 				chatRoom.getUserChatRoomList().stream().map(UserChatRoom::getUser).toList());
