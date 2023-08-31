@@ -18,4 +18,6 @@ public interface EmitterRepository {
 	void deleteAllEmitterStartWithId(String userId);
 
 	void deleteAllEventCacheStartWithId(String userId);
+
+	void deleteAllEventCacheEndsWithNotificationId(Long notificationId);
 }

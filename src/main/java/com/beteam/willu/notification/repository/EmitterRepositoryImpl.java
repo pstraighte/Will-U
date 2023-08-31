@@ -59,8 +59,19 @@ public class EmitterRepositoryImpl implements EmitterRepository {
 	@Override
 	public void deleteAllEventCacheStartWithId(String userId) {
 		eventCache.forEach(
-			(key, emitter) -> {
+			(key, event) -> {
 				if (key.startsWith(userId)) {
+					eventCache.remove(key);
+				}
+			}
+		);
+	}
+
+	@Override
+	public void deleteAllEventCacheEndsWithNotificationId(Long notificationId) {
+		eventCache.forEach(
+			(key, event) -> {
+				if (key.endsWith(String.valueOf(notificationId))) {
 					eventCache.remove(key);
 				}
 			}
