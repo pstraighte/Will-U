@@ -17,6 +17,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -62,6 +63,8 @@ public class Notification extends Timestamped {
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private User publisher;
 
+	@Transient
+	private Long postId;
 	/**
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
 	 */

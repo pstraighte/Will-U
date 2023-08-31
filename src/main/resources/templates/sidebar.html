@@ -12,31 +12,194 @@
 </head>
 
 <body>
-<h1 onclick="sse()">사이드바입니다</h1>
+<h1>사이드바입니다</h1>
 <div class="alert-list"></div>
-<div class="chat-list"></div>
+<div class="chat-list">
+
+</div>
 <div class="profile-btn-container">
     <h2 onclick="goProfile()">프로필</h2>
 </div>
 </body>
 </html>
 <script>
-    function sse() {
-        const eventSource = new EventSource(`/subscribe`);
+    //사이드 바 페이지 로드 시에
+    //TODO 3 마지막 이벤트id 존재하면 가져오기
+    //TODO 1 내가 받은 알림 목록 중 읽지 않은 목록 가져오기
+    // +추가되는 목록은 새로 생긴 알림들 - 완료
+    //TODO 승인 알림 API 전송
+    //
+    //TODO user chatroom 초대 API
+    //TODO 거절 알림 API 전송
+    const eventSource = new EventSource(`/subscribe`, {
+        headers: {"Last-Event-ID": "1_1231123123"}
+    });
+    const eventList = $(".alert-list");
+    let ntId;
+    /*        eventSource.addEventListener("sse", function (event) {
 
-        eventSource.addEventListener("sse", function (event) {
+                console.log(event);
+                const {data: receivedConnectionData} = event;
+                console.log('connect event data: ', receivedConnectionData);
 
-            console.log(event);
-            const {data: receivedConnectionData} = event;
-            console.log('connect event data: ', receivedConnectionData);
+            });
+            //서버에서 데이터 전송
+            eventSource.addEventListener('message', function (e) {
+                    console.log(e.data);
+                }, false,
+            );*/
+    eventSource.onopen = e => {
+        console.log("연결 완료");
+    };
 
-        });
+    eventSource.onmessage = e => {
+
+        const {data: receivedConnectionData} = e;
+        const jsonData = JSON.parse(receivedConnectionData);
+        console.log(jsonData);
+        const nt = jsonData.notificationType;
+        const title = jsonData.title;
+        const content = jsonData.content;
+
+        ntId = jsonData.id;
+        if (nt != "MAKE_CONNECTION") {
+            const publisherId = jsonData.publisher.id;
+            const postId = jsonData.postId;
+            console.log("ntId: " + ntId);
+            console.log("publisherId: " + publisherId);
+            console.log("postId: " + postId);
+            showNotification(content, nt, title, ntId);
+            addNotificationHTML(content, nt, title, ntId, publisherId, postId);
+
+        }
     }
+    eventSource.onerror = error => {
+        console.log("에러 발생");
+        //eventSource.close();
+    };
+
+    //알림 허용 체크
+    notifyMe();
 
 
     function goProfile() {
         window.location.href = "/profile";
     }
 
+    function read(ntId) {
+        $.ajax({
+            url: `/api/notification/${ntId}`, // 요청을 보낼 서버의 URL
+            method: 'PATCH', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            success: function (response) {
+                console.log("읽기 처리 완료");
+                //TODO 알림이 포함된 HTML 지우기
+                removeNotificationHTML(ntId);
+            },
+            error: function (xhr, status, error) {
+                console.log("읽기 처리 실패");
+            }
+        });
+    }
 
+    function reject(ntId, postId, publisherId) {
+        if (confirm("참가 요청을 거부하시겠습니까?")) {
+            console.log("거부했습니다.");
+            read(ntId);
+            sendReject(ntId, postId, publisherId);
+            //거절 알림 전송
+            //window.location.reload();
+        } else {
+            window.focus();
+        }
+    }
+
+    function approve(ntId) {
+        if (confirm("참가 요청을 승인하시겠습니까?")) {
+            console.log("승인했습니다.");
+            read(ntId);
+
+            //승인 알림 전송
+            //chatroom user 추가
+            //window.location.reload();
+        } else {
+            window.focus();
+        }
+    }
+
+    function notifyMe() {
+        if (Notification.permission === "granted") {
+            console.log("notification granted");
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+    }
+
+    function showNotification(content, notificationType, title, ntId) {
+        const notificationOptions = {
+            body: notificationType + ": " + content,
+            icon: "path/to/icon.png" // 사용자에게 보일 아이콘의 경로
+        };
+
+        const notification = new Notification(title, notificationOptions);
+
+        notification.onclick = function () {
+            // 알림 클릭 시 수행할 동작 설정
+            //window.open("http://localhost:8080/api/users/user-login");
+            window.focus();
+            //사이드바 열고 알림 목록 보여주기
+
+            notification.close();
+
+        };
+    }
+
+    function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
+        const newElement =
+            `<div class="unread-notification-${ntId}">
+                    <h2>title: ${title}</h2>
+                    <p>content: ${content}</p>
+                    <p>type: ${nt}</p>
+                `;
+        const replyElement = `<input type="button" onclick="approve(${ntId})" value="승인">
+                                <input type="button" onclick="reject(${ntId},${postId},${publisherId})" value="거부">
+`
+        const buttonElement = `<input type="button" onclick="read(${ntId})" value="닫기">`;
+        eventList.append(newElement);
+        if (nt === "JOIN_REQUEST") {
+            eventList.append(replyElement);
+        } else {
+            eventList.append(buttonElement);
+        }
+        eventList.append(`</div>`);
+    }
+
+    function removeNotificationHTML(ntId) {
+        const div = $(`.unread-notification-${ntId}`);
+        div.remove();
+    }
+
+    function sendReject(ntId, postId, publisherId) {
+
+        const data = {
+            "postId": postId,
+            "type": "REJECT_REQUEST",
+            "receiverId": publisherId
+        };
+        //헤더에 토큰
+        $.ajax({
+            url: `/api/notifications`, // 요청을 보낼 서버의 URL
+            method: 'POST', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            success: function (response) {
+                alert("전송 완료");
+
+            },
+            error: function (xhr, status, error) {
+                alert("저장 실패")
+                console.log(xhr);
+            }
+        });
+    }
 </script>

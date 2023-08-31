@@ -2,6 +2,7 @@ package com.beteam.willu.notification.service;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,14 +31,42 @@ public class NotificationService {
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 
-	public void sendDirectNotification(NotificationRequestDto requestDto, User user) {
-		Post post = postRepository.findById(requestDto.getPostId()).orElseThrow();
-		//본인이 작성한 글인지 확인 필요
-		//type 에 따른 메세지 전송
-		send(user, post.getUser(), NotificationType.JOIN_REQUEST,
-			user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 요청했습니다", "참가 요청 알림");
+	//참가 요청 알림 보내기
+	public void sendRequestNotification(NotificationRequestDto requestDto, User user) {
+		Long postId = requestDto.getPostId();
+		Post post = postRepository.findById(postId).orElseThrow();
+		String type = requestDto.getType().getDescription();
+		switch (type) {
+			case "참가 신청" -> {
+				log.info("참가 신청 알림");
+				send(user, post.getUser(), requestDto.getType(),
+					user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 요청했습니다", "참가 요청 알림", postId);
+			}
+			case "참가 거절" -> {
+				log.info("참가 거절 알림");
+				User receiver = userRepository.findById(requestDto.getReceiverId()).orElseThrow();
+				if (!Objects.equals(post.getUser().getId(), user.getId())) {
+					throw new IllegalArgumentException("게시글 작성자가 아닙니다. 알림을 보낼 수 없습니다.");
+				}
+				send(user, receiver, requestDto.getType(),
+					user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 거절했습니다", "요청 거절 알림", postId);
+			}
+		}
 
 	}
+
+	//참가 거절 알림 보내기
+/*	public void sendRejectNotification(NotificationRequestDto requestDto, User user) {
+		Long postId = requestDto.getPostId();
+		User receiver = userRepository.findById(requestDto.getReceiverId()).orElseThrow();
+		Post post = postRepository.findById(postId).orElseThrow();
+		if (post.getUser().getId() != user.getId()) {
+			throw new IllegalArgumentException("게시글 작성자가 아닙니다. 알림을 보낼 수 없습니다.");
+		}
+		send(user, receiver, requestDto.getType(),
+			user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 거절했습니다", "요청 거절 알림", postId);
+
+	}*/
 
 	public SseEmitter subscribe(Long userId, String lastEventId) {
 		log.info("SSE subscribe: USER ID: " + userId + "LastEVENTID: " + lastEventId);
@@ -69,10 +98,11 @@ public class NotificationService {
 		return emitter;
 	}
 
-	public void send(User publisher, User receiver, NotificationType notificationType, String content, String title) {
+	public void send(User publisher, User receiver, NotificationType notificationType, String content, String title,
+		Long postId) {
 		log.info("send 실행");
 		Notification notification = notificationRepository.save(
-			createNotification(publisher, receiver, notificationType, content, title));
+			createNotification(publisher, receiver, notificationType, content, title, postId));
 
 		String receiverId = String.valueOf(receiver.getId());
 		String eventId = makeTimeIncludeId(receiver.getId());
@@ -89,7 +119,7 @@ public class NotificationService {
 
 	private Notification createNotification(User publisher, User receiver, NotificationType notificationType,
 		String content,
-		String title) {
+		String title, Long postId) {
 		return Notification.builder()
 			.receiver(receiver)
 			.publisher(publisher)
@@ -97,6 +127,7 @@ public class NotificationService {
 			.content(content)
 			.title(title)
 			.isRead(false)
+			.postId(postId)
 			.build();
 	}
 
@@ -126,7 +157,7 @@ public class NotificationService {
 		try {
 			log.info("sendNotification 실행");
 			emitter.send(SseEmitter.event()
-				.name("sse")
+
 				.id(eventId)
 				.data(data));
 		} catch (IOException exception) {

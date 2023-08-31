@@ -26,4 +26,5 @@ public class NotificationEvent {
 
 	private User receiver;
 	private User publisher;
+	private Long postId;
 }

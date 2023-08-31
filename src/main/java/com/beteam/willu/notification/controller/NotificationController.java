@@ -42,7 +42,7 @@ public class NotificationController {
 	@PostMapping("/api/notifications")
 	public ResponseEntity<ApiResponseDto> sendJoinNotifcation(@RequestBody NotificationRequestDto requestDto,
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		notificationService.sendDirectNotification(requestDto, userDetails.getUser());
+		notificationService.sendRequestNotification(requestDto, userDetails.getUser());
 		return ResponseEntity.ok().body(new ApiResponseDto("알림 전송 완료", 200));
 	}
 

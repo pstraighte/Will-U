@@ -19,6 +19,6 @@ public class NotificationListener {
 	@Async
 	public void handleNotification(NotificationEvent event) {
 		notificationService.send(event.getPublisher(), event.getReceiver(), event.getNotificationType(),
-			event.getContent(), event.getTitle());
+			event.getContent(), event.getTitle(), event.getPostId());
 	}
 }
