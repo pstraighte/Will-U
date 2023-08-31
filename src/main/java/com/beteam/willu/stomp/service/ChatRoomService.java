@@ -28,8 +28,10 @@ import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
+@Slf4j(topic = "ChatRoomService")
 @RequiredArgsConstructor
 public class ChatRoomService {
 	private final ChatRoomRepository chatRoomRepository;
@@ -161,30 +163,38 @@ public class ChatRoomService {
 		if (!Objects.equals(loginUser.getId(), post.getUser().getId())) {
 			throw new IllegalArgumentException("게시글 작성자가 아닙니다. 유저를 참가시킬 권한이 없습니다.");
 		}
+		log.info("현재 정원:" + chatRoom.getUserChatRoomList().size());
 		if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
 			throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
 		} else if (userChatRoomsRepository.existsByUserAndChatRooms(joiner, chatRoom)) {
 			throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
 		}
 
-		UserChatRoom guestChatRoom = UserChatRoom.builder()
-			.user(joiner)
-			.chatRooms(chatRoom)
-			.role("GUEST")
-			.build();
+		UserChatRoom guestChatRoom = UserChatRoom.builder().user(joiner).chatRooms(chatRoom).role("GUEST").build();
 		//유저 채팅방 초대
 		userChatRoomsRepository.save(guestChatRoom);
 
 		//알림 발송
-		NotificationEvent event = NotificationEvent.builder()
-			.title("참여 요청 승인")
-			.notificationType(NotificationType.APPROVE_REQUEST)
-			.receiver(joiner)
-			.publisher(loginUser)
-			.content(post.getTitle() + " 게시글에 초대됐습니다.")
-			.postId(postId)
-			.build();
-		eventPublisher.publishEvent(event);
+		NotificationEvent approveMessageEvent = NotificationEvent.builder()
+			.title("참여 요청 승인").notificationType(NotificationType.APPROVE_REQUEST)
+			.receiver(joiner).publisher(loginUser).content(post.getTitle() + " 게시글에 초대됐습니다.")
+			.postId(postId).build();
+		eventPublisher.publishEvent(approveMessageEvent);
+		//추가 후 인원이 모두 찼는지 확인
+		if (chatRoom.getUserChatRoomList().size() + 1 >= post.getMaxnum()) {
+			//기존 chatRoom에 있는 유저 목록
+			List<User> users = new ArrayList<>(
+				chatRoom.getUserChatRoomList().stream().map(UserChatRoom::getUser).toList());
+			users.add(joiner);
+			for (User user : users) {
+				NotificationEvent doneMessageEvent = NotificationEvent.builder()
+					.title("모집 완료 알림")
+					.notificationType(NotificationType.RECRUIT_DONE).receiver(user)
+					.publisher(loginUser).content(post.getTitle() + " 게시글 모집이 완료되었습니다.")
+					.postId(postId).build();
+				eventPublisher.publishEvent(doneMessageEvent);
+			}
+		}
 	}
 
 	// 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
@@ -213,7 +223,7 @@ public class ChatRoomService {
 		// 나갈 방 조회
 		Optional<UserChatRoom> chatRoom = userChatRoomsRepository.findByChatRoomsIdAndUserId(id, userId);
 
-		if (!chatRoom.isPresent()) {
+		if (chatRoom.isEmpty()) {
 			throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
 		}
 
@@ -226,7 +236,7 @@ public class ChatRoomService {
 		// 해당 채팅방이 있는지 확인
 		Optional<UserChatRoom> chatRoom = userChatRoomsRepository.findById(id);
 
-		if (!chatRoom.isPresent()) {
+		if (chatRoom.isEmpty()) {
 			throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
 		}
 		// 해당 채팅방의 id 를 가진 유저들을 조회

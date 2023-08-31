@@ -2,7 +2,6 @@ package com.beteam.willu.blacklist.service;
 
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BlacklistService {
 	private final UserRepository userRepository;
 	private final BlacklistRepository blacklistRepository;
-	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional //차단 유저 추가
 	public void addBlacklist(Long id, User user) {
@@ -43,7 +41,6 @@ public class BlacklistService {
 			.publisher(user)
 			.content(receiver.getNickname() + "님을 차단했습니다")
 			.build();
-		eventPublisher.publishEvent(event);
 	}
 
 	@Transactional  //차단 유저 해제

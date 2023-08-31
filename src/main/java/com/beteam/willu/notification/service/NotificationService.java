@@ -57,19 +57,6 @@ public class NotificationService {
 
 	}
 
-	//참가 거절 알림 보내기
-/*	public void sendRejectNotification(NotificationRequestDto requestDto, User user) {
-		Long postId = requestDto.getPostId();
-		User receiver = userRepository.findById(requestDto.getReceiverId()).orElseThrow();
-		Post post = postRepository.findById(postId).orElseThrow();
-		if (post.getUser().getId() != user.getId()) {
-			throw new IllegalArgumentException("게시글 작성자가 아닙니다. 알림을 보낼 수 없습니다.");
-		}
-		send(user, receiver, requestDto.getType(),
-			user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 거절했습니다", "요청 거절 알림", postId);
-
-	}*/
-
 	public SseEmitter subscribe(Long userId, String lastEventId) {
 		log.info("SSE subscribe: USER ID: " + userId + "LastEVENTID: " + lastEventId);
 		User user = userRepository.findById(userId).orElseThrow();
@@ -166,7 +153,6 @@ public class NotificationService {
 		try {
 			log.info("sendNotification 실행");
 			emitter.send(SseEmitter.event()
-
 				.id(eventId)
 				.data(data));
 		} catch (IOException exception) {
