@@ -53,7 +53,7 @@ public class Notification extends Timestamped {
 	private NotificationType notificationType;
 
 	//TODO :STUDY OnDelete 와 연관관계에서 cascade 사용하는 것의 차이?
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "receiver_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private User receiver;

@@ -1,6 +1,7 @@
 package com.beteam.willu.notification.service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.beteam.willu.notification.dto.NotificationRequestDto;
+import com.beteam.willu.notification.dto.NotificationResponseDto;
 import com.beteam.willu.notification.entity.Notification;
 import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.notification.repository.EmitterRepository;
@@ -71,22 +73,22 @@ public class NotificationService {
 	public SseEmitter subscribe(Long userId, String lastEventId) {
 		log.info("SSE subscribe: USER ID: " + userId + "LastEVENTID: " + lastEventId);
 		User user = userRepository.findById(userId).orElseThrow();
-		String emitterId = makeTimeIncludeId(userId);
 
+		String emitterId = makeTimeIncludeId(userId);
 		SseEmitter emitter = emitterRepository.save(emitterId, new SseEmitter(DEFAULT_TIMEOUT));
 
 		emitter.onCompletion(() -> emitterRepository.deleteById(emitterId));
 		emitter.onTimeout(() -> emitterRepository.deleteById(emitterId));
 
 		// 503 에러를 방지하기 위한 더미 이벤트 전송
-		String eventId = makeTimeIncludeId(userId);
+
 		Notification notification = Notification.builder()
 			.title("connect")
 			.content("EventStream Created. [userId=" + userId + "]")
 			.receiver(user)
 			.notificationType(NotificationType.MAKE_CONNECTION)
 			.build();
-
+		String eventId = makeNotificationIdIncludeId(userId, notification.getId());
 		sendNotification(emitter, eventId, emitterId, notification);
 
 		// 클라이언트가 미수신한 Event 목록이 존재할 경우 전송하여 Event 유실을 예방
@@ -105,16 +107,23 @@ public class NotificationService {
 			createNotification(publisher, receiver, notificationType, content, title, postId));
 
 		String receiverId = String.valueOf(receiver.getId());
-		String eventId = makeTimeIncludeId(receiver.getId());
+		String eventId = makeNotificationIdIncludeId(receiver.getId(), notification.getId());
 		Map<String, SseEmitter> emitters = emitterRepository.findAllEmitterStartWithById(receiverId);
 		log.info("emitters 크기: " + emitters.size());
-		emitters.forEach(
-			(key, emitter) -> {
-				emitterRepository.saveEventCache(key, notification);
-				log.info("eventCache 저장 key: " + key + " emitter: " + emitter);
-				sendNotification(emitter, eventId, key, notification);
-			}
-		);
+		if (emitters.size() > 0) {
+			emitters.forEach(
+				(key, emitter) -> {
+					emitterRepository.saveEventCache(eventId, notification);
+					log.info("eventCache 저장 key: " + eventId + " notification: " + notification);
+					sendNotification(emitter, eventId, key, notification);
+				}
+			);
+		} else {
+			log.info("연결된 Emitter가 없는 경우");
+			log.info("eventCache 저장 key: " + eventId + " notification: " + notification);
+			emitterRepository.saveEventCache(eventId, notification);
+		}
+
 	}
 
 	private Notification createNotification(User publisher, User receiver, NotificationType notificationType,
@@ -169,11 +178,25 @@ public class NotificationService {
 		return userId + "_" + System.currentTimeMillis();
 	}
 
+	private String makeNotificationIdIncludeId(Long userId, Long notificationId) {
+		return userId + "_" + notificationId;
+	}
+
 	@Transactional
 	public void updateRead(long id) {
 		Notification notification = notificationRepository.findById(id)
 			.orElseThrow(() -> new IllegalArgumentException("알림이 존재하지 않습니다."));
 		notification.updateIsRead();
+		emitterRepository.deleteAllEventCacheEndsWithNotificationId(id);
 		log.info("읽었음으로 상태 변경" + notification.getIsRead().toString());
+		log.info("cache 에서 notificationId 로끝나는 키를 가진 notification 삭제");
+	}
+
+	//읽음 처리 되지 않은 특정 게시글에 대한 내 알림 목록
+	public List<NotificationResponseDto> getNotificationByUserId(Long userId) {
+		return notificationRepository.findNotificationByReceiver_IdAndIsReadIsFalse(userId)
+			.stream()
+			.map(NotificationResponseDto::new)
+			.toList();
 	}
 }
