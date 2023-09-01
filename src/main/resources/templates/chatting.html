@@ -9,10 +9,56 @@
             padding: 0;
         }
 
+        /*사이드바*/
+        #sidebar {
+            width: 0;
+            background-color: #333;
+            color: gray;
+            height: 100vh;
+            position: fixed;
+            transition: 0.5s;
+            overflow: hidden;
+        }
+
+        #openBtn {
+            position: absolute;
+            top: 20px;
+            left: 10px;
+            cursor: pointer;
+        }
+
+        /*아코디언 스타일 메뉴바*/
+        .accordion {
+            width: 300px;
+            margin: 20px auto;
+        }
+
+        .accordion-item {
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+        }
+
+        .accordion-header {
+            padding: 10px;
+            background-color: #f0f0f0;
+            cursor: pointer;
+        }
+
+        .accordion-content {
+            padding: 10px;
+            display: none;
+        }
+
+        /*채팅방*/
         .container {
             width: 500px;
             margin: 0 auto;
-            padding: 25px
+            padding: 25px;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
         }
 
         .container h1 {
@@ -53,27 +99,90 @@
         .other {
             color: red;
         }
+
+        /*모달창*/
+        #reviewModalOverlay {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            top: 0;
+            left: 0;
+            display: none;
+        }
+
+        #reviewModal {
+            width: 30%;
+            height: 30%;
+            background: #fff;
+            border-radius: 10px;
+            position: relative;
+            top: 50%;
+            left: 50%;
+            margin-top: -100px;
+            margin-left: -100px;
+            text-align: center;
+            box-sizing: border-box;
+            padding: 20px 30px;
+            line-height: 23px;
+        }
+
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
 </head>
 <body>
+
+<div id="reviewModalOverlay">
+    <div id="reviewModal">
+        <div class="modal-content">
+            <h2>후기를 남겨보세요</h2>
+            <p>유저 정보</p>
+            <div class="modal-buttons">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="sidebar">
+    <h2>내비게이션</h2>
+
+    <div class="accordion">
+        <div class="accordion-item">
+            <div class="accordion-header">Menu 1</div>
+            <div class="accordion-content">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="container" id="container">
-    <h1 id="title_room">채팅방제목</h1>
-    <div id="chatting" class="chatting">
+    <span id="openBtn" onclick="openSidebar()">☰</span>
+    <div id="chatBox">
+        <h1 id="title_room">채팅방제목</h1>
+        <div id="chatting" class="chatting">
+        </div>
+        <div id="yourMsg">
+            <table class="inputTable">
+                <tr>
+                    <th>메시지</th>
+                    <th><input id="msg" placeholder="보내실 메시지를 입력하세요."></th>
+                    <th>
+                        <button onclick="send()" id="sendBtn">보내기</button>
+                        <button onclick="disconnectChatRoom()" id="disconnectChatRoomBtn">채팅방 나가기</button>
+                    </th>
+                </tr>
+            </table>
+        </div>
     </div>
-    <div id="yourMsg">
-        <table class="inputTable">
-            <tr>
-                <th>메시지</th>
-                <th><input id="msg" placeholder="보내실 메시지를 입력하세요."></th>
-                <th>
-                    <button onclick="send()" id="sendBtn">보내기</button>
-                    <button onclick="disconnect()" id="disconnectBtn">끊기</button>
-                </th>
-            </tr>
-        </table>
+
+    <div id="userBox">
+
     </div>
+
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
@@ -90,6 +199,23 @@
         // 채팅방 id
         roomNumber = urlSearch.get('number')
 
+        // 해당 채팅방이 활성화 상태인지 - 사용자가 url로 채팅방 이동시 막기
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                if (!response.activated) {
+                    alert("활성화된 채팅방이 아닙니다.")
+                    window.location.href = "/api/users/chatList";
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("채팅방 활성화 체크 오류")
+                console.log(xhr);
+            }
+        });
+
+
         // 채팅방에 속한 사용자 인지 확인
         $.ajax({
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
@@ -98,16 +224,40 @@
                 console.log(response.chatRoomList.length);
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
+
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
                         // 해당 채팅방에 속한 사용자
-                        console.log(true);
                         chackUser = true;
                     }
                 }
+
+                // 해당 채팅방에 속한 사용자가 아닐때 이동
                 if (!chackUser == true) {
                     window.location.href = "/api/users/chatList"
                 }
+
+                // 해당 채팅방의 사용자가 1명일 떄
+                if (response.chatRoomList.length == 1) {
+                    $('#sendBtn').remove();
+                }
+
+                // 채팅방에 저장된 채팅내용 조회
+                $.ajax({
+                    url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
+                    method: 'GET', // 요청 메소드 (GET, POST 등)
+                    success: function (response) {
+
+                        for (var i = 0; i < response.chatContentList.length; i++) {
+                            $(`<div id="chatContent" class="testChat">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatting`);
+                            $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatting`);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        alert("채팅 내용 불러오기 실패")
+                        console.log(xhr);
+                    }
+                });
             },
             error: function (xhr, status, error) {
                 alert("해당 채팅방 사용자가 아닙니다.")
@@ -116,24 +266,23 @@
             }
         });
 
-        // 채팅방에 저장된 채팅내용 조회
-        $.ajax({
-            url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
-            method: 'GET', // 요청 메소드 (GET, POST 등)
-            success: function (response) {
-
-                for (var i = 0; i < response.chatContentList.length; i++) {
-                    $(`<div id="chatContent" class="testChat">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatting`);
-                    $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatting`);
-                }
-            },
-            error: function (xhr, status, error) {
-                alert("채팅 내용 불러오기 실패")
-                console.log(xhr);
-            }
-        });
-
     })
+
+    function openSidebar() {
+        var sidebar = document.getElementById("sidebar");
+        var content = document.getElementById("content");
+
+        if (sidebar.style.width === "250px") {
+            sidebar.style.width = "0";
+            content.style.marginLeft = "0";
+            $('#sidebar').find($('ui')).hide();
+        } else {
+            sidebar.style.width = "250px";
+            content.style.marginLeft = "260px";
+            $('#sidebar').show();
+        }
+    }
+
     // 쿼리스트링 값 불러오기
     urlSearch = new URLSearchParams(location.search);
 
@@ -151,24 +300,33 @@
     var socket = new SockJS("/chatting");
     stompClient = Stomp.over(socket);
 
+
     function connect() {
         //StompConfig.java에 설정된 endpoint로 SockJS 객체, StompClient 객체 생성
 
         console.log("socket", socket);
         console.log("stompClient", stompClient);
+        // 사용자가 초대 되었을 때
+        // data = {
+        //     'type': 'connect',
+        //     'sender': userId,
+        //     'contents': '',
+        //     'roomNumber': roomNumber
+        // };
 
         // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
         // connect(header,연결 성공시 콜백,에러발생시 콜백)
         stompClient.connect({}, function () {
                 // 소켓을 연결 시키기 전에 채팅방의 활성화 필드가 true 인지 확인 후 false 라면 연결 x
+                // 활성화 필드가 true인 채팅방 리스트만 보여주긴 하지만 주소창의 url 로 접근시 적용
 
                 //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
                 sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
+                    // 메세시가 강퇴 관련이면 alter창 띄우기 (미구현)
 
-                    console.log("e : ", e);
                     showMessage(JSON.parse(e.body));
                 });
-
+                // stompClient.send("/app/chat/send", {}, JSON.stringify(data));
             },
             function (e) {
                 alert('통신끊김');
@@ -178,10 +336,6 @@
     }
 
     connect();
-
-    function disconnect() {
-        stompClient.disconnect();
-    }
 
     //엔터 눌렀을때 전송
     $('#msg').keypress(function (e) {
@@ -199,21 +353,377 @@
 
     //메시지 브로커로 메시지 전송
     function send() {
+
+        //사용자가 채팅방에 속한 유저인지 확인
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                console.log(response.chatRoomList.length);
+                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                var chackUser;
+                for (var i = 0; i < response.chatRoomList.length; i++) {
+                    if (userAuth == response.chatRoomList[i].userName) {
+                        // 해당 채팅방에 속한 사용자
+                        chackUser = true;
+                    }
+                }
+                if (!chackUser == true) {
+                    disconnect();
+                    window.location.href = "/api/users/chatList"
+                }
+
+                data = {
+                    'type': 'chat',
+                    'sender': userId,
+                    'contents': $("#msg").val(),
+                    'roomNumber': roomNumber
+                };
+                // send(destination,헤더,페이로드)
+                stompClient.send("/app/chat/send", {}, JSON.stringify(data));
+
+                //보낼때 채팅 저장
+                $.ajax({
+                    url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
+                    method: 'POST', // 요청 메소드 (GET, POST 등)
+                    contentType: "application/json",
+                    data: JSON.stringify({userId: userId, chatContent: $("#msg").val(), roomId: roomNumber}),
+                    success: function (response) {
+                        alert("저장완료");
+                        $("#msg").val('');
+                    },
+                    error: function (xhr, status, error) {
+                        alert("저장 실패")
+                        console.log(xhr);
+                    }
+                });
+
+            },
+            error: function (xhr, status, error) {
+                alert("저장 실패")
+                console.log(xhr);
+            }
+        });
+
+
+    }
+
+    // 아코디언 메뉴바 메소드
+    $(document).ready(function () {
+        $(".accordion-header").click(function () {
+            $(this).toggleClass("active");
+            $(this).next(".accordion-content").slideToggle();
+            $(".accordion-content").not($(this).next()).slideUp();
+            $(".accordion-header").not($(this)).removeClass("active");
+        });
+    });
+
+    $.ajax({
+        url: `/api/chat/getUsers/${userId}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
+        method: 'GET', // 요청 메소드 (GET, POST 등)
+        success: function (response) {
+            // response 사용자의 id
+            $.ajax({
+                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
+                method: 'GET', // 요청 메소드 (GET, POST 등)
+                success: function (response) {
+
+                    if (response.chatRoomList.length == 0) {
+                        // 해당 사용자가 속한 채팅방이 없다면
+                        alert("채팅방 없음");
+                        $(`<div id="userChatRoom-1" class="userChatRoom" onclick="chatRoom(1)">1</div>`).appendTo(`.chatRoom`);
+                    }
+
+                    // 해당 사용자가 속한 채팅방이 있다면
+                    for (var i = 0; i < response.chatRoomList.length; i++) {
+                        $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    alert("불러오기 실패")
+                    console.log(xhr);
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            alert("불러오기 실패")
+            console.log(xhr);
+        }
+    });
+
+    function chatRoom(id) {
+        // 해당 채팅방의 id 전달 (채팅방 입장)
+        window.location.href = `/api/users/chat?number=${id}`;
+    }
+
+    // 채팅방 사용자들 조회
+    $.ajax({
+        url: `/api/chat/chatRooms/${roomNumber}/users`,
+        method: 'GET', // 요청 메소드 (GET, POST 등)
+        success: function (response) {
+            var chackUser;
+            // 해당 사용자가 ADMIN인지 판단
+            for (var j = 0; j < response.chatRoomList.length; j++) {
+
+                if ((userId == response.chatRoomList[j].userName) && (response.chatRoomList[j].role == "ADMIN")) {
+                    chackUser = true;
+                }
+
+            }
+
+            // 해당 채팅방 사용자 조회
+            for (var i = 0; i < response.chatRoomList.length; i++) {
+
+                // 로그인한 유저인지 확인 (자기자신한테 후기 안남기게 하기)
+                if (userId == response.chatRoomList[i].userName) {
+                    $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">${response.chatRoomList[i].userName}</div>`).appendTo(`#userBox`);
+                    continue;
+                }
+
+                // 로그인한 유저가 아닌 유저들 (사용자가 후기를 남길 사람들)
+                $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">${response.chatRoomList[i].userName}</div>`).prependTo(`#userBox`);
+                $(`<div id="reviewBtnBox" class="reviewBtnBox">
+                    <button onclick="review(${response.chatRoomList[i].userId})">후기 남기기</button>
+                </div>`).appendTo(`#chatRoomUser-${response.chatRoomList[i].userId}`);
+
+                if (chackUser) {
+                    $(`<div id="kickOutBtn" class="kickOutBtn">
+                     <button onclick="kickOut('${response.chatRoomList[i].userId}','${response.chatRoomList[i].userName}')">강퇴하기</button>
+                     </div>`).appendTo(`#chatRoomUser-${response.chatRoomList[i].userId}`);
+                }
+            }
+
+        },
+        error: function (xhr, status, error) {
+            alert("불러오기 실패")
+            console.log(xhr);
+        }
+    });
+
+    //review 남기기 모달창 띄우기
+    //이미 review가 남겨저 있는 사용자 인지 확인.
+    function review(id) {
+        //id 값은 로그인한 사용자가 후기를 남길 유저의 id
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                console.log(response.chatRoomList.length);
+                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                var chackUser;
+                for (var i = 0; i < response.chatRoomList.length; i++) {
+                    if (userAuth == response.chatRoomList[i].userName) {
+                        // 해당 채팅방에 속한 사용자
+                        chackUser = true;
+                    }
+                }
+                if (!chackUser == true) {
+                    disconnect();
+                    window.location.href = "/api/users/chatList"
+                }
+
+            },
+            error: function (xhr, status, error) {
+                alert("저장 실패")
+                console.log(xhr);
+            }
+        });
+
+        //이미 review가 남겨저 있는 사용자 인지 확인.
+        $.ajax({
+            url: `/api/review/chatRooms/${roomNumber}`,
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                console.log("채팅방 review 데이터 :", response.reviews);
+                var reviewCheck = false;
+                var reviewContent = "";
+                var reviewScore = "";
+                // 해당 유저에게 리뷰를 이미 남겼는지 확인
+                for (var i = 0; i < response.reviews.length; i++) {
+                    // 해당 유저에게 리뷰를 이미 남겼는지 확인
+                    if (id == response.reviews[i].receiverId) {
+                        alert("이미 후기를 남긴 유저입니다.")
+                        // 리뷰 수정창 띄우기
+                        reviewCheck = true;
+                        reviewContent = response.reviews[i].content;
+                        reviewScore = response.reviews[i].score;
+                    }
+                }
+
+                if (reviewCheck) {
+                    // 리뷰 수정창 띄우기
+                    $("#reviewModalOverlay").fadeIn();
+
+                    //후기 입력 노드
+                    $(`<input type="text" id="reviewUpdateContent" value="${reviewContent}" />
+                      <input type="text" id="reviewUpdateScore" value="${reviewScore}" />
+                    `).appendTo(`.modal-buttons`);
+
+                    $(` <button id="reviewUpdateInsert" onclick="reviewUpdate(${id})">확인</button>
+                    <button id="reviewDelete" onclick="reviewDelete(${id})">리뷰삭제</button>
+                    <button id="reviewUpdateCancle" onclick="reviewCancle()">닫기</button>
+                    `).appendTo(`.modal-buttons`);
+                } else {
+                    $("#reviewModalOverlay").fadeIn();
+
+                    //후기 입력 노드
+                    $(`<input type="text" id="reviewContent" />
+                      <input type="text" id="reviewScore" />
+                    `).appendTo(`.modal-buttons`);
+
+                    $(` <button id="reviewInsert" onclick="reviewInsert(${id})">확인</button>
+                    <button id="reviewCancle" onclick="reviewCancle()">닫기</button>
+                    `).appendTo(`.modal-buttons`);
+                }
+
+
+            },
+            error: function (xhr, status, error) {
+                alert("후기데이터 조회 실패")
+                console.log(xhr);
+            }
+        });
+
+
+    }
+
+    // review 남기기 모달창 끄기
+    function reviewCancle() {
+        // 수정 노드 삭제
+        $("#reviewUpdateContent").remove();
+        $("#reviewUpdateScore").remove();
+        $("#reviewUpdateInsert").remove();
+        $("#reviewUpdateCancle").remove();
+        $("#reviewDelete").remove();
+
+        // 리뷰 입력 노드 삭제
+        $("#reviewInsert").remove();
+        $("#reviewCancle").remove();
+        $("#reviewContent").remove();
+        $("#reviewScore").remove();
+
+        $("#reviewModalOverlay").fadeOut();
+    }
+
+    // review 저장 api
+    function reviewInsert(id) {
+
+        $.ajax({
+            url: `/api/review/users/${id}/chatRooms/${roomNumber}`,
+            method: 'POST', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            data: JSON.stringify({content: $("#reviewContent").val(), score: $("#reviewScore").val()}),
+            success: function (response) {
+                alert("후기남기기 성공")
+                // 수정 노드 삭제
+                $("#reviewUpdateContent").remove();
+                $("#reviewUpdateScore").remove();
+                $("#reviewUpdateInsert").remove();
+                $("#reviewUpdateCancle").remove();
+                $("#reviewDelete").remove();
+
+                // 리뷰 입력 노드 삭제
+                $("#reviewInsert").remove();
+                $("#reviewCancle").remove();
+                $("#reviewContent").remove();
+                $("#reviewScore").remove();
+
+                $("#reviewModalOverlay").fadeOut();
+            },
+            error: function (xhr, status, error) {
+                alert("후기남기기 실패")
+                console.log(xhr);
+            }
+        });
+    }
+
+    // review 수정 api
+    function reviewUpdate(id) {
+        // 수정가능한 리뷰가 아닌지 확인(3일이 지난 리뷰인지 확인 필요)
+        console.log($("#reviewUpdateContent").val(), $("#reviewUpdateScore").val());
+
+        $.ajax({
+            url: `/api/review/users/${id}/chatRooms/${roomNumber}`,
+            method: 'PUT', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            data: JSON.stringify({content: $("#reviewUpdateContent").val(), score: $("#reviewUpdateScore").val()}),
+            success: function (response) {
+                alert("리뷰가 수정되었습니다");
+                // 수정 노드 삭제
+                $("#reviewUpdateContent").remove();
+                $("#reviewUpdateScore").remove();
+                $("#reviewUpdateInsert").remove();
+                $("#reviewUpdateCancle").remove();
+                $("#reviewDelete").remove();
+
+                // 리뷰 입력 노드 삭제
+                $("#reviewInsert").remove();
+                $("#reviewCancle").remove();
+                $("#reviewContent").remove();
+                $("#reviewScore").remove();
+
+                $("#reviewModalOverlay").fadeOut();
+            },
+            error: function (xhr, status, error) {
+                alert("리뷰수정 실패")
+                console.log(xhr);
+            }
+        });
+    }
+
+    // 리뷰 삭제 api
+    function reviewDelete(id) {
+        $.ajax({
+            url: `/api/review/users/${id}/chatRooms/${roomNumber}`,
+            method: 'DELETE', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                alert("리뷰가 삭제되었습니다.");
+                // 수정 노드 삭제
+                $("#reviewUpdateContent").remove();
+                $("#reviewUpdateScore").remove();
+                $("#reviewUpdateInsert").remove();
+                $("#reviewUpdateCancle").remove();
+                $("#reviewDelete").remove();
+
+                // 리뷰 입력 노드 삭제
+                $("#reviewInsert").remove();
+                $("#reviewCancle").remove();
+                $("#reviewContent").remove();
+                $("#reviewScore").remove();
+
+                $("#reviewModalOverlay").fadeOut();
+            },
+            error: function (xhr, status, error) {
+                alert("리뷰삭제 실패")
+                console.log(xhr);
+            }
+        });
+    }
+
+    // 소켓 끊기
+    function disconnect() {
+        stompClient.disconnect();
+    }
+
+    // 채팅방 나가기
+    // 채팅방에서 방장이 나갔을 경우 (미구현)
+    function disconnectChatRoom() {
         data = {
+            'type': 'disconnect',
             'sender': userId,
-            'contents': $("#msg").val(),
+            'contents': `님이 나가셨습니다.`,
             'roomNumber': roomNumber
         };
-        // send(destination,헤더,페이로드)
-        stompClient.send("/app/chat/send", {}, JSON.stringify(data));
 
+        stompClient.send("/app/chat/send", {}, JSON.stringify(data));
 
         //보낼때 채팅 저장
         $.ajax({
             url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
             method: 'POST', // 요청 메소드 (GET, POST 등)
             contentType: "application/json",
-            data: JSON.stringify({userId: userId, chatContent: $("#msg").val(), roomId: roomNumber}),
+            data: JSON.stringify({userId: userId, chatContent: data.contents, roomId: roomNumber}),
             success: function (response) {
                 alert("저장완료");
                 $("#msg").val('');
@@ -224,8 +734,62 @@
             }
         });
 
+        // 소켓 연결 해제
+        disconnect();
+
+        // 채팅방 유저 테이블 에서 데이터 삭제
+        $.ajax({
+            url: `/api/chat/chatRoom/${roomNumber}/out`,
+            method: 'DELETE', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                alert("채팅방 나가기 성공");
+                window.location.href = "/";
+            },
+            error: function (xhr, status, error) {
+                alert("채팅방 나가기 실패")
+                console.log(xhr);
+            }
+        });
     }
 
+    // 유저 강퇴
+    function kickOut(id, kickOutUser) {
+
+        $.ajax({
+            url: `/api/chat/users/${id}/chatRoom/${roomNumber}/kickout`,
+            method: 'DELETE', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                alert("사용자 강퇴 성공");
+                // 성공시 사용자 목록에서 제거
+                $(`#chatRoomUser-${id}`).remove();
+
+                data = {
+                    'type': 'connect',
+                    'sender': kickOutUser,
+                    'contents': '님이 강퇴 당했습니다.',
+                    'roomNumber': roomNumber
+                };
+
+                stompClient.send("/app/chat/send", {}, JSON.stringify(data));
+
+                // 기능 업그레이드는 개별 메세지를 보내고 개별 메세지를 받은 사용자가
+                // 확인버튼을 누르면 바로 채팅방이 나가지는 (리다이렉트)
+            },
+            error: function (xhr, status, error) {
+                alert("채팅방 나가기 실패")
+                console.log(xhr);
+            }
+        });
+
+    }
+
+    // 사용자가 뒤로 가기시 동작
+    window.addEventListener("popstate", (event) => {
+        alert("뒤로간다!")
+        disconnect();
+        // 여기에 뒤로가기 시 실행할 작업을 추가하세요.
+        // 예: 경고창 표시, 원하는 동작 수행 등
+    });
 </script>
 </body>
 </html>
