@@ -204,8 +204,8 @@
             url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                alert("활성화된 채팅방이 아닙니다.")
                 if (!response.activated) {
+                    alert("활성화된 채팅방이 아닙니다.")
                     window.location.href = "/api/users/chatList";
                 }
             },
@@ -224,14 +224,22 @@
                 console.log(response.chatRoomList.length);
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
+
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
                         // 해당 채팅방에 속한 사용자
                         chackUser = true;
                     }
                 }
+
+                // 해당 채팅방에 속한 사용자가 아닐때 이동
                 if (!chackUser == true) {
                     window.location.href = "/api/users/chatList"
+                }
+
+                // 해당 채팅방의 사용자가 1명일 떄
+                if (response.chatRoomList.length == 1) {
+                    $('#sendBtn').remove();
                 }
 
                 // 채팅방에 저장된 채팅내용 조회

@@ -1,25 +1,11 @@
 package com.beteam.willu.stomp.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.common.security.UserDetailsImpl;
-import com.beteam.willu.stomp.dto.ChatRoomNameResponseDto;
-import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
-import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
-import com.beteam.willu.stomp.dto.ChatroomJoinRequestDto;
-import com.beteam.willu.stomp.dto.ChatsResponseDto;
+import com.beteam.willu.stomp.dto.*;
 import com.beteam.willu.stomp.service.ChatRoomService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -69,21 +55,21 @@ public class ChatRoomController {
         return chatRoomService.getChat(id, userDetails);
     }
 
-	//(할것)
-	// 로그인한 유저의 채팅방 추가(사용할 일 없을지도..!)
-	@PostMapping("chat/join/{postId}/{chatRoomId}")
-	public ResponseEntity<ApiResponseDto> userJoin(@PathVariable long postId, @PathVariable long chatRoomId,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		chatRoomService.userJoin(postId, chatRoomId, userDetails);
-		return ResponseEntity.ok().body(new ApiResponseDto("사용자 채팅방 추가 성공", 200));
-	}
+    //(할것)
+    // 로그인한 유저의 채팅방 추가(사용할 일 없을지도..!)
+    @PostMapping("chat/join/{postId}/{chatRoomId}")
+    public ResponseEntity<ApiResponseDto> userJoin(@PathVariable long postId, @PathVariable long chatRoomId,
+                                                   @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        chatRoomService.userJoin(postId, chatRoomId, userDetails);
+        return ResponseEntity.ok().body(new ApiResponseDto("사용자 채팅방 추가 성공", 200));
+    }
 
-	//채팅방 참가
-	@PostMapping("/chatRoom/join")
-	public void joinUserChatRoom(@RequestBody ChatroomJoinRequestDto requestDto,
-		@AuthenticationPrincipal UserDetailsImpl userDetails) {
-		chatRoomService.joinUserChatRoom(requestDto, userDetails.getUser());
-	}
+    //채팅방 참가
+    @PostMapping("/chatRoom/join")
+    public void joinUserChatRoom(@RequestBody ChatroomJoinRequestDto requestDto,
+                                 @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        chatRoomService.joinUserChatRoom(requestDto, userDetails.getUser());
+    }
 
     // 사용자 채팅방에서 다른사용자 추방 (ADMIN 용) (프론트 적용 완료)
     // 특청 사용자의 id를 이용해 테이블에서 유저 삭제

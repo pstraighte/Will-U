@@ -1,24 +1,11 @@
 package com.beteam.willu.stomp.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.notification.dto.NotificationEvent;
 import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
-import com.beteam.willu.stomp.dto.ChatRoomNameResponseDto;
-import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
-import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
-import com.beteam.willu.stomp.dto.ChatroomJoinRequestDto;
-import com.beteam.willu.stomp.dto.ChatsResponseDto;
+import com.beteam.willu.stomp.dto.*;
 import com.beteam.willu.stomp.entity.Chat;
 import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.stomp.entity.UserChatRoom;
@@ -28,19 +15,27 @@ import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j(topic = "ChatRoomService")
 @RequiredArgsConstructor
 public class ChatRoomService {
-	private final ChatRoomRepository chatRoomRepository;
-	private final UserChatRoomsRepository userChatRoomsRepository;
-	private final PostRepository postRepository;
-	private final UserRepository userRepository;
-	private final ChatRepository chatRepository;
-	private final ApplicationEventPublisher eventPublisher;
+    private final ChatRoomRepository chatRoomRepository;
+    private final UserChatRoomsRepository userChatRoomsRepository;
+    private final PostRepository postRepository;
+    private final UserRepository userRepository;
+    private final ChatRepository chatRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     // 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
 
@@ -145,11 +140,11 @@ public class ChatRoomService {
         return new ChatsResponseDto(showChatList);
     }
 
-	// 게시글에서 신청 버튼 클릭시->작성자 알림-> 작성자 알림 승인-> 사용자 채팅방 추가
-	@Transactional
-	public void userJoin(Long postId, Long chatRoomId, UserDetailsImpl userDetails) {
-		Post post = findPost(postId);
-		ChatRoom chatRoom = findChatRoom(chatRoomId);
+    // 게시글에서 신청 버튼 클릭시->작성자 알림-> 작성자 알림 승인-> 사용자 채팅방 추가
+    @Transactional
+    public void userJoin(Long postId, Long chatRoomId, UserDetailsImpl userDetails) {
+        Post post = findPost(postId);
+        ChatRoom chatRoom = findChatRoom(chatRoomId);
 
         //중복참여 방지
         User user = userDetails.getUser();
@@ -166,57 +161,57 @@ public class ChatRoomService {
                 .role("GUEST")
                 .build();
 
-		userChatRoomsRepository.save(guestChatRoom);
+        userChatRoomsRepository.save(guestChatRoom);
 
-	}
+    }
 
-	@Transactional
-	public void joinUserChatRoom(ChatroomJoinRequestDto requestDto, User loginUser) {
-		Long postId = requestDto.getPostId();
-		Post post = findPost(postId);
-		ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId)
-			.orElseThrow(() -> new IllegalArgumentException("유효한 채팅방이 존재하지 않습니다."));
+    @Transactional
+    public void joinUserChatRoom(ChatroomJoinRequestDto requestDto, User loginUser) {
+        Long postId = requestDto.getPostId();
+        Post post = findPost(postId);
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId)
+                .orElseThrow(() -> new IllegalArgumentException("유효한 채팅방이 존재하지 않습니다."));
 
-		//중복참여 방지
-		Long userId = requestDto.getUserId();
-		User joiner = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-		if (!Objects.equals(loginUser.getId(), post.getUser().getId())) {
-			throw new IllegalArgumentException("게시글 작성자가 아닙니다. 유저를 참가시킬 권한이 없습니다.");
-		}
-		log.info("현재 정원:" + chatRoom.getUserChatRoomList().size());
-		if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
-			throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
-		} else if (userChatRoomsRepository.existsByUserAndChatRooms(joiner, chatRoom)) {
-			throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
-		}
+        //중복참여 방지
+        Long userId = requestDto.getUserId();
+        User joiner = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+        if (!Objects.equals(loginUser.getId(), post.getUser().getId())) {
+            throw new IllegalArgumentException("게시글 작성자가 아닙니다. 유저를 참가시킬 권한이 없습니다.");
+        }
+        log.info("현재 정원:" + chatRoom.getUserChatRoomList().size());
+        if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
+            throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
+        } else if (userChatRoomsRepository.existsByUserAndChatRooms(joiner, chatRoom)) {
+            throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
+        }
 
-		UserChatRoom guestChatRoom = UserChatRoom.builder().user(joiner).chatRooms(chatRoom).role("GUEST").build();
-		//유저 채팅방 초대
-		userChatRoomsRepository.save(guestChatRoom);
+        UserChatRoom guestChatRoom = UserChatRoom.builder().user(joiner).chatRooms(chatRoom).role("GUEST").build();
+        //유저 채팅방 초대
+        userChatRoomsRepository.save(guestChatRoom);
 
-		//알림 발송
-		NotificationEvent approveMessageEvent = NotificationEvent.builder()
-			.title("참여 요청 승인").notificationType(NotificationType.APPROVE_REQUEST)
-			.receiver(joiner).publisher(loginUser).content(post.getTitle() + " 게시글에 초대됐습니다.")
-			.postId(postId).build();
-		eventPublisher.publishEvent(approveMessageEvent);
-		//추가 후 인원이 모두 찼는지 확인
-		if (chatRoom.getUserChatRoomList().size() + 1 >= post.getMaxnum()) {
-			post.setRecruitment(false);
-			//기존 chatRoom에 있는 유저 목록
-			List<User> users = new ArrayList<>(
-				chatRoom.getUserChatRoomList().stream().map(UserChatRoom::getUser).toList());
-			users.add(joiner);
-			for (User user : users) {
-				NotificationEvent doneMessageEvent = NotificationEvent.builder()
-					.title("모집 완료 알림")
-					.notificationType(NotificationType.RECRUIT_DONE).receiver(user)
-					.publisher(loginUser).content(post.getTitle() + " 게시글 모집이 완료되었습니다.")
-					.postId(postId).build();
-				eventPublisher.publishEvent(doneMessageEvent);
-			}
-		}
-	}
+        //알림 발송
+        NotificationEvent approveMessageEvent = NotificationEvent.builder()
+                .title("참여 요청 승인").notificationType(NotificationType.APPROVE_REQUEST)
+                .receiver(joiner).publisher(loginUser).content(post.getTitle() + " 게시글에 초대됐습니다.")
+                .postId(postId).build();
+        eventPublisher.publishEvent(approveMessageEvent);
+        //추가 후 인원이 모두 찼는지 확인
+        if (chatRoom.getUserChatRoomList().size() + 1 >= post.getMaxnum()) {
+            post.setRecruitment(false);
+            //기존 chatRoom에 있는 유저 목록
+            List<User> users = new ArrayList<>(
+                    chatRoom.getUserChatRoomList().stream().map(UserChatRoom::getUser).toList());
+            users.add(joiner);
+            for (User user : users) {
+                NotificationEvent doneMessageEvent = NotificationEvent.builder()
+                        .title("모집 완료 알림")
+                        .notificationType(NotificationType.RECRUIT_DONE).receiver(user)
+                        .publisher(loginUser).content(post.getTitle() + " 게시글 모집이 완료되었습니다.")
+                        .postId(postId).build();
+                eventPublisher.publishEvent(doneMessageEvent);
+            }
+        }
+    }
 
     // 사용자 채팅방에서 다른사용자 추방 (ADMIN 용)
     // 특청 사용자의 id를 이용해 테이블에서 유저 삭제
@@ -244,9 +239,9 @@ public class ChatRoomService {
         // 나갈 방 조회
         Optional<UserChatRoom> chatRoom = userChatRoomsRepository.findByChatRoomsIdAndUserId(id, userId);
 
-		if (chatRoom.isEmpty()) {
-			throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
-		}
+        if (chatRoom.isEmpty()) {
+            throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
+        }
 
         userChatRoomsRepository.delete(chatRoom.get());
     }
@@ -255,20 +250,20 @@ public class ChatRoomService {
     // 채팅방 id를 사용해서 조회
     public ChatRoomsResponseDto getChatRoomUsers(Long id) {
         // 해당 채팅방이 있는지 확인
-        List<UserChatRoom> chatRoomUsers = userChatRoomsRepository.findAllByChatRoomsId(id);
+        List<UserChatRoom> chatRoom = userChatRoomsRepository.findAllByChatRoomsId(id);
 
-		if (chatRoom.isEmpty()) {
-			throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
-		}
-		// 해당 채팅방의 id 를 가진 유저들을 조회
+        if (chatRoom.isEmpty()) {
+            throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
+        }
+        // 해당 채팅방의 id 를 가진 유저들을 조회
 
 //		List<UserChatRoom> chatRoomUsers = userChatRoomsRepository.findAllByChatRoomsId(id);
 
-        for (UserChatRoom userChatRoom : chatRoomUsers) {
+        for (UserChatRoom userChatRoom : chatRoom) {
             System.out.println("userChatRoom = " + userChatRoom.getUser().getUsername());
         }
 
-        return new ChatRoomsResponseDto(chatRoomUsers);
+        return new ChatRoomsResponseDto(chatRoom);
     }
 
     private Post findPost(Long id) {
