@@ -38,9 +38,9 @@ public class UserController {
 	}
 
 	@PostMapping("/users/login")
-	public ResponseEntity<ApiResponseDto> login(@RequestBody UserRequestDto requestDto, HttpServletResponse response) {
+	public String login(@RequestBody UserRequestDto requestDto, HttpServletResponse response) {
 		userService.userLogin(requestDto, response);
-		return ResponseEntity.ok().body(new ApiResponseDto("로그인 성공", 200));
+		return "redirect:/";
 	}
 
 	//로그아웃 확인용 API  redis 에 토큰을 추가하는 행위임으로 POST 사용

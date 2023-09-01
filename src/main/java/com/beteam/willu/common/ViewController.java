@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.beteam.willu.blacklist.dto.BlacklistResponseDto;
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
+import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.interest.dto.InterestResponseDto;
 import com.beteam.willu.interest.entity.Interest;

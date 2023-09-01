@@ -43,30 +43,10 @@ public class SocialLoginController {
 
 	//네이버 토큰 요청
 	@GetMapping("/users/naver/callback")
-	public ResponseEntity<ApiResponseDto> naverLogin(@RequestParam String code, HttpServletResponse response) throws
+	public String naverLogin(@RequestParam String code, HttpServletResponse response) throws
 		JsonProcessingException {
 		socialNaverService.naverLogin(code, response);
-		return ResponseEntity.ok().body(new ApiResponseDto("네이버 토큰 요청 성공", 200));
-	}
-
-	// 로그인 페이지
-	@GetMapping("/users/user-login")
-	public String getLoginPage(HttpServletResponse response) {
-		jwtUtil.expireCookie(response, "Authorization");
-		jwtUtil.expireCookie(response, "RT");
-		return "loginSignUp";
-	}
-
-	// 채팅 페이지
-	@GetMapping("/users/chat")
-	public String getChatPage(@RequestParam(value = "number", required = false) int number) {
-		return "chatting";
-	}
-
-	// 채팅 목록 페이지
-	@GetMapping("/users/chatList")
-	public String chatList() {
-		return "chatTest";
+		return "redirect:/";
 	}
 
 }
