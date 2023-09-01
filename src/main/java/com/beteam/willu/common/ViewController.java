@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.beteam.willu.post.dto.PostResponseDto;
+import com.beteam.willu.post.service.PostService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
 import com.beteam.willu.blacklist.dto.BlacklistResponseDto;
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
@@ -16,25 +19,49 @@ import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.interest.dto.InterestResponseDto;
 import com.beteam.willu.interest.entity.Interest;
 import com.beteam.willu.interest.repository.InterestRepository;
-import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
-
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Controller
+@Slf4j
 @RequiredArgsConstructor
 public class ViewController {
 
-	private final InterestRepository interestRepository;
-	private final BlacklistRepository blacklistRepository;
-	private final PostRepository postRepository;
-	private final UserService userService;
+    @Autowired
+    private PostService postService;
 
-	// 마이 페이지
+    //메인화면
+    @GetMapping("/index")    //주소 입력값
+    public String postsView(Model model) {
+        List<PostResponseDto> posts = postService.getPosts();
+        model.addAttribute("posts", posts);
+        return "index"; //출력 html
+    }
+
+    //게시글 작성
+    @GetMapping("/post/create")
+    public String createPost() {
+        return "createPost";
+    }
+
+    //게시글 단건 조회
+    @GetMapping("/posts/{postId}")
+    public String detailPost(Model model, @PathVariable Long postId) {
+        PostResponseDto post = postService.getPost(postId);
+        model.addAttribute("post", post);
+        return "detailPost";
+    }
+
+    // 보드 수정 페이지
+    @GetMapping("/posts/update/{postId}")
+    public String updatePost(Model model, @PathVariable Long postId) {
+        model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
+        return "updatePost";
+    }
+  
+    // 마이 페이지
 	@GetMapping("/users/mypage")
 	public String myPage(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		// userDetails 객체에서 현재 사용자의 정보를 가져와서 모델에 추가

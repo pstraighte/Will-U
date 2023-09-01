@@ -4,8 +4,10 @@ import com.beteam.willu.notification.entity.Notification;
 import com.beteam.willu.notification.entity.NotificationType;
 
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class NotificationResponseDto {
 	private Long id;
@@ -18,6 +20,8 @@ public class NotificationResponseDto {
 	private NotificationType notificationType;
 
 	private String nickname;
+	private Long userId;
+	private Long postId;
 
 	public NotificationResponseDto(Notification notification) {
 		this.id = notification.getId();
@@ -26,6 +30,8 @@ public class NotificationResponseDto {
 		this.isRead = notification.getIsRead();
 		this.notificationType = notification.getNotificationType();
 		this.nickname = notification.getReceiver().getNickname();
+		this.userId = notification.getReceiver().getId();
+		this.postId = notification.getPostId();
 
 	}
 }

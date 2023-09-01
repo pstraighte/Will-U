@@ -2,13 +2,11 @@ package com.beteam.willu.interest.service;
 
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.interest.entity.Interest;
 import com.beteam.willu.interest.repository.InterestRepository;
-import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -21,7 +19,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class InterestService {
 	private final UserRepository userRepository;
-	private final ApplicationEventPublisher eventPublisher;
 	private final InterestRepository interestRepository;
 
 	@Transactional  //관심유저 추가
@@ -33,7 +30,6 @@ public class InterestService {
 		} else {
 			Interest interest = new Interest(receiver, user);
 			interestRepository.save(interest);
-			notifyLoginInfo(user, NotificationType.LOGIN_DONE);
 		}
 	}
 
@@ -48,9 +44,5 @@ public class InterestService {
 		} else {
 			throw new IllegalArgumentException("이미 관심해제 된 유저 입니다.");
 		}
-	}
-
-	private void notifyLoginInfo(User user, NotificationType type) {
-		user.publishEvent(eventPublisher, type);
 	}
 }

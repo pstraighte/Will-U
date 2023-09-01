@@ -1,11 +1,8 @@
 package com.beteam.willu.user.entity;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.common.Timestamped;
-import com.beteam.willu.notification.dto.NotificationRequestDto;
-import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.dto.UserUpdateRequestDto;
 
 import jakarta.persistence.Column;
@@ -74,6 +71,10 @@ public class User extends Timestamped {
 	@Column(name = "naverId")
 	private String naverId;
 
+	public User(long id) {
+		super();
+	}
+
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
 		this.nickname = updateRequestDto.getNickname();
@@ -108,5 +109,6 @@ public class User extends Timestamped {
 			type, this);
 		eventPublisher.publishEvent(requestDto);
 	}
+
 }
 
