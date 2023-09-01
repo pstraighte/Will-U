@@ -76,11 +76,9 @@ public class User extends Timestamped {
 
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
-		this.username = updateRequestDto.getUsername();
 		this.nickname = updateRequestDto.getNickname();
 		this.phoneNumber = updateRequestDto.getPhoneNumber();
 		this.area = updateRequestDto.getArea();
-		this.picture = updateRequestDto.getPicture();
 	}
 
 	// 카카오 id 를 업데이트
@@ -98,6 +96,10 @@ public class User extends Timestamped {
 	public User naverIdUpdate(String naverId) {
 		this.naverId = naverId;
 		return this;
+	}
+
+	public void setPicture(String url) {
+		this.picture = url;
 	}
 
 	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
