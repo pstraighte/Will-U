@@ -1,5 +1,6 @@
 package com.beteam.willu.blacklist.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ public interface BlacklistRepository extends JpaRepository<Blacklist, Long> {
 	boolean existsByReceiverIdAndSenderId(Long receiver, Long sender);
 
 	Optional<Blacklist> findByReceiverIdAndSenderId(Long receiver, Long sender);
+
+	List<Blacklist> findBySenderId(Long id);
 }
