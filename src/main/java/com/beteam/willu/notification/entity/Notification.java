@@ -52,11 +52,17 @@ public class Notification extends Timestamped {
 	private NotificationType notificationType;
 
 	//TODO :STUDY OnDelete 와 연관관계에서 cascade 사용하는 것의 차이?
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "member_id")
+	@ManyToOne
+	@JoinColumn(name = "receiver_id")
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	private User receiver;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "publisher_id")
+	@OnDelete(action = OnDeleteAction.CASCADE)
+	private User publisher;
+
+	private Long postId;
 	/**
 	 * 생성자 - 약속된 형태로만 생성가능하도록 합니다.
 	 */

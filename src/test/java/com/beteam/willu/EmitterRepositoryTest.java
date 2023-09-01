@@ -1,5 +1,7 @@
 package com.beteam.willu;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,9 +45,9 @@ class EmitterRepositoryTest {
 	@DisplayName("수신한 이벤트를 캐시에 저장한다.")
 	public void saveEventCache() throws Exception {
 		//given
-		Long userId = 8L;
+		Long userId = 1L;
 		String eventCacheId = userId + "_" + System.currentTimeMillis();
-		User user = userRepository.findById(userId).get();
+		User user = userRepository.findById(userId).orElseThrow();
 		Notification notification = Notification.builder()
 			.receiver(user)
 			.title("localhost:8080/")
@@ -58,7 +60,7 @@ class EmitterRepositoryTest {
 		Assertions.assertDoesNotThrow(() -> emitterRepository.saveEventCache(eventCacheId, notification));
 	}
 
-	/*@Test
+	@Test
 	@DisplayName("어떤 회원이 접속한 모든 Emitter를 찾는다")
 	public void findAllEmitterStartWithByUserId() throws Exception {
 		//given
@@ -75,7 +77,7 @@ class EmitterRepositoryTest {
 		emitterRepository.save(emitterId3, new SseEmitter(DEFAULT_TIMEOUT));
 
 		//when
-		Map<String, SseEmitter> ActualResult = emitterRepository.findAllEmitterStartWithByUserId(
+		Map<String, SseEmitter> ActualResult = emitterRepository.findAllEmitterStartWithById(
 			String.valueOf(userId));
 
 		//then
@@ -88,30 +90,56 @@ class EmitterRepositoryTest {
 		//given
 		Long userId = 1L;
 		String eventCacheId1 = userId + "_" + System.currentTimeMillis();
-		Notification notification1 = new Notification(new User(1L), NotificationType.APPLY, "스터디 신청이 왔습니다.", "url",
-			false);
+		User user1 = userRepository.findById(1L).orElseThrow();
+		Notification notification1 = Notification.builder()
+			.receiver(user1)
+			.publisher(user1)
+			.notificationType(NotificationType.JOIN_REQUEST)
+			.content("hi1")
+			.title("title1")
+			.isRead(false)
+			.build();
 		emitterRepository.saveEventCache(eventCacheId1, notification1);
 
 		Thread.sleep(100);
 		String eventCacheId2 = userId + "_" + System.currentTimeMillis();
-		Notification notification2 = new Notification(new User(1L), NotificationType.ACCEPT, "스터디 신청이 승인되었습니다.",
-			"url", false);
+		//User user2 = userRepository.findById(2L).orElseThrow();
+		Notification notification2 = Notification.builder()
+			.receiver(user1)
+			.publisher(user1)
+			.notificationType(NotificationType.JOIN_REQUEST)
+			.content("hi2")
+			.title("title2")
+			.isRead(false)
+			.build();
 		emitterRepository.saveEventCache(eventCacheId2, notification2);
 
 		Thread.sleep(100);
 		String eventCacheId3 = userId + "_" + System.currentTimeMillis();
-		Notification notification3 = new Notification(new User(1L), NotificationType.REJECT, "스터디 신청이 거절되었습니다.",
-			"url", false);
+		//User user3 = userRepository.findById(3L).orElseThrow();
+		Notification notification3 = Notification.builder()
+			.receiver(user1)
+			.publisher(user1)
+			.notificationType(NotificationType.JOIN_REQUEST)
+			.content("hi3")
+			.title("title3")
+			.isRead(false)
+			.build();
 		emitterRepository.saveEventCache(eventCacheId3, notification3);
 
 		//when
-		Map<String, Object> ActualResult = emitterRepository.findAllEventCacheStartWithByUserId(
+		Map<String, Object> ActualResult = emitterRepository.findAllEventCacheStartWithById(
 			String.valueOf(userId));
 
+		for (String key : ActualResult.keySet()) {
+			Notification nt = (Notification)ActualResult.get(key);
+			System.out.println(nt.getTitle());
+		}
 		//then
+
 		Assertions.assertEquals(3, ActualResult.size());
 	}
-
+/*
 	@Test
 	@DisplayName("ID를 통해 Emitter를 Repository에서 제거한다.")
 	public void deleteById() throws Exception {

@@ -2,12 +2,12 @@ package com.beteam.willu.blacklist.service;
 
 import java.util.Optional;
 
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
+import com.beteam.willu.notification.dto.NotificationEvent;
 import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
@@ -22,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class BlacklistService {
 	private final UserRepository userRepository;
 	private final BlacklistRepository blacklistRepository;
-	private final ApplicationEventPublisher eventPublisher;
 
 	@Transactional //차단 유저 추가
 	public void addBlacklist(Long id, User user) {
@@ -35,7 +34,13 @@ public class BlacklistService {
 			blacklistRepository.save(blacklist);
 		}
 		//sse 테스트용
-		notifyLoginInfo(user, NotificationType.LOGIN_DONE);
+		NotificationEvent event = NotificationEvent.builder()
+			.title("차단 유저 추가")
+			.notificationType(NotificationType.LOGIN_DONE)
+			.receiver(receiver)
+			.publisher(user)
+			.content(receiver.getNickname() + "님을 차단했습니다")
+			.build();
 	}
 
 	@Transactional  //차단 유저 해제
@@ -49,10 +54,5 @@ public class BlacklistService {
 		} else {
 			throw new IllegalArgumentException("이미 차단해제 된 유저 입니다.");
 		}
-	}
-
-	//Event Trigger method
-	private void notifyLoginInfo(User user, NotificationType type) {
-		user.publishEvent(eventPublisher, type);
 	}
 }

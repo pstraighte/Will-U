@@ -92,11 +92,11 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    // 모집중 -> 모집완료로 변경
-    @Override
-    @Transactional
-    public void completeRecruitment(Long id, User user) {
-        Post post = findPost(id);
+	// 모집중 -> 모집완료로 변경
+	@Override
+	@Transactional
+	public void completeRecruitment(Long id, User user) {
+		Post post = findPost(id);
 
         if (!post.getUser().getId().equals(user.getId())) {
             throw new RejectedExecutionException("작성자만 변경 가능합니다.");
@@ -109,24 +109,24 @@ public class PostServiceImpl implements PostService {
         }
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment,
-                                             Pageable pageable) {
-        Page<Post> searchResultPage;
-        if (recruitment) {
-            searchResultPage = switch (criteria) {
-                case "username" -> postRepository.findByUser_UsernameContainingAndRecruitmentIsTrue(keyword, pageable);
-                case "content" -> postRepository.findByContentContainingAndRecruitmentIsTrue(keyword, pageable);
-                default -> postRepository.findByTitleContainingAndRecruitmentIsTrue(keyword, pageable);
-            };
-        } else {
-            searchResultPage = switch (criteria) {
-                case "username" -> postRepository.findByUser_UsernameContaining(keyword, pageable);
-                case "content" -> postRepository.findByContentContaining(keyword, pageable);
-                default -> postRepository.findByTitleContaining(keyword, pageable);
-            };
-        }
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment,
+		Pageable pageable) {
+		Page<Post> searchResultPage;
+		if (recruitment) {
+			searchResultPage = switch (criteria) {
+				case "username" -> postRepository.findByUser_UsernameContainingAndRecruitmentIsTrue(keyword, pageable);
+				case "content" -> postRepository.findByContentContainingAndRecruitmentIsTrue(keyword, pageable);
+				default -> postRepository.findByTitleContainingAndRecruitmentIsTrue(keyword, pageable);
+			};
+		} else {
+			searchResultPage = switch (criteria) {
+				case "username" -> postRepository.findByUser_UsernameContaining(keyword, pageable);
+				case "content" -> postRepository.findByContentContaining(keyword, pageable);
+				default -> postRepository.findByTitleContaining(keyword, pageable);
+			};
+		}
 
         return searchResultPage.map(PostResponseDto::new);
     }

@@ -12,10 +12,6 @@
             const eventSource = new EventSource(`/subscribe`);
 
             eventSource.addEventListener("sse", function (event) {
-
-                console.log(event);
-
-                console.log(event.data);
                 const rawData = JSON.parse(event.data);
                 const ntId = rawData.id;
                 const content = rawData.content;
@@ -36,6 +32,10 @@
                             }
                         });
                     }
+                    //html 로 추가
+                    const newNotificationHtml = ``;
+                    $('.container').append(newNotificationHtml);
+                    console.log("알림 도착 시 html 추가");
                 })();
             });
         }
@@ -57,12 +57,15 @@
 
             notification.onclick = function () {
                 // 알림 클릭 시 수행할 동작 설정
-                window.open("http://localhost:8080/api/users/user-login");
+                //window.open("http://localhost:8080/api/users/user-login");
+                window.focus();
+                //사이드바 열고 알림 목록 보여주기
+
                 notification.close();
 
             };
 
-            notification.onshow = function () {
+            notification.onclose = function () {
                 console.log("isRead true 로 변경");
                 $.ajax({
                     url: `/api/notification/${ntId}`, // 요청을 보낼 서버의 URL
@@ -87,8 +90,8 @@
             const notification = new Notification("로그인 알림", notificationOptions);
 
             notification.onclick = function () {
-                // 알림 클릭 시 수행할 동작 설정
-                window.open("http://localhost:8080/api/users/user-login");
+                // 알림 클릭 시 수행할 동작 설정notification-page
+                //window.open("http://localhost:8080/api/users/user-login");
                 notification.close();
                 //isRead true 로 변경
             };
@@ -97,12 +100,17 @@
 
         window.onload = createES();
 
-        window.onbeforeunload = closeEventSource();
+        // window.onbeforeunload = closeEventSource();
 
     </script>
 </head>
 
 <body>
-<h1>로그인 된 상태의 어느 페이지</h1>
+<div class="container">
+    <h1>로그인 된 상태의 어느 페이지</h1>
+    <div class="alert-list">
+
+    </div>
+</div>
 </body>
 </html>
