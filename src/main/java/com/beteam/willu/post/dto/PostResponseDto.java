@@ -12,6 +12,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponseDto extends ApiResponseDto {
 
+	private Long id;
 	private String title;
 	private String content;
 	//TODO
@@ -24,6 +25,7 @@ public class PostResponseDto extends ApiResponseDto {
 	private Long score;
 
 	public PostResponseDto(Post post) {
+		this.id = post.getId();
 		this.title = post.getTitle();
 		this.username = post.getUser().getUsername();
 		this.content = post.getContent();

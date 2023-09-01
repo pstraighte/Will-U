@@ -38,7 +38,7 @@ public class PostServiceImpl implements PostService {
 	public List<PostResponseDto> getPosts() {
 		return postRepository.findAllByOrderByCreatedAtDesc()
 			.stream()
-			.map(post -> new PostResponseDto(post))
+			.map(PostResponseDto::new)
 			.toList();
 	}
 	//    @Override
