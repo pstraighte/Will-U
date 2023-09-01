@@ -92,6 +92,5 @@ public class User extends Timestamped {
         this.picture = url;
     }
 
-
 }
 

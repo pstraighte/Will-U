@@ -109,7 +109,7 @@
 <main>
     <div class="list" id="post-list">
         <div id="posts">
-            같이 밥 먹으실분
+
         </div>
     </div>
 </main>
@@ -118,15 +118,21 @@
 <script src="/js/sidebar.js"></script>
 <script>
     $(document).ready(function () {
+        let token = Cookies.get('Authorization');
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        // 로그인한 유저 이름
+        const userName = payloads.sub;
+        console.log("userName : ", userName);
         $.ajax({
             url: 'http://localhost:8080/api/posts', // 스프링 컨트롤러 api 작성
             type: 'GET',
             contentType: 'application/json',
             success: function (response) { //postResponce값 가져옴
-                var postsContainer = $('#posts');
-                postsContainer.empty();
 
-                response.forEach(function (post) {
+                var postsContainer = $('#posts');
+
+                response.content.forEach(function (post) {
+
                     var postLink = `<a href="/posts/${post.id}">${post.title}</a>`;
                     var postDiv = `<div>${postLink}</div>`;
                     postsContainer.append(postDiv);
