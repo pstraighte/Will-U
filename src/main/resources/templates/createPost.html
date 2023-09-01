@@ -92,7 +92,7 @@
         <input type="number" id="maxnum" name="maxnum" min="2">
 
         <div class="buttons">
-            <button type="submit" onclick="createPost()">작성</button>
+            <button onclick="createPost()">작성</button>
             <button type="button" id="back">취소</button>
         </div>
     </form>
@@ -119,7 +119,7 @@
             }),
             success: function (response) {
                 alert("글 작성 성공")
-                window.location.href = "/index";
+                window.location.href = "/";
             },
             error: function (xhr, status, error) {
                 alert("글 작성 실패")
