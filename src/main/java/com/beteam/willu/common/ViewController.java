@@ -9,10 +9,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import lombok.RequiredArgsConstructor;
+
 import java.util.List;
 
 @Controller
 @Slf4j
+@RequiredArgsConstructor
 public class ViewController {
 
     @Autowired
@@ -46,5 +49,4 @@ public class ViewController {
         model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
         return "updatePost";
     }
-
 }

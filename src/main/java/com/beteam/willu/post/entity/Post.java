@@ -107,4 +107,9 @@ public class Post extends Timestamped {
             this.promiseArea = postRequestDto.getPromiseArea();
         }
     }
+  /*	//event publish method
+	//게시글 관련 알림:
+	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
+	}*/
+
 }
