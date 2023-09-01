@@ -271,6 +271,8 @@
 
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script src="/js/login.js"></script>
 </head>
 
 <body>
@@ -311,15 +313,15 @@
                             <input type="button" onclick="login()" value="로그인">
                         </div>
                         <button id="login-kakao-btn"
-                                onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=53fd8dda11511575d7ad1ce60895dd5e&redirect_uri=http://localhost:8080/api/users/kakao/callback&response_type=code'">
+                                onclick="kakaoLogin()">
                             카카오로 로그인하기
                         </button>
-                        <button id="login-gogle-btn"
-                                onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-ika35lgnjbmu7hvi51r10er1qjjcqmbh.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile'">
+                        <button id="login-google-btn"
+                                onclick="googleLogin()">
                             구글 로그인하기
                         </button>
                         <button id="login-naver-btn"
-                                onclick="location.href='https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://localhost:8080/api/users/naver/callback&response_type=code;'">
+                                onclick="naverLogin()">
                             네이버 로그인하기
                         </button>
                         <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label>
@@ -487,7 +489,7 @@
                     icon: 'success',
                     title: '회원가입 성공'
                 }).then(() => {
-                    window.location.href = "/api/users/user-login";
+                    window.location.href = "/view/users/user-login";
                 });
 
             },

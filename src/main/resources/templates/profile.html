@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/css/profile.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <title>프로필 페이지</title>
 </head>
 <body>
+<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}"></div>
 <div class="profile-container">
     <img th:src="${user.picture}" alt="Profile Image" width="70" height="70 style=" src="">
     <a th:text="${user.nickname}" class="navbar-brand nickname"> Nickname </a>
@@ -37,6 +40,7 @@
         </form>
     </div>
 </div>
+<script src="/js/sidebar.js"></script>
 <script>
     const editProfileButton = document.getElementById("edit-profile-button");
     const editProfileModal = document.getElementById("edit-profile-modal");

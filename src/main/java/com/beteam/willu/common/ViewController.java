@@ -3,10 +3,12 @@ package com.beteam.willu.common;
 import java.util.ArrayList;
 import java.util.List;
 
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.beteam.willu.blacklist.dto.BlacklistResponseDto;
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
+import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.interest.dto.InterestResponseDto;
 import com.beteam.willu.interest.entity.Interest;
@@ -27,6 +30,9 @@ import com.beteam.willu.post.service.PostService;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
+
+import jakarta.servlet.http.HttpServletResponse;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,27 +41,20 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ViewController {
 
-	@Autowired
 	private final InterestRepository interestRepository;
 	private final BlacklistRepository blacklistRepository;
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final PostService postService;
+	private final JwtUtil jwtUtil;
 
-	//메인화면
-	// @GetMapping("/index")    //주소 입력값
-	// public String postsView(Model model) {
-	//     List<PostResponseDto> posts = postService.getPosts();
-	//     model.addAttribute("posts", posts);
-	//     return "index"; //출력 html
-	// }
-
-	@GetMapping("/index")    //주소 입력값
+	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
 		@RequestParam(value = "size", defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
 		Page<PostResponseDto> posts = postService.getPosts(pageable);
+
 		model.addAttribute("posts", posts);
 		return "index"; //출력 html
 	}
@@ -122,5 +121,19 @@ public class ViewController {
 		model.addAttribute("user", user);
 
 		return "profile";
+	}
+  
+	// 로그인 페이지
+	@GetMapping("/view/users/user-login")
+	public String getLoginPage(HttpServletResponse response) {
+		jwtUtil.expireCookie(response, "Authorization");
+		jwtUtil.expireCookie(response, "RT");
+		return "loginSignUp";
+	}
+
+	// 채팅 페이지
+	@GetMapping("/users/chat")
+	public String getChatPage(@RequestParam(value = "number", required = false) int number) {
+		return "chatting";
 	}
 }

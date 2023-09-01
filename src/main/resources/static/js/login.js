@@ -10,20 +10,150 @@ function naverLogin() {
     window.location.href = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://localhost:8080/api/users/naver/callback&response_type=code;'
 }
 
+$(document).ready(function () {
+    // 토큰 삭제
+    Cookies.remove('Authorization', {path: '/'});
+    Cookies.remove('RT', {path: '/'});
+});
+
 function login() {
+    let username = document.getElementById("idInput").value;
+    let password = document.getElementById("passInput").value;
+    if (username === '' || password === '') {
+        alert("정보를 모두 입력해주세요");
+        return;
+    }
     $.ajax({
         url: `/api/users/login`, // 요청을 보낼 서버의 URL
         method: 'POST', // 요청 메소드 (GET, POST 등)
         contentType: "application/json",
-        data: JSON.stringify({username: $("#idInput").val(), password: $("#passInput").val()}),
-        success: function (response) {
-            alert("로그인 성공")
+        data: JSON.stringify({username: username, password: password}),
 
-            window.location.href = "/notification-page";
+        success: function (response) {
+            console.log(response.message);
+            if (response.message === "로그인 성공") {
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'center',
+                    showConfirmButton: false,
+                    timer: 1000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                })
+
+                Toast.fire({
+                    icon: 'success',
+                    title: '로그인 성공'
+                }).then(() => {
+                    window.location.href = "/sidebar";
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: '로그인 실패',
+                    text: response,
+                });
+            }
         },
-        error: function (xhr, status, error) {
-            alert("로그인 실패")
-            console.log(xhr);
+        error: function (xhr) {
+            Swal.fire({
+                icon: 'error',
+                title: '로그인 실패',
+                text: "아이디 혹은 비밀번호를 확인하세요",
+            });
         }
     });
+}
+
+function signup() {
+    let username = document.getElementById("username").value;
+    let nickname = document.getElementById("nickname").value;
+    let email = document.getElementById("email").value;
+    let password = document.getElementById("password").value;
+    let confirmPassword = document.getElementById("password-confirm").value;
+
+    if (username === '' || password === '' || nickname === '' || email === '' || confirmPassword === '') {
+        Swal.fire({
+            icon: 'warning',
+            title: '회원가입 실패',
+            text: "회원 정보를 모두 입력해주세요"
+        });
+    }
+
+    let email_format = '^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+)$';
+
+    if (!email.match(email_format)) {
+        Swal.fire({
+            icon: 'warning',
+            title: '회원가입 실패',
+            text: "아이디가 이메일 형식에 부합하지 않습니다."
+        });
+        document.getElementById("email").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        Swal.fire({
+            icon: 'warning',
+            title: '회원가입 실패',
+            text: "비밀번호가 일치하지 않습니다"
+        });
+        document.getElementById("password-confirm").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
+        return;
+    }
+
+    $.ajax({
+        type: "POST",
+        url: "/api/users/signup",
+        data: JSON.stringify({
+            username: username,
+            nickname: nickname,
+            email: email,
+            password: password
+        }),
+        contentType: "application/json",
+
+        success: function (response) {
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'center-center',
+                showConfirmButton: false,
+                timer: 800,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+
+            Toast.fire({
+                icon: 'success',
+                title: '회원가입 성공'
+            }).then(() => {
+                window.location.href = "/view/users/user-login";
+            });
+
+        },
+        error: function (xhr) {
+            if (xhr.responseText) {
+                try {
+                    const responseJson = JSON.parse(xhr.responseText);
+                    const errorMessage = responseJson.message;
+                    Swal.fire({
+                        icon: 'error',
+                        title: '회원가입 실패',
+                        text: errorMessage,
+                    });
+                } catch (e) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: '회원가입 실패'
+                    });
+                }
+            }
+        }
+    })
 }
