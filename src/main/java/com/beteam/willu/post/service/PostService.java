@@ -1,7 +1,5 @@
 package com.beteam.willu.post.service;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -47,7 +45,8 @@ public interface PostService {
 	//     * @return
 	//     */
 	//    Page<PostResponseDto> getPosts(Pageable pageable);
-	List<PostResponseDto> getPosts();
+	// List<PostResponseDto> getPosts();
+	Page<PostResponseDto> getPosts(Pageable pageable);
 
 	/**
 	 *
