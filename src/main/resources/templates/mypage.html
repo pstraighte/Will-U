@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/mypage.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+
+    <title>마이 페이지</title>
+</head>
+<body>
+<div class="profile-container">
+    <img th:src="${user.picture}" alt="Profile Image" width="70" height="70 style=" src="">
+    <a th:text="${user.nickname}" class="navbar-brand nickname"> Nickname </a>
+    <br>
+    <button id="profile-button">프로필 보기</button>
+
+    <div class="interest">
+        <button id="interest-users-button">관심 유저</button>
+    </div>
+    <div class="interest-users-tab tab-content" id="interest-users">
+        <ul class="interest-users-list">
+            <!-- Thymeleaf 반복문으로 interestResponseDtos 데이터 출력 -->
+            <li th:each="interest : ${interests}">
+                <span th:text="${interest.receiver.nickname}"
+                      th:attr="data-user-id=${interest.receiver.id}"
+                      class="interest-user"></span>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <button id="blocked-users-button">차단 유저</button>
+    </div>
+    <div class="blacklist-users-tab tab-content" id="blacklist-users">
+        <ul class="blacklist-users-list">
+            <!-- Thymeleaf 반복문으로 blacklistResponseDtos 데이터 출력 -->
+            <li th:each="blacklist : ${blacklists}">
+                <span th:text="${blacklist.receiver.nickname}"
+                      th:attr="data-user-id=${blacklist.receiver.id}"
+                      class="blacklist-user"></span>
+            </li>
+        </ul>
+    </div>
+    <div>
+        <button id="recruitment-button">모집 활동 내역</button>
+    </div>
+    <div class="post-tab tab-content" id="posts">
+        <ul class="post-list">
+            <!-- Thymeleaf 반복문으로 PostResponseDtos 데이터 출력 -->
+            <li th:each="post : ${posts}">
+                <span th:text="${post.title}" th:attr="data-post-id=${post.id}" class="post-title"></span>
+            </li>
+        </ul>
+    </div>
+    <button id="cancel-membership-button" th:data-user-id="${user.id}">회원 탈퇴</button>
+</div>
+<script th:inline="javascript">
+    var userId = [[${user.id}]];
+    const profileButton = document.getElementById("profile-button");
+    profileButton.addEventListener("click", () => {
+        // 프로필 페이지로 이동
+        window.location.href = `http://localhost:8080/users/profile/${userId}`;
+    });
+
+    const cancelMembershipButton = document.getElementById("cancel-membership-button");
+
+    cancelMembershipButton.addEventListener("click", () => {
+        const userId = cancelMembershipButton.getAttribute("data-user-id"); // 사용자 아이디 값 가져오기
+
+        // 비밀번호 확인 다이얼로그 표시
+        const password = prompt("비밀번호를 입력하세요:");
+        if (password === null) {
+            // 사용자가 취소를 눌렀을 경우 처리
+            return;
+        }
+
+        // 정말 탈퇴할 것인지 묻는 다이얼로그 표시
+        const confirmResult = confirm("정말로 회원 탈퇴하시겠습니까?");
+        if (!confirmResult) {
+            // 사용자가 취소를 눌렀을 경우 처리
+            return;
+        }
+
+        fetch(`/api/users/${userId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                password: password
+            })
+        })
+            .then(response => {
+                if (response.ok) {
+                    // 회원 탈퇴 성공 시 처리할 로직
+                    deleteJwtCookie();
+                    deleteRefreshTokenCookie();
+                    alert("회원 탈퇴되었습니다.");
+                    window.location.href = "http://localhost:8080/api/users/user-login";
+                } else {
+                    // 회원 탈퇴 실패 시 처리할 로직
+                    alert("회원 탈퇴에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+    });
+
+
+    // 이벤트 핸들러를 등록
+    document.addEventListener('DOMContentLoaded', function () {
+        const postTitles = document.querySelectorAll('.post-title');
+        postTitles.forEach(title => {
+            title.addEventListener('click', function (event) {
+                const postId = event.target.getAttribute('data-post-id');
+                if (postId) {
+                    window.location.href = `/posts/${postId}`;
+                }
+            });
+        });
+    });
+    // 관심 유저 클릭 이벤트 핸들러
+    const interestUsers = document.querySelectorAll('.interest-user');
+    interestUsers.forEach(user => {
+        user.addEventListener('click', function (event) {
+            const userId = event.target.getAttribute('data-user-id');
+            window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+        });
+    });
+
+    // 관심 유저 클릭 이벤트 핸들러
+    const blacklistUsers = document.querySelectorAll('.blacklist-user');
+    blacklistUsers.forEach(user => {
+        user.addEventListener('click', function (event) {
+            const userId = event.target.getAttribute('data-user-id');
+            window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+        });
+    });
+
+    function deleteJwtCookie() {
+        const cookieName = 'Authorization'; // JWT가 저장된 쿠키의 이름
+        // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
+        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+
+    function deleteRefreshTokenCookie() {
+        const refreshTokenCookieName = 'RT'; // refreshToken이 저장된 쿠키의 이름
+        // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
+        document.cookie = `${refreshTokenCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+    }
+</script>
+</body>
+</html>

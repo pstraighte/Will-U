@@ -6,6 +6,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import com.beteam.willu.post.entity.Post;
+import com.beteam.willu.user.entity.User;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByOrderByCreatedAtDesc();
@@ -28,4 +30,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 내용으로 검색하고 모집 상태가 true인 게시글만 검색
     Page<Post> findByContentContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
 
+	List<Post> findByUser(User user);
 }

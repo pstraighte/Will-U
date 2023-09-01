@@ -77,11 +77,9 @@ public class User extends Timestamped {
 
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
-		this.username = updateRequestDto.getUsername();
 		this.nickname = updateRequestDto.getNickname();
 		this.phoneNumber = updateRequestDto.getPhoneNumber();
 		this.area = updateRequestDto.getArea();
-		this.picture = updateRequestDto.getPicture();
 	}
 
 	// 카카오 id 를 업데이트
@@ -100,5 +98,17 @@ public class User extends Timestamped {
 		this.naverId = naverId;
 		return this;
 	}
+
+	public void setPicture(String url) {
+		this.picture = url;
+	}
+
+	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
+		//type 에 따른 알림 내용 변경
+		NotificationRequestDto requestDto = new NotificationRequestDto(this.getNickname() + "님이 로그인하셨습니다.", "로그인 알림",
+			type, this);
+		eventPublisher.publishEvent(requestDto);
+	}
+
 }
 

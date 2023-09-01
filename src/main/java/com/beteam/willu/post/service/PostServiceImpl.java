@@ -31,19 +31,19 @@ public class PostServiceImpl implements PostService {
         return new PostResponseDto(post);
     }
 
-    // 게시글 전체 조회
-    @Override
-    public List<PostResponseDto> getPosts() {
-        return postRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
-                .map(post -> new PostResponseDto(post))
-                .toList();
-    }
-    //    @Override
-    //    public Page<PostResponseDto> getPosts(Pageable pageable) {
-    //        Page<Post> posts = postRepository.findAll(pageable);
-    //        return posts.map(post -> new PostResponseDto(post));
-    //    }
+	// 게시글 전체 조회
+	@Override
+	public List<PostResponseDto> getPosts() {
+		return postRepository.findAllByOrderByCreatedAtDesc()
+			.stream()
+			.map(PostResponseDto::new)
+			.toList();
+	}
+	//    @Override
+	//    public Page<PostResponseDto> getPosts(Pageable pageable) {
+	//        Page<Post> posts = postRepository.findAll(pageable);
+	//        return posts.map(post -> new PostResponseDto(post));
+	//    }
 
     // 게시글 상세 조회
 

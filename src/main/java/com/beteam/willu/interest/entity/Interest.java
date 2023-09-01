@@ -4,7 +4,6 @@ import com.beteam.willu.common.Timestamped;
 import com.beteam.willu.user.entity.User;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -26,11 +25,11 @@ public class Interest extends Timestamped {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "receiver_id") //받는 사람
 	private User receiver;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "sender_id") //보내는 사람
 	private User sender;
 

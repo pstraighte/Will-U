@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/profile.css">
+    <title>프로필 페이지</title>
+</head>
+<body>
+<div class="profile-container">
+    <img th:src="${user.picture}" alt="Profile Image" width="70" height="70 style=" src="">
+    <a th:text="${user.nickname}" class="navbar-brand nickname"> Nickname </a>
+
+    <div class="evaluation">
+        <h2>점수 : X</h2>
+    </div>
+
+    <div class="reviews">
+        <h2>받은 후기</h2>
+        <ul id="reviews-list"></ul>
+    </div>
+
+    <button id="edit-profile-button">프로필 수정</button>
+</div>
+<div id="edit-profile-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>프로필 수정</h2>
+        <form id="edit-image-form" enctype="multipart/form-data">
+            <input type="file" id="profile-image" accept="image/*">
+            <button type="submit">저장</button>
+        </form>
+        <form id="edit-nickname-form">
+            <label for="nickname">새로운 닉네임:</label>
+            <input type="text" id="nickname" name="nickname">
+            <button type="submit">저장</button>
+        </form>
+    </div>
+</div>
+<script>
+    const editProfileButton = document.getElementById("edit-profile-button");
+    const editProfileModal = document.getElementById("edit-profile-modal");
+    const closeModal = document.querySelector(".close");
+
+    editProfileButton.addEventListener("click", () => {
+        editProfileModal.style.display = "block";
+    });
+
+    closeModal.addEventListener("click", () => {
+        editProfileModal.style.display = "none";
+    });
+
+    window.addEventListener("click", event => {
+        if (event.target === editProfileModal) {
+            editProfileModal.style.display = "none";
+        }
+    });
+
+    const editProfileForm = document.getElementById("edit-nickname-form");
+
+    editProfileForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const newNickname = editProfileForm.nickname.value;
+
+        try {
+            const response = await fetch("/api/users", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nickname: newNickname
+                })
+            });
+
+            if (response.ok) {
+                // 성공적으로 수정되었을 때의 처리
+                // 예: 모달 닫기 등
+                editProfileModal.style.display = "none";
+                window.alert("닉네임이 성공적으로 수정되었습니다.");
+                location.reload();
+            } else {
+                // 서버로부터 실패 응답을 받았을 때의 처리
+                // 예: 에러 메시지 표시 등
+                console.error("프로필 수정 실패");
+                window.alert("닉네임 수정이 실패했습니다.");
+
+            }
+        } catch (error) {
+            // API 요청 중에 발생한 오류 처리
+            console.error("API 요청 오류:", error);
+        }
+    });
+
+    const editImageForm = document.getElementById("edit-image-form");
+    const profileImageInput = document.getElementById("profile-image");
+
+    editImageForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const formData = new FormData();
+        formData.append("file", profileImageInput.files[0]);
+
+        try {
+            const response = await fetch("/api/image", {
+                method: "POST",
+                body: formData
+            });
+
+            if (response.ok) {
+                // 이미지 업로드 성공 시의 처리
+                // 예: 프로필 이미지를 업데이트하고 모달 닫기 등
+                editProfileModal.style.display = "none";
+                window.alert("프로필 이미지가 성공적으로 업로드되었습니다.");
+                location.reload();
+            } else {
+                // 이미지 업로드 실패 시의 처리
+                // 예: 에러 메시지 표시 등
+                console.error("프로필 이미지 업로드 실패");
+                window.alert("프로필 이미지 업로드가 실패했습니다.");
+            }
+        } catch (error) {
+            // API 요청 중에 발생한 오류 처리
+            console.error("API 요청 오류:", error);
+        }
+    });
+</script>
+</body>
+</html>
