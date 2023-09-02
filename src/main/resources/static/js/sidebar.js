@@ -356,7 +356,6 @@ function showMyNotification() {
             });
         },
         error: function (xhr, status, error) {
-            alert("조회 실패")
             console.log(xhr);
         }
     });
