@@ -31,6 +31,7 @@ public class PostServiceImpl implements PostService {
 
 	// 게시글 작성
 	@Override
+	@Transactional
 	public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
 		Post post = new Post(postRequestDto);
 		post.setUser(user);
@@ -56,6 +57,7 @@ public class PostServiceImpl implements PostService {
 
 	// 게시글 전체 조회
 	@Override
+	@Transactional(readOnly = true)
 	public Page<PostResponseDto> getPosts(Pageable pageable) {
 		Page<Post> posts = postRepository.findAll(pageable);
 		return posts.map(PostResponseDto::new);

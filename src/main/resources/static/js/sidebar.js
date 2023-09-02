@@ -253,7 +253,6 @@ function showNotification(content, notificationType, title, ntId) {
 
     notification.onclick = function () {
         // 알림 클릭 시 수행할 동작 설정
-        //window.open("http://localhost:8080/view/users/user-login");
         window.focus();
         //사이드바 열고 알림 목록 보여주기
 
