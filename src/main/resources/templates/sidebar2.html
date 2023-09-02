@@ -10,7 +10,7 @@
 <body>
 <div th:fragment="sidebarFragment">
     <div id="sidebar">
-        <h2>내비게이션</h2>
+        <h2 onclick="window.location.href='/'">할래?</h2>
         <button id="closeBtn" onclick="openSidebar()">X</button>
         <!-- 로그인 완료 상태 -->
         <div class="profile-btn-container">
@@ -251,7 +251,6 @@
                 });
             },
             error: function (xhr, status, error) {
-                alert("조회 실패");
                 console.log(xhr);
             }
         });
