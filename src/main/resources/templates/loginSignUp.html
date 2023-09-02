@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<!-- Coding by CodingNepal | www.codingnepalweb.com-->
 <html lang="en" dir="ltr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script crossorigin="anonymous"
+            integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g="
+            src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+
     <script src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <title> Login & SignUp </title>
-    <!--<link rel="stylesheet" href="../static/css/style.css">-->
-    <!-- Fontawesome CDN Link -->
     <style>
         /* Google Font Link */
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
@@ -270,6 +270,9 @@
         }
 
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+    <script src="/js/login.js"></script>
 </head>
 
 <body>
@@ -310,15 +313,15 @@
                             <input type="button" onclick="login()" value="로그인">
                         </div>
                         <button id="login-kakao-btn"
-                                onclick="location.href='https://kauth.kakao.com/oauth/authorize?client_id=53fd8dda11511575d7ad1ce60895dd5e&redirect_uri=http://localhost:8080/api/users/kakao/callback&response_type=code'">
+                                onclick="kakaoLogin()">
                             카카오로 로그인하기
                         </button>
-                        <button id="login-gogle-btn"
-                                onclick="location.href='https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-ika35lgnjbmu7hvi51r10er1qjjcqmbh.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile'">
+                        <button id="login-google-btn"
+                                onclick="googleLogin()">
                             구글 로그인하기
                         </button>
                         <button id="login-naver-btn"
-                                onclick="location.href='https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://localhost:8080/api/users/naver/callback&response_type=code;'">
+                                onclick="naverLogin()">
                             네이버 로그인하기
                         </button>
                         <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label>
@@ -401,7 +404,7 @@
                         icon: 'success',
                         title: '로그인 성공'
                     }).then(() => {
-                        window.location.href = "/notification-page";
+                        window.location.href = "/";
                     });
                 } else {
                     Swal.fire({
@@ -486,7 +489,7 @@
                     icon: 'success',
                     title: '회원가입 성공'
                 }).then(() => {
-                    window.location.reload();
+                    window.location.href = "/view/users/user-login";
                 });
 
             },

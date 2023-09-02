@@ -1,7 +1,5 @@
 package com.beteam.willu.post.controller;
 
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,12 +43,20 @@ public class PostController {
 	}
 
 	// 게시글 전체 조회
+	// @GetMapping("/posts")
+	// public ResponseEntity<List<PostResponseDto>> getPosts() {
+	// 	List<PostResponseDto> result = postService.getPosts();
+	// 	return ResponseEntity.ok().body(result);
+	// }
 	@GetMapping("/posts")
-	public ResponseEntity<List<PostResponseDto>> getPosts() {
-		List<PostResponseDto> result = postService.getPosts();
-		return ResponseEntity.ok().body(result);
+	public ResponseEntity<Page<PostResponseDto>> getPosts(
+		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
+		@RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
+	) {
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		Page<PostResponseDto> posts = postService.getPosts(pageable);
+		return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
 	}
-
 	//    @GetMapping("/posts")
 	//    public String getPosts(Pageable pageable, Model model) {
 	//        Page<PostResponseDto> postPage = postService.getPosts(pageable);

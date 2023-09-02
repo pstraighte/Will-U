@@ -16,6 +16,7 @@ import com.beteam.willu.user.dto.UserUpdateRequestDto;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,7 @@ public class UserService {
 			.password(password)
 			.nickname(requestDto.getNickname())
 			.email(requestDto.getEmail())
+			.picture("https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg?w=826")
 			.build();
 
 		userRepository.save(user);
@@ -109,6 +111,7 @@ public class UserService {
 	public UserResponseDto userUpdate(UserUpdateRequestDto updateRequestDto, UserDetailsImpl users) {
 		User user = users.getUser();
 		user.profileUpdate(updateRequestDto);
+		userRepository.save(user);
 		return new UserResponseDto(user);
 	}
 
@@ -120,12 +123,22 @@ public class UserService {
 		userRepository.delete(user);
 	}
 
+	@Transactional
+	public boolean isPasswordCorrect(Long userId, String password) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
+
+		// 비밀번호 확인 로직
+		String encryptedPassword = user.getPassword();
+		return passwordEncoder.matches(password, encryptedPassword);
+	}
+
 	private User findUser(String username) {
 		return userRepository.findByUsername(username)
 			.orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 	}
 
-	private User findUser(Long id) {
+	public User findUser(Long id) {
 		return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 	}
 

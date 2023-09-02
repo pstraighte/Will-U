@@ -1,5 +1,6 @@
 package com.beteam.willu.interest.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,6 @@ public interface InterestRepository extends JpaRepository<Interest, Long> {
 	boolean existsByReceiverIdAndSenderId(Long receiver, Long sender);
 
 	Optional<Interest> findByReceiverIdAndSenderId(Long receiver, Long sender);
+
+	List<Interest> findBySenderId(Long senderId);
 }
