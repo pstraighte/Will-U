@@ -140,7 +140,6 @@
                 maxnum: $("#maxnum").val()
             }),
             success: function (response) {
-                alert("글 수정 성공");
                 window.location.href = "/posts/" + postId;
             },
             error: function (xhr, status, error) {
@@ -151,7 +150,7 @@
     }
 
     document.getElementById("back").addEventListener("click", function () {
-        history.back(); // 뒤로가기 기능 실행
+        window.location.href = "/posts/" + postId; // 뒤로가기 (상세페이지로)
     });
 </script>
 </html>
