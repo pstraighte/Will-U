@@ -378,11 +378,10 @@
                     contentType: "application/json",
                     data: JSON.stringify({userId: userId, chatContent: $("#msg").val(), roomId: roomNumber}),
                     success: function (response) {
-                        alert("저장완료");
                         $("#msg").val('');
                     },
                     error: function (xhr, status, error) {
-                        alert("저장 실패")
+                        console.log("채팅 발송 실패");
                         console.log(xhr);
                     }
                 });
@@ -731,11 +730,10 @@
             url: `/api/chat/chatRoom/${roomNumber}/out`,
             method: 'DELETE', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                alert("채팅방 나가기 성공");
                 window.location.href = "/";
             },
             error: function (xhr, status, error) {
-                alert("채팅방 나가기 실패")
+                alert("채팅방 나가기 실패");
                 console.log(xhr);
             }
         });

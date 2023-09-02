@@ -12,6 +12,10 @@ import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
+import com.beteam.willu.stomp.entity.ChatRoom;
+import com.beteam.willu.stomp.entity.UserChatRoom;
+import com.beteam.willu.stomp.repository.ChatRoomRepository;
+import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -22,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 public class PostServiceImpl implements PostService {
 
 	private final PostRepository postRepository;
+	private final ChatRoomRepository chatRoomRepository;
+	private final UserChatRoomsRepository userChatRoomsRepository;
 
 	// 게시글 작성
 	@Override
@@ -29,6 +35,22 @@ public class PostServiceImpl implements PostService {
 		Post post = new Post(postRequestDto);
 		post.setUser(user);
 		postRepository.save(post);
+
+		// 게시글 생성 과 함께 채팅방 개설
+		ChatRoom chatRoom = ChatRoom.builder()
+			.post(post)
+			.chatTitle(post.getTitle())
+			.activated(true)
+			.build();
+
+		chatRoomRepository.save(chatRoom);
+
+		// UserChatRooms 생성
+
+		UserChatRoom userChatRoom = UserChatRoom.builder().user(user).chatRooms(chatRoom).role("ADMIN").build();
+
+		userChatRoomsRepository.save(userChatRoom);
+
 		return new PostResponseDto(post);
 	}
 

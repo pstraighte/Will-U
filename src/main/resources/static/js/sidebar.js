@@ -19,7 +19,7 @@ $(document).ready(function () {
 
                     if (response.chatRoomList.length == 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
-                        alert("채팅방 없음");
+
                     }
 
                     // 해당 사용자가 속한 채팅방이 있다면
@@ -150,7 +150,7 @@ function logout() {
         method: 'POST', // 요청 메소드 (GET, POST 등)
         contentType: "application/json",
         success: function (response) {
-            window.location.href = "/view/users/user-login";
+            window.location.href = "/";
 
         },
         error: function (xhr, status, error) {
