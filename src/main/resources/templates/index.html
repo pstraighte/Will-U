@@ -118,11 +118,11 @@
 <script src="/js/sidebar.js"></script>
 <script>
     $(document).ready(function () {
-        let token = Cookies.get('Authorization');
-        const payloads = JSON.parse(atob(token.split(".")[1]));
-        // 로그인한 유저 이름
-        const userName = payloads.sub;
-        console.log("userName : ", userName);
+        /*        let token = Cookies.get('Authorization');
+                const payloads = JSON.parse(atob(token.split(".")[1]));
+                // 로그인한 유저 이름
+                const userName = payloads.sub;
+                console.log("userName : ", userName);*/
         $.ajax({
             url: '/api/posts', // 스프링 컨트롤러 api 작성
             type: 'GET',
