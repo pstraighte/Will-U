@@ -101,13 +101,15 @@
 
 <script>
     function createPost() {
-        let authCookie = Cookies.get("Authorization");
+        console.log("title:" + $("#title").val(),
+            "content: " + $("#content").val(),
+            "category: " + $("#category").val(),
+            "promiseTime: " + $("#promiseTime").val(),
+            "promiseArea: " + $("#promiseArea").val(),
+            "maxnum:" + $("#maxnum").val());
         $.ajax({
             url: `/api/post`, // 컨트롤러 url 작성
             method: 'POST',
-            headers: {
-                'Authorization': authCookie
-            },
             contentType: "application/json",
             data: JSON.stringify({
                 title: $("#title").val(),
@@ -118,7 +120,6 @@
                 maxnum: $("#maxnum").val()
             }),
             success: function (response) {
-                alert("글 작성 성공")
                 window.location.href = "/";
             },
             error: function (xhr, status, error) {
@@ -129,7 +130,7 @@
     }
 
     document.getElementById("back").addEventListener("click", function () {
-        history.back(); // 뒤로가기 기능 실행
+        window.location.href = "/";
     });
 </script>
 </html>

@@ -16,7 +16,7 @@ $(document).ready(function () {
 
                     if (response.chatRoomList.length == 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
-                        alert("채팅방 없음");
+
                     }
 
                     // 해당 사용자가 속한 채팅방이 있다면
@@ -147,7 +147,7 @@ function logout() {
         method: 'POST', // 요청 메소드 (GET, POST 등)
         contentType: "application/json",
         success: function (response) {
-            window.location.href = "/view/users/user-login";
+            window.location.href = "/";
 
         },
         error: function (xhr, status, error) {
@@ -250,7 +250,6 @@ function showNotification(content, notificationType, title, ntId) {
 
     notification.onclick = function () {
         // 알림 클릭 시 수행할 동작 설정
-        //window.open("http://localhost:8080/view/users/user-login");
         window.focus();
         //사이드바 열고 알림 목록 보여주기
 
@@ -353,7 +352,6 @@ function showMyNotification() {
             });
         },
         error: function (xhr, status, error) {
-            alert("조회 실패")
             console.log(xhr);
         }
     });

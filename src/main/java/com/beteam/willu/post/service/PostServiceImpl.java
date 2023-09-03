@@ -23,57 +23,55 @@ import java.util.concurrent.RejectedExecutionException;
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
 
-    private final PostRepository postRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final UserChatRoomsRepository userChatRoomsRepository;
+	private final PostRepository postRepository;
+	private final ChatRoomRepository chatRoomRepository;
+	private final UserChatRoomsRepository userChatRoomsRepository;
 
-    // 게시글 작성
-    @Override
-    public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
-        Post post = new Post(postRequestDto);
-        post.setUser(user);
-        postRepository.save(post);
+	// 게시글 작성
+	@Override
+	@Transactional
+	public PostResponseDto createPost(PostRequestDto postRequestDto, User user) {
+		Post post = new Post(postRequestDto);
+		post.setUser(user);
+		postRepository.save(post);
 
-        Post newPost = findPost(post.getId());
+		// 게시글 생성 과 함께 채팅방 개설
+		ChatRoom chatRoom = ChatRoom.builder()
+			.post(post)
+			.chatTitle(post.getTitle())
+			.activated(true)
+			.build();
 
-        String chatTitle = newPost.getTitle();
-        // 게시글 생성 과 함께 채팅방 개설
-        ChatRoom chatRoom = ChatRoom.builder()
-                .post(post)
-                .chatTitle(chatTitle)
-                .activated(true)
-                .build();
+		chatRoomRepository.save(chatRoom);
 
-        chatRoomRepository.save(chatRoom);
+		// UserChatRooms 생성
 
-        // UserChatRooms 생성
+		UserChatRoom userChatRoom = UserChatRoom.builder().user(user).chatRooms(chatRoom).role("ADMIN").build();
 
+		userChatRoomsRepository.save(userChatRoom);
 
-        UserChatRoom userChatRoom = UserChatRoom.builder().user(user).chatRooms(chatRoom).role("ADMIN").build();
+		return new PostResponseDto(post);
+	}
 
-        userChatRoomsRepository.save(userChatRoom);
-
-        return new PostResponseDto(post);
-    }
-
-    // 게시글 전체 조회
-    @Override
-    public Page<PostResponseDto> getPosts(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
-        return posts.map(PostResponseDto::new);
-    }
-    // @Override
-    // public List<PostResponseDto> getPosts() {
-    // 	return postRepository.findAllByOrderByCreatedAtDesc()
-    // 		.stream()
-    // 		.map(PostResponseDto::new)
-    // 		.toList();
-    // }
-    //    @Override
-    //    public Page<PostResponseDto> getPosts(Pageable pageable) {
-    //        Page<Post> posts = postRepository.findAll(pageable);
-    //        return posts.map(post -> new PostResponseDto(post));
-    //    }
+	// 게시글 전체 조회
+	@Override
+	@Transactional(readOnly = true)
+	public Page<PostResponseDto> getPosts(Pageable pageable) {
+		Page<Post> posts = postRepository.findAll(pageable);
+		return posts.map(PostResponseDto::new);
+	}
+	// @Override
+	// public List<PostResponseDto> getPosts() {
+	// 	return postRepository.findAllByOrderByCreatedAtDesc()
+	// 		.stream()
+	// 		.map(PostResponseDto::new)
+	// 		.toList();
+	// }
+	//    @Override
+	//    public Page<PostResponseDto> getPosts(Pageable pageable) {
+	//        Page<Post> posts = postRepository.findAll(pageable);
+	//        return posts.map(post -> new PostResponseDto(post));
+	//    }
 
     // 게시글 상세 조회
 
