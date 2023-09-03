@@ -3,39 +3,54 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>sideBar</title>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 <body>
 <div th:fragment="sidebarFragment">
-    <div id="sidebar">
-        <h2 onclick="window.location.href='/'">할래?</h2>
-        <button id="closeBtn" onclick="openSidebar()">X</button>
-        <!-- 로그인 완료 상태 -->
-        <div class="profile-btn-container">
-            <span onclick="goProfile()">프로필</span>
-            <span onclick="logout()">로그아웃</span>
-        </div>
-        <!-- 로그인 전 상태 -->
-        <div class="login-btn-container">
-            <span><a href="/view/users/user-login" style="text-decoration: none" th:color="white">로그인/회원가입</a></span>
-        </div>
+<!--    사이드바 호출 버튼-->
+    <button class="btn btn-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasWithBothOptions"
+            aria-controls="offcanvasWithBothOptions">☰
+    </button>
 
-        <div class="accordion">
-            <div class="accordion-item">
-                <div class="accordion-header">채팅방리스트</div>
-                <div class="accordion-content">
+    <!--    사이드바 div-->
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+         aria-labelledby="offcanvasWithBothOptionsLabel">
 
+        <!--        내비게이션-->
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel" onclick="window.location.href='/'">할래?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <!--        내비게이션 content-->
+        <div class="offcanvas-body">
+            <!-- 로그인 완료 상태 -->
+            <div class="profile-btn-container">
+                <span onclick="goProfile()">프로필</span>
+                <span onclick="logout()">로그아웃</span>
+            </div>
+
+            <!-- 로그인 전 상태 -->
+            <div class="login-btn-container">
+                <span><a href="/view/users/user-login" style="text-decoration: none"
+                         th:color="white">로그인/회원가입</a></span>
+            </div>
+            <!-- 채팅방 리스트-->
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header">채팅방리스트</div>
+                    <div class="accordion-content">
+
+                    </div>
                 </div>
             </div>
-        </div>
-        <h2>알림 리스트</h2>
-        <div class="alert-list"></div>
-    </div>
+            <!-- 알림 리스트-->
+            <h2>알림 리스트</h2>
+            <div class="alert-list"></div>
 
-    <div>
-        <span id="openBtn" onclick="openSidebar()">☰</span>
+        </div>
     </div>
 </div>
 </body>
@@ -148,7 +163,6 @@
 
         notification.onclick = function () {
             // 알림 클릭 시 수행할 동작 설정
-            //window.open("http://localhost:8080/view/users/user-login");
             window.focus();
             //사이드바 열고 알림 목록 보여주기
 

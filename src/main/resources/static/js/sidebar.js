@@ -7,15 +7,12 @@ $(document).ready(function () {
         url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
-            console.log("response1 : ", response);
 
             // response 사용자의 id
             $.ajax({
                 url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
                 method: 'GET', // 요청 메소드 (GET, POST 등)
                 success: function (response) {
-
-                    console.log("response2 : ", response);
 
                     if (response.chatRoomList.length == 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
@@ -253,7 +250,6 @@ function showNotification(content, notificationType, title, ntId) {
 
     notification.onclick = function () {
         // 알림 클릭 시 수행할 동작 설정
-        //window.open("http://localhost:8080/view/users/user-login");
         window.focus();
         //사이드바 열고 알림 목록 보여주기
 

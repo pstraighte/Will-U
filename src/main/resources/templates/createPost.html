@@ -72,7 +72,7 @@
 <body>
 <div class="post-form">
     <h1>게시글 작성</h1>
-    <form id="post-form">
+    <div id="post-form">
         <label for="title">제목</label>
         <input type="text" id="title" name="title" required>
 
@@ -95,19 +95,21 @@
             <button onclick="createPost()">작성</button>
             <button type="button" id="back">취소</button>
         </div>
-    </form>
+    </div>
 </div>
 </body>
 
 <script>
     function createPost() {
-        let authCookie = Cookies.get("Authorization");
+        console.log("title:" + $("#title").val(),
+            "content: " + $("#content").val(),
+            "category: " + $("#category").val(),
+            "promiseTime: " + $("#promiseTime").val(),
+            "promiseArea: " + $("#promiseArea").val(),
+            "maxnum:" + $("#maxnum").val());
         $.ajax({
             url: `/api/post`, // 컨트롤러 url 작성
             method: 'POST',
-            headers: {
-                'Authorization': authCookie
-            },
             contentType: "application/json",
             data: JSON.stringify({
                 title: $("#title").val(),
@@ -118,7 +120,6 @@
                 maxnum: $("#maxnum").val()
             }),
             success: function (response) {
-                alert("글 작성 성공")
                 window.location.href = "/";
             },
             error: function (xhr, status, error) {
@@ -129,7 +130,7 @@
     }
 
     document.getElementById("back").addEventListener("click", function () {
-        history.back(); // 뒤로가기 기능 실행
+        window.location.href = "/";
     });
 </script>
 </html>
