@@ -1,5 +1,5 @@
 function googleLogin() {
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-os264ffg5u5a27545p76e535cuhf1v0u.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-os264ffg5u5a27545p76e535cuhf1v0u.apps.googleusercontent.com&redirect_uri=http://43.201.154.114:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
 }
 
 function kakaoLogin() {

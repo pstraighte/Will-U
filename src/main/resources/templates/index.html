@@ -2,9 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>willu</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+            integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+            crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
-    <title>willu</title>
     <STYLE>
         body {
             font-family: Arial, sans-serif;
@@ -40,6 +49,7 @@
         #sideBarDiv {
             width: 200px;
             height: 100%;
+           
         }
 
         /*사이드바*/
@@ -98,6 +108,7 @@
 <div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}">
 
 </div>
+
 <header>
     <h1>할래?</h1>
 </header>
@@ -118,17 +129,13 @@
 <script src="/js/sidebar.js"></script>
 <script>
     $(document).ready(function () {
-        let token = Cookies.get('Authorization');
-        const payloads = JSON.parse(atob(token.split(".")[1]));
-        // 로그인한 유저 이름
-        const userName = payloads.sub;
-        console.log("userName : ", userName);
+
         $.ajax({
-            url: 'http://localhost:8080/api/posts', // 스프링 컨트롤러 api 작성
+            url: '/api/posts', // 스프링 컨트롤러 api 작성
             type: 'GET',
             contentType: 'application/json',
             success: function (response) { //postResponce값 가져옴
-
+                console.log("postResponce값 :", response);
                 var postsContainer = $('#posts');
 
                 response.content.forEach(function (post) {
@@ -146,6 +153,7 @@
         });
 
     });
+
 
 </script>
 </html>
