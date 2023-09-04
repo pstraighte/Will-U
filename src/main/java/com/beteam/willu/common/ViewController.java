@@ -3,12 +3,9 @@ package com.beteam.willu.common;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,9 +27,7 @@ import com.beteam.willu.post.service.PostService;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
-
 import jakarta.servlet.http.HttpServletResponse;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,7 +61,7 @@ public class ViewController {
 	}
 
 	//게시글 단건 조회
-	@GetMapping("/posts/{postId}")
+	@GetMapping("/view/posts/{postId}")
 	public String detailPost(Model model, @PathVariable Long postId) {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
@@ -122,7 +117,7 @@ public class ViewController {
 
 		return "profile";
 	}
-  
+
 	// 로그인 페이지
 	@GetMapping("/view/users/user-login")
 	public String getLoginPage(HttpServletResponse response) {

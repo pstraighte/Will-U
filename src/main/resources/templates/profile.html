@@ -14,12 +14,11 @@
             crossorigin="anonymous"></script>
     
     <link rel="stylesheet" href="/css/profile.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <th:block th:replace="~{/fragments/sidebar::common-header}"></th:block>
     <title>프로필 페이지</title>
 </head>
 <body>
-<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}"></div>
+<div id="sideBarDiv" th:insert="~{/fragments/sidebar::sidebarFragment}"></div>
 <div class="profile-container">
     <img th:src="${user.picture}" alt="Profile Image" width="70" height="70 style=" src="">
     <a th:text="${user.nickname}" class="navbar-brand nickname"> Nickname </a>
@@ -50,7 +49,6 @@
         </form>
     </div>
 </div>
-<script src="/js/sidebar.js"></script>
 <script>
     const editProfileButton = document.getElementById("edit-profile-button");
     const editProfileModal = document.getElementById("edit-profile-modal");
