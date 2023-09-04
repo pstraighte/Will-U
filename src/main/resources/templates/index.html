@@ -72,7 +72,7 @@
             type: 'GET',
             contentType: 'application/json',
             success: function (response) { //postResponce값 가져옴
-
+                console.log("postResponce값 :", response);
                 var postsContainer = $('#posts');
 
                 response.content.forEach(function (post) {

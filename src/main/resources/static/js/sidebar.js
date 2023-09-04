@@ -2,6 +2,7 @@ const token = getAuthorizationCookie();
 if (token !== null) {
     const payloads = JSON.parse(atob(token.split(".")[1]));
     const userName = payloads.sub;
+    checkLoginStatus();
     console.log(token);
     console.log(userName);
     getChatRooms(userName);
@@ -9,7 +10,6 @@ if (token !== null) {
 
 checkLoginStatus(token);
 //채팅방 조회
-
 
 $(".accordion-header").click(function () {
     $(this).toggleClass("active");
@@ -67,26 +67,19 @@ function getChatRooms(userName) {
         url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
-            console.log("response1 : ", response);
-
             // response 사용자의 id
             $.ajax({
                 url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
                 method: 'GET', // 요청 메소드 (GET, POST 등)
                 success: function (response) {
 
-                    console.log("response2 : ", response);
-
-                    if (response.chatRoomList.length == 0) {
+                    if (response.chatRoomList.length === 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
-
                     }
-
                     // 해당 사용자가 속한 채팅방이 있다면
-                    for (let i = 0; i < response.chatRoomList.length; i++) {
+                    for (var i = 0; i < response.chatRoomList.length; i++) {
                         $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
                     }
-
                 },
                 error: function (xhr, status, error) {
                     console.log(xhr);
