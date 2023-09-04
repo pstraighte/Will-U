@@ -3,12 +3,9 @@ package com.beteam.willu.common;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,12 +24,12 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.review.dto.ReviewSetResponseDto;
+import com.beteam.willu.review.repository.ReviewRepository;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
-
 import jakarta.servlet.http.HttpServletResponse;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,6 +44,7 @@ public class ViewController {
 	private final UserService userService;
 	private final PostService postService;
 	private final JwtUtil jwtUtil;
+	private final ReviewRepository reviewRepository;
 
 	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
@@ -120,9 +118,15 @@ public class ViewController {
 		User user = userService.findUser(id);
 		model.addAttribute("user", user);
 
+		List<ReviewSetResponseDto> reviewResponseDtos = reviewRepository.findByReceiverId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("reviews", reviewResponseDtos);
+
 		return "profile";
 	}
-  
+
 	// 로그인 페이지
 	@GetMapping("/view/users/user-login")
 	public String getLoginPage(HttpServletResponse response) {
