@@ -1,5 +1,7 @@
 package com.beteam.willu.common;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -114,15 +116,37 @@ public class ViewController {
 	}
 
 	@GetMapping("/users/profile/{id}")
-	public String Profile(Model model, @PathVariable Long id) {
+	public String Profile(Model model, @PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
 		User user = userService.findUser(id);
 		model.addAttribute("user", user);
 
-		List<ReviewSetResponseDto> reviewResponseDtos = reviewRepository.findByReceiverId(id)
+		Double score = user.getScore();
+
+		BigDecimal bd = new BigDecimal(score);
+
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+
+		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+			// 소수 부분이 0일 경우 정수 부분만 사용
+			Integer userScore = bd.intValue();
+			model.addAttribute("userScore", userScore);
+		} else {
+			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+			Double userScore = bd.doubleValue();
+			model.addAttribute("userScore", userScore);
+		}
+
+		List<ReviewSetResponseDto> receiveReviewResponseDtos = reviewRepository.findByReceiverId(id)
 			.stream()
 			.map(ReviewSetResponseDto::new)
 			.toList();
-		model.addAttribute("reviews", reviewResponseDtos);
+		model.addAttribute("receiveReviews", receiveReviewResponseDtos);
+
+		List<ReviewSetResponseDto> sendReviewResponseDtos = reviewRepository.findBySenderId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("sendReviews", sendReviewResponseDtos);
 
 		return "profile";
 	}
