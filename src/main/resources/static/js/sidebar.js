@@ -187,7 +187,7 @@ function goProfile() {
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
             // response 사용자의 id
-            window.location.href = `/users/profile/${response}`;
+            window.location.href = `/profile/${response}`;
         },
         error: function (xhr, status, error) {
             alert("불러오기 실패")
