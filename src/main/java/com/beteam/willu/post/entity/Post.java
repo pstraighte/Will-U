@@ -106,6 +106,12 @@ public class Post extends Timestamped {
         if (postRequestDto.getPromiseArea() != null) {
             this.promiseArea = postRequestDto.getPromiseArea();
         }
+        if (postRequestDto.getMaxnum() != null) {
+            this.maxnum = postRequestDto.getMaxnum();
+        }
+        if (postRequestDto.getCategory() != null) {
+            this.category = postRequestDto.getCategory();
+        }
     }
   /*	//event publish method
 	//게시글 관련 알림:
