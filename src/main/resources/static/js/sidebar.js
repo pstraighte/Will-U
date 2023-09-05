@@ -1,4 +1,11 @@
 const token = getAuthorizationCookie();
+
+$("#logo").click(function () {
+    window.location.href = '/';
+});
+// 클릭 이벤트가 발생했을 때 실행할 코드 작성
+
+
 if (token !== null) {
     const payloads = JSON.parse(atob(token.split(".")[1]));
     const userName = payloads.sub;
@@ -190,7 +197,7 @@ function goProfile() {
 }
 
 function goMypage() {
-    window.location.href = `/users/myPage`;
+    window.location.href = `/users/mypage`;
 }
 
 function chatRoom(id) {
@@ -367,3 +374,4 @@ function showMyNotification() {
         }
     });
 }
+
