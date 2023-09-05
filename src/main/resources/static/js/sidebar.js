@@ -17,6 +17,12 @@ $(".accordion-header").click(function () {
     $(".accordion-content").not($(this).next()).slideUp();
     $(".accordion-header").not($(this)).removeClass("active");
 });
+$(".accordion-header2").click(function () {
+    $(this).toggleClass("active");
+    $(this).next(".accordion-content2").slideToggle();
+    $(".accordion-content2").not($(this).next()).slideUp();
+    $(".accordion-header2").not($(this)).removeClass("active");
+});
 showMyNotification();
 
 const eventSource = new EventSource(`/subscribe`);
@@ -181,7 +187,10 @@ function goProfile() {
             console.log(xhr);
         }
     });
+}
 
+function goMypage() {
+    window.location.href = `/users/myPage`;
 }
 
 function chatRoom(id) {
@@ -263,9 +272,9 @@ function showNotification(content, notificationType, title, ntId) {
 function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
     let newElement =
         `<div class="unread-notification-${ntId}">
-                    <h2>title: ${title}</h2>
-                    <p>content: ${content}</p>
-                    <p>type: ${nt}</p>
+                    <h4>${title}</h4>
+                    <p>${content}</p>
+                    <p>${nt}</p>
                 `;
     if (nt === "JOIN_REQUEST") {
         newElement += `<input type="button" onclick="approve(${ntId},${postId},${publisherId})" value="승인">
