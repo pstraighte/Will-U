@@ -133,7 +133,7 @@ function signup() {
                 icon: 'success',
                 title: '회원가입 성공'
             }).then(() => {
-                window.location.href = "/view/users/user-login";
+                window.location.href = "/login";
             });
 
         },
