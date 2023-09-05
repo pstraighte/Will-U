@@ -61,7 +61,7 @@ public class ViewController {
 	}
 
 	//게시글 단건 조회
-	@GetMapping("/view/posts/{postId}")
+	@GetMapping("/posts/{postId}")
 	public String detailPost(Model model, @PathVariable Long postId) {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
