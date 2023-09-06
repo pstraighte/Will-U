@@ -362,6 +362,7 @@
             },
             error: function (xhr, status, error) {
                 alert("채팅방 활성화 체크 오류")
+                window.location.href = "/";
                 console.log(xhr);
             }
         });
@@ -372,6 +373,7 @@
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
+                console.log("채팅내용1 : ", response)
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
@@ -391,7 +393,7 @@
                     url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
                     method: 'GET', // 요청 메소드 (GET, POST 등)
                     success: function (response) {
-                        console.log("채팅내용 : ", response)
+                        console.log("채팅내용2 : ", response)
                         for (var i = 0; i < response.chatContentList.length; i++) {
 
                             if (userAuth == response.chatContentList[i].userName) {
@@ -890,11 +892,19 @@
     // 채팅방 나가기
     // 채팅방에서 방장이 나갔을 경우 (미구현)
     function disconnectChatRoom() {
+        var currentDate = new Date(); // 클라이언트 기준의 로컬 시간을 얻어옴
+        var koreanOffsetMinutes = 9 * 60; // 한국 시간대(UTC+9)의 시차를 분 단위로 계산
+
+        // 한국 시간대에 시차를 적용
+        var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
+
+
         data = {
             'type': 'disconnect',
             'sender': userId,
             'contents': `님이 나가셨습니다.`,
-            'roomNumber': roomNumber
+            'roomNumber': roomNumber,
+            'date': koreanTime
         };
 
         stompClient.send("/app/chat/send", {}, JSON.stringify(data));
@@ -904,7 +914,12 @@
             url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
             method: 'POST', // 요청 메소드 (GET, POST 등)
             contentType: "application/json",
-            data: JSON.stringify({userId: userId, chatContent: data.contents, roomId: roomNumber}),
+            data: JSON.stringify({
+                userId: userId,
+                chatContent: data.contents,
+                roomId: roomNumber,
+                createdAt: koreanTime
+            }),
             success: function (response) {
                 alert("저장완료");
                 $("#msg").val('');
@@ -934,6 +949,11 @@
 
     // 유저 강퇴
     function kickOut(id, kickOutUser) {
+        var currentDate = new Date(); // 클라이언트 기준의 로컬 시간을 얻어옴
+        var koreanOffsetMinutes = 9 * 60; // 한국 시간대(UTC+9)의 시차를 분 단위로 계산
+
+        // 한국 시간대에 시차를 적용
+        var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
 
         $.ajax({
             url: `/api/chat/users/${id}/chatRoom/${roomNumber}/kickout`,
@@ -948,7 +968,8 @@
                     'sender': kickOutUser,
                     'kickOutUser': kickOutUser,
                     'contents': '님이 강퇴 당했습니다.',
-                    'roomNumber': roomNumber
+                    'roomNumber': roomNumber,
+                    'date': koreanTime
                 };
 
                 stompClient.send("/app/chat/send", {}, JSON.stringify(allMsg));
@@ -957,9 +978,29 @@
 
                 // 기능 업그레이드는 개별 메세지를 보내고 개별 메세지를 받은 사용자가
                 // 확인버튼을 누르면 바로 채팅방이 나가지는 (리다이렉트)
+                //보낼때 채팅 저장
+                $.ajax({
+                    url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
+                    method: 'POST', // 요청 메소드 (GET, POST 등)
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        userId: kickOutUser,
+                        chatContent: allMsg.contents,
+                        roomId: roomNumber,
+                        createdAt: koreanTime
+                    }),
+                    success: function (response) {
+                        alert("저장완료");
+                        $("#msg").val('');
+                    },
+                    error: function (xhr, status, error) {
+                        alert("저장 실패")
+                        console.log(xhr);
+                    }
+                });
             },
             error: function (xhr, status, error) {
-                alert("채팅방 나가기 실패")
+                alert("강퇴 실패")
                 console.log(xhr);
             }
         });
