@@ -1,14 +1,13 @@
 package com.beteam.willu.common;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,12 +26,12 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.review.dto.ReviewSetResponseDto;
+import com.beteam.willu.review.repository.ReviewRepository;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
-
 import jakarta.servlet.http.HttpServletResponse;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,7 +46,9 @@ public class ViewController {
 	private final UserService userService;
 	private final PostService postService;
 	private final JwtUtil jwtUtil;
+	private final ReviewRepository reviewRepository;
 
+	//인덱스 페이지 게시글 목록
 	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
@@ -115,16 +116,45 @@ public class ViewController {
 		return "mypage";
 	}
 
-	@GetMapping("/users/profile/{id}")
+	@GetMapping("/profile/{id}")
 	public String Profile(Model model, @PathVariable Long id) {
+
 		User user = userService.findUser(id);
 		model.addAttribute("user", user);
 
+		Double score = user.getScore();
+
+		BigDecimal bd = new BigDecimal(score);
+
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+
+		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+			// 소수 부분이 0일 경우 정수 부분만 사용
+			Integer userScore = bd.intValue();
+			model.addAttribute("userScore", userScore);
+		} else {
+			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+			Double userScore = bd.doubleValue();
+			model.addAttribute("userScore", userScore);
+		}
+
+		List<ReviewSetResponseDto> receiveReviewResponseDtos = reviewRepository.findByReceiverId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("receiveReviews", receiveReviewResponseDtos);
+
+		List<ReviewSetResponseDto> sendReviewResponseDtos = reviewRepository.findBySenderId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("sendReviews", sendReviewResponseDtos);
+
 		return "profile";
 	}
-  
+
 	// 로그인 페이지
-	@GetMapping("/view/users/user-login")
+	@GetMapping("/login")
 	public String getLoginPage(HttpServletResponse response) {
 		jwtUtil.expireCookie(response, "Authorization");
 		jwtUtil.expireCookie(response, "RT");

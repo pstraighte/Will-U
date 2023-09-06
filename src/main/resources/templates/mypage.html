@@ -3,17 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/css/mypage.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>마이 페이지</title>
 
 </head>
 <body>
 
-<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}">
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}">
 
 </div>
 
@@ -63,13 +59,12 @@
     <button id="cancel-membership-button" th:data-user-id="${user.id}">회원 탈퇴</button>
 </div>
 
-<script src="/js/sidebar.js"></script>
 <script th:inline="javascript">
     var userId = [[${user.id}]];
     const profileButton = document.getElementById("profile-button");
     profileButton.addEventListener("click", () => {
         // 프로필 페이지로 이동
-        window.location.href = `/users/profile/${userId}`;
+        window.location.href = `/profile/${userId}`;
     });
 
     const cancelMembershipButton = document.getElementById("cancel-membership-button");
@@ -106,7 +101,7 @@
                     deleteJwtCookie();
                     deleteRefreshTokenCookie();
                     alert("회원 탈퇴되었습니다.");
-                    window.location.href = "/view/users/user-login";
+                    window.location.href = "/login";
                 } else {
                     // 회원 탈퇴 실패 시 처리할 로직
                     alert("회원 탈퇴에 실패했습니다.");
@@ -135,7 +130,7 @@
     interestUsers.forEach(user => {
         user.addEventListener('click', function (event) {
             const userId = event.target.getAttribute('data-user-id');
-            window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+            window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
         });
     });
 
@@ -144,7 +139,7 @@
     blacklistUsers.forEach(user => {
         user.addEventListener('click', function (event) {
             const userId = event.target.getAttribute('data-user-id');
-            window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+            window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
         });
     });
 
