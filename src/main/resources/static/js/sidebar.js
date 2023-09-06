@@ -1,4 +1,11 @@
 const token = getAuthorizationCookie();
+
+$("#logo").click(function () {
+    window.location.href = '/';
+});
+// 클릭 이벤트가 발생했을 때 실행할 코드 작성
+
+
 if (token !== null) {
     const payloads = JSON.parse(atob(token.split(".")[1]));
     const userName = payloads.sub;
@@ -16,6 +23,12 @@ $(".accordion-header").click(function () {
     $(this).next(".accordion-content").slideToggle();
     $(".accordion-content").not($(this).next()).slideUp();
     $(".accordion-header").not($(this)).removeClass("active");
+});
+$(".accordion-header2").click(function () {
+    $(this).toggleClass("active");
+    $(this).next(".accordion-content2").slideToggle();
+    $(".accordion-content2").not($(this).next()).slideUp();
+    $(".accordion-header2").not($(this)).removeClass("active");
 });
 showMyNotification();
 
@@ -174,14 +187,17 @@ function goProfile() {
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
             // response 사용자의 id
-            window.location.href = `/users/profile/${response}`;
+            window.location.href = `/profile/${response}`;
         },
         error: function (xhr, status, error) {
             alert("불러오기 실패")
             console.log(xhr);
         }
     });
+}
 
+function goMypage() {
+    window.location.href = `/users/mypage`;
 }
 
 function chatRoom(id) {
@@ -263,9 +279,9 @@ function showNotification(content, notificationType, title, ntId) {
 function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
     let newElement =
         `<div class="unread-notification-${ntId}">
-                    <h2>title: ${title}</h2>
-                    <p>content: ${content}</p>
-                    <p>type: ${nt}</p>
+                    <h4>${title}</h4>
+                    <p>${content}</p>
+                    <p>${nt}</p>
                 `;
     if (nt === "JOIN_REQUEST") {
         newElement += `<input type="button" onclick="approve(${ntId},${postId},${publisherId})" value="승인">
@@ -358,3 +374,4 @@ function showMyNotification() {
         }
     });
 }
+

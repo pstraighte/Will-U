@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.social.service.SocialGoogleService;
 import com.beteam.willu.social.service.SocialNaverService;
 import com.beteam.willu.social.service.UserKakaoService;
@@ -22,7 +21,6 @@ public class SocialLoginController {
 	private final UserKakaoService userKakaoService;
 	private final SocialGoogleService socialGoogleService;
 	private final SocialNaverService socialNaverService;
-	private final JwtUtil jwtUtil;
 
 	// 카카오 토큰 요청
 	// 카카오 로그인이 아닌 페이지 로그인 정보와 비교할 정보 정하기 ex) email

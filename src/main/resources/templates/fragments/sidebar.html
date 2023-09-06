@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>sideBar</title>
     <th:block th:fragment="common-header">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
               integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9"
               crossorigin="anonymous">
@@ -30,39 +30,54 @@
     </button>
 
     <!--    사이드바 div-->
-    <div class="offcanvas offcanvas-start" data-bs-scroll="true" tabindex="-1" id="offcanvasWithBothOptions"
+    <div class="offcanvas offcanvas-start" style="width: 300px" data-bs-scroll="true" tabindex="-1"
+         id="offcanvasWithBothOptions"
          aria-labelledby="offcanvasWithBothOptionsLabel">
 
         <!--        내비게이션-->
         <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasWithBothOptionsLabel" onclick="window.location.href='/'">할래?</h5>
+            <img id="logo" src="/images/LOGO.png"/>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <!--        내비게이션 content-->
-        <div class="offcanvas-body">
+        <div class="offcanvas-body" style="padding: 0">
             <!-- 로그인 완료 상태 -->
             <div class="profile-btn-container">
-                <span onclick="goProfile()">프로필</span>
-                <span onclick="logout()">로그아웃</span>
+                <button type="button" class="btn btn-primary" onclick="goMypage()" style="background-color:#5F9DF7">My
+                    Page
+                </button>
+                <button type="button" class="btn btn-primary" onclick="goProfile()" style="background-color:#5F9DF7">
+                    프로필
+                </button>
+                <button type="button" class="btn btn-primary" onclick="logout()" style="background-color:#5F9DF7">로그아웃
+                </button>
+
             </div>
 
             <!-- 로그인 전 상태 -->
             <div class="login-btn-container">
-                <span><a href="/view/users/user-login" style="text-decoration: none"
-                         th:color="white">로그인/회원가입</a></span>
+                <button type="button" id="loginSignupBtn" class="btn btn-primary"
+                        onclick="window.location.href='/login'">로그인/회원가입
+                </button>
             </div>
             <!-- 채팅방 리스트-->
             <div class="accordion">
                 <div class="accordion-item">
-                    <div class="accordion-header">채팅방리스트</div>
+                    <div class="accordion-header">채팅방</div>
                     <div class="accordion-content">
 
                     </div>
                 </div>
             </div>
             <!-- 알림 리스트-->
-            <h2>알림 리스트</h2>
-            <div class="alert-list"></div>
+            <div class="accordion">
+                <div class="accordion-item">
+                    <div class="accordion-header2">알림</div>
+                    <div class="accordion-content2">
+                        <div class="alert-list"></div>
+                    </div>
+                </div>
+            </div>
             <script src="/js/sidebar.js"></script>
         </div>
     </div>
