@@ -7,8 +7,6 @@
 
     <title>게시글 상세 조회</title>
     <style>
-
-
         .attr {
             border: 1px solid black;
             border-radius: 15px;
@@ -91,10 +89,8 @@
 </head>
 
 <body>
-
-<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}">
-
-</div>
+<div id="headerDiv" th:insert="~{fragments/sidebar::header}"></div>
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
 
 <div class="post-view">
     <div class="post" id="postbox">
@@ -117,9 +113,9 @@
     </div>
     <div class="buttons">
         <button id="join" onclick="joinRequest()">신청하기</button>
-        <button id="back">돌아가기</button>
         <button id="edit" onclick="updatePost()">수정하기</button>
         <button id="delete" onclick="confirmAndDelete()">삭제하기</button>
+        <button id="back">돌아가기</button>
     </div>
 </div>
 

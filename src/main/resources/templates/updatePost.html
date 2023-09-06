@@ -2,17 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>게시글 수정</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
         .post-form {
-            width: 400px;
+            width: 50%;
             margin: 50px auto;
             padding: 20px;
             border: 1px solid #ccc;
@@ -40,7 +34,9 @@
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
+            margin-bottom: 15px;
             border-radius: 3px;
+            font-size: 1rem;
         }
 
         .buttons {
@@ -73,6 +69,8 @@
     </style>
 </head>
 <body>
+<div id="headerDiv" th:insert="~{fragments/sidebar::header}"></div>
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
 <div class="post-form">
     <h1>게시글 수정</h1>
     <form id="post-form">
