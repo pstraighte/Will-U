@@ -1,54 +1,37 @@
-$(document).ready(function () {
-    let token = Cookies.get('Authorization');
+const token = getAuthorizationCookie();
+
+$("#logo").click(function () {
+    window.location.href = '/';
+});
+// 클릭 이벤트가 발생했을 때 실행할 코드 작성
+
+
+if (token !== null) {
     const payloads = JSON.parse(atob(token.split(".")[1]));
     const userName = payloads.sub;
     checkLoginStatus();
-    $.ajax({
-        url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
-        method: 'GET', // 요청 메소드 (GET, POST 등)
-        success: function (response) {
-            console.log("response1 : ", response);
+    console.log(token);
+    console.log(userName);
+    getChatRooms(userName);
+}
 
-            // response 사용자의 id
-            $.ajax({
-                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
-                method: 'GET', // 요청 메소드 (GET, POST 등)
-                success: function (response) {
+checkLoginStatus(token);
+//채팅방 조회
 
-                    console.log("response2 : ", response);
-
-                    if (response.chatRoomList.length == 0) {
-                        // 해당 사용자가 속한 채팅방이 없다면
-
-                    }
-
-                    // 해당 사용자가 속한 채팅방이 있다면
-                    for (var i = 0; i < response.chatRoomList.length; i++) {
-                        $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
-                    }
-
-                },
-                error: function (xhr, status, error) {
-                    alert("불러오기 실패")
-                    console.log(xhr);
-                }
-            });
-        },
-        error: function (xhr, status, error) {
-            alert("불러오기 실패")
-            console.log(xhr);
-        }
-    });
-
-    $(".accordion-header").click(function () {
-        $(this).toggleClass("active");
-        $(this).next(".accordion-content").slideToggle();
-        $(".accordion-content").not($(this).next()).slideUp();
-        $(".accordion-header").not($(this)).removeClass("active");
-    });
-
+$(".accordion-header").click(function () {
+    $(this).toggleClass("active");
+    $(this).next(".accordion-content").slideToggle();
+    $(".accordion-content").not($(this).next()).slideUp();
+    $(".accordion-header").not($(this)).removeClass("active");
+});
+$(".accordion-header2").click(function () {
+    $(this).toggleClass("active");
+    $(this).next(".accordion-content2").slideToggle();
+    $(".accordion-content2").not($(this).next()).slideUp();
+    $(".accordion-header2").not($(this)).removeClass("active");
 });
 showMyNotification();
+
 const eventSource = new EventSource(`/subscribe`);
 
 const eventList = $(".alert-list");
@@ -92,11 +75,41 @@ eventSource.onerror = error => {
 notifyMe();
 
 
+function getChatRooms(userName) {
+    $.ajax({
+        url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
+        method: 'GET', // 요청 메소드 (GET, POST 등)
+        success: function (response) {
+            // response 사용자의 id
+            $.ajax({
+                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
+                method: 'GET', // 요청 메소드 (GET, POST 등)
+                success: function (response) {
+
+                    if (response.chatRoomList.length === 0) {
+                        // 해당 사용자가 속한 채팅방이 없다면
+                    }
+                    // 해당 사용자가 속한 채팅방이 있다면
+                    for (var i = 0; i < response.chatRoomList.length; i++) {
+                        $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.log(xhr);
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log(xhr);
+        }
+    });
+}
+
 // 쿠키에서 Authorization 값을 가져오는 함수
 function getAuthorizationCookie() {
-    var cookies = document.cookie.split(';');
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].trim();
+    let cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        let cookie = cookies[i].trim();
         if (cookie.startsWith('Authorization=')) {
             return cookie.substring('Authorization='.length, cookie.length);
         }
@@ -105,13 +118,12 @@ function getAuthorizationCookie() {
 }
 
 // 페이지 로드 시 실행되는 함수
-function checkLoginStatus() {
-    var authorizationToken = getAuthorizationCookie();
+function checkLoginStatus(authorizationToken) {
 
-    var profileBtnContainer = document.querySelector('.profile-btn-container');
-    var loginBtnContainer = document.querySelector('.login-btn-container');
+    let profileBtnContainer = document.querySelector('.profile-btn-container');
+    let loginBtnContainer = document.querySelector('.login-btn-container');
 
-    if (authorizationToken) {
+    if (authorizationToken != null) {
         console.log("로그인 완료 상태");
         profileBtnContainer.style.display = 'block';
         loginBtnContainer.style.display = 'none';
@@ -125,10 +137,10 @@ function checkLoginStatus() {
 
 
 function openSidebar() {
-    var sidebar = document.getElementById("sidebar");
-    var content = document.getElementById("content");
-    var openBtn = document.getElementById("openBtn");
-    var closeBtn = document.getElementById("closeBtn");
+    let sidebar = document.getElementById("sidebar");
+    let content = document.getElementById("content");
+    let openBtn = document.getElementById("openBtn");
+    let closeBtn = document.getElementById("closeBtn");
 
     if (sidebar.style.width === "250px") {
         sidebar.style.width = "0";
@@ -162,7 +174,7 @@ function logout() {
 
 function goProfile() {
 
-    var authorizationToken = getAuthorizationCookie();
+    let authorizationToken = getAuthorizationCookie();
 
     const payloads = JSON.parse(atob(authorizationToken.split(".")[1]));
     const userName = payloads.sub;
@@ -175,14 +187,17 @@ function goProfile() {
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
             // response 사용자의 id
-            window.location.href = `/users/profile/${response}`;
+            window.location.href = `/profile/${response}`;
         },
         error: function (xhr, status, error) {
             alert("불러오기 실패")
             console.log(xhr);
         }
     });
+}
 
+function goMypage() {
+    window.location.href = `/users/mypage`;
 }
 
 function chatRoom(id) {
@@ -253,7 +268,6 @@ function showNotification(content, notificationType, title, ntId) {
 
     notification.onclick = function () {
         // 알림 클릭 시 수행할 동작 설정
-        //window.open("http://localhost:8080/view/users/user-login");
         window.focus();
         //사이드바 열고 알림 목록 보여주기
 
@@ -265,9 +279,9 @@ function showNotification(content, notificationType, title, ntId) {
 function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
     let newElement =
         `<div class="unread-notification-${ntId}">
-                    <h2>title: ${title}</h2>
-                    <p>content: ${content}</p>
-                    <p>type: ${nt}</p>
+                    <h4>${title}</h4>
+                    <p>${content}</p>
+                    <p>${nt}</p>
                 `;
     if (nt === "JOIN_REQUEST") {
         newElement += `<input type="button" onclick="approve(${ntId},${postId},${publisherId})" value="승인">
@@ -360,3 +374,4 @@ function showMyNotification() {
         }
     });
 }
+

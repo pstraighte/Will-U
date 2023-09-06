@@ -2,10 +2,10 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <!-- Jquery, Cookie, sidebarCSS-->
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>willu</title>
-    <STYLE>
+    <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -41,61 +41,11 @@
             width: 200px;
             height: 100%;
         }
-
-        /*사이드바*/
-        #sidebar {
-            width: 0;
-            background-color: #333;
-            color: gray;
-            height: 100vh;
-            position: fixed;
-            transition: 0.5s;
-            overflow: hidden;
-        }
-
-        #openBtn {
-            /*position: absolute;*/
-            top: 20px;
-            left: 10px;
-            cursor: pointer;
-            display: block;
-        }
-
-        #closeBtn {
-            display: block;
-            /*position: absolute;*/
-            top: 20px;
-            left: 10px;
-            cursor: pointer;
-        }
-
-        /*아코디언 스타일 메뉴바*/
-        .accordion {
-            width: 300px;
-            margin: 20px auto;
-        }
-
-        .accordion-item {
-            border: 1px solid #ccc;
-            margin-bottom: 5px;
-        }
-
-        .accordion-header {
-            padding: 10px;
-            background-color: #f0f0f0;
-            cursor: pointer;
-        }
-
-        .accordion-content {
-            padding: 10px;
-            display: none;
-        }
-
-    </STYLE>
+    </style>
 
 </head>
 <body>
-<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}">
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}">
 
 </div>
 <header>
@@ -115,20 +65,14 @@
 </main>
 
 </body>
-<script src="/js/sidebar.js"></script>
 <script>
     $(document).ready(function () {
-        let token = Cookies.get('Authorization');
-        const payloads = JSON.parse(atob(token.split(".")[1]));
-        // 로그인한 유저 이름
-        const userName = payloads.sub;
-        console.log("userName : ", userName);
         $.ajax({
-            url: 'http://localhost:8080/api/posts', // 스프링 컨트롤러 api 작성
+            url: '/api/posts', // 스프링 컨트롤러 api 작성
             type: 'GET',
             contentType: 'application/json',
             success: function (response) { //postResponce값 가져옴
-
+                console.log("postResponce값 :", response);
                 var postsContainer = $('#posts');
 
                 response.content.forEach(function (post) {
@@ -141,7 +85,7 @@
                 });
             },
             error: function (xhr, status, error) {
-                console.log(error);
+                window.location.href = "/login";
             }
         });
 

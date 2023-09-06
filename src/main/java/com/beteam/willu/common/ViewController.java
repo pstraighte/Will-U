@@ -48,6 +48,7 @@ public class ViewController {
 	private final JwtUtil jwtUtil;
 	private final ReviewRepository reviewRepository;
 
+	//인덱스 페이지 게시글 목록
 	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
@@ -115,8 +116,9 @@ public class ViewController {
 		return "mypage";
 	}
 
-	@GetMapping("/users/profile/{id}")
-	public String Profile(Model model, @PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+	@GetMapping("/profile/{id}")
+	public String Profile(Model model, @PathVariable Long id) {
+
 		User user = userService.findUser(id);
 		model.addAttribute("user", user);
 
@@ -152,7 +154,7 @@ public class ViewController {
 	}
 
 	// 로그인 페이지
-	@GetMapping("/view/users/user-login")
+	@GetMapping("/login")
 	public String getLoginPage(HttpServletResponse response) {
 		jwtUtil.expireCookie(response, "Authorization");
 		jwtUtil.expireCookie(response, "RT");

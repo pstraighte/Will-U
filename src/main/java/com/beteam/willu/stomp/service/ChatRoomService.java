@@ -90,7 +90,7 @@ public class ChatRoomService {
     // 특정 채팅룸 불러오기 (채팅방의 활성화 확인)
     public ChatRoomNameResponseDto getRoom(Long id, UserDetailsImpl userDetails) {
 
-        Optional<ChatRoom> chatRoom = chatRoomRepository.findByPostId(id);
+        Optional<ChatRoom> chatRoom = chatRoomRepository.findById(id);
 
         if (!chatRoom.isPresent()) {
             throw new IllegalArgumentException("해당 채팅방이 존재하지 않습니다.");

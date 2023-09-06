@@ -69,8 +69,7 @@ public class PostController {
 	public PostResponseDto getPost(@PathVariable Long id) {
 		return postService.getPost(id);
 	}
-
-	//
+	
 	//게시글 수정
 	@PutMapping("/posts/{id}")
 	public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto,

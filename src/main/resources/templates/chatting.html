@@ -2,10 +2,9 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>Title</title>
     <style>
         * {
@@ -146,7 +145,7 @@
     </div>
 </div>
 
-<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}">
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}">
 
 </div>
 
@@ -175,7 +174,6 @@
 
 </div>
 </body>
-<script src="/js/sidebar.js"></script>
 <script>
     $(document).ready(function () {
         let token = Cookies.get('Authorization');

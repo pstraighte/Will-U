@@ -57,15 +57,4 @@ public class NotificationController {
 		@AuthenticationPrincipal UserDetailsImpl userDetails) {
 		return ResponseEntity.ok(notificationService.getNotificationByUserId(userDetails.getUser().getId()));
 	}
-
-	//알림 테스트 화면
-	@GetMapping("/notification-page")
-	public String notificationPage() {
-		return "Notification";
-	}
-
-	@GetMapping("/sidebar")
-	public String sidebar() {
-		return "sidebar";
-	}
 }

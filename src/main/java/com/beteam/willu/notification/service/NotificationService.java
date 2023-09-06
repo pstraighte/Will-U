@@ -128,7 +128,7 @@ public class NotificationService {
 	}
 
 	private boolean hasLostData(String lastEventId) {
-		return !lastEventId.isEmpty();
+		return !(lastEventId.endsWith("null") || lastEventId.isEmpty());
 	}
 
 	private void sendLostData(String lastEventId, Long userId, String emitterId, SseEmitter emitter) {
