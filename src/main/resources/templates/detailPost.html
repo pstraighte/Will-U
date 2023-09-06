@@ -96,18 +96,32 @@
     </div>
 
     <div class="buttons">
-        <button id="join" onclick="joinRequest()">신청하기</button>
+        <button id="join" onclick="joinRequest()" style="display: none">신청하기</button>
         <button id="back">돌아가기</button>
-        <button id="edit" onclick="updatePost()">수정하기</button>
-        <button id="delete" onclick="confirmAndDelete()">삭제하기</button>
+        <button id="edit" onclick="updatePost()" style="display: none">수정하기</button>
+        <button id="delete" onclick="confirmAndDelete()" style="display: none">삭제하기</button>
     </div>
 </div>
 
 </body>
 <script th:inline="javascript">
+    let token = Cookies.get('Authorization');
+    const payloads = JSON.parse(atob(token.split(".")[1]));
+    const userAuth = payloads.sub;
 
     var post = [[${post}]];//타임리프-post.id에 사용
     // console.log(post);
+    if (userAuth === post.username) {
+        // 작성자
+        $('#edit').show();
+        $('#delete').show();
+        $('#join').remove();
+    } else {
+        // 작성자 아닐때
+        $('#edit').remove();
+        $('#delete').remove();
+        $('#join').show();
+    }
 
     //==========게시글 내용 가져오기==========
     $(document).ready(function () {

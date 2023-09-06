@@ -64,6 +64,10 @@ eventSource.onmessage = e => {
         showNotification(content, nt, title, ntId);
         addNotificationHTML(content, nt, title, ntId, publisherId, postId);
 
+        if (jsonData.notificationType == "APPROVE_REQUEST") {
+            $('.accordion-content').empty();
+            showChatRoom(jsonData.receiver.nickname);
+        }
     }
 }
 eventSource.onerror = error => {
@@ -136,6 +140,25 @@ function checkLoginStatus(authorizationToken) {
 }
 
 
+// function openSidebar() {
+//     var sidebar = document.getElementById("sidebar");
+//     var content = document.getElementById("content");
+//     var openBtn = document.getElementById("openBtn");
+//     var closeBtn = document.getElementById("closeBtn");
+//
+//     if (sidebar.style.width === "250px") {
+//         sidebar.style.width = "0";
+//         content.style.marginLeft = "0";
+//         closeBtn.style.display = "none";
+//         openBtn.style.display = "inline-block";
+//     } else {
+//         sidebar.style.width = "250px";
+//         content.style.marginLeft = "260px";
+//         closeBtn.style.display = "inline-block";
+//         openBtn.style.display = "none";
+//     }
+// }
+
 function openSidebar() {
     let sidebar = document.getElementById("sidebar");
     let content = document.getElementById("content");
@@ -154,6 +177,7 @@ function openSidebar() {
         openBtn.style.display = "none";
     }
 }
+
 
 function logout() {
     //로그아웃 api 호출하고 로그인 페이지로
@@ -214,9 +238,11 @@ function read(ntId) {
         method: 'PATCH', // 요청 메소드 (GET, POST 등)
         contentType: "application/json",
         success: function (response) {
+            console.log("알림 결과 : ", response);
             console.log("읽기 처리 완료");
             //TODO 알림이 포함된 HTML 지우기
             removeNotificationHTML(ntId);
+
         },
         error: function (xhr, status, error) {
             console.log("읽기 처리 실패");
@@ -375,3 +401,37 @@ function showMyNotification() {
     });
 }
 
+function showChatRoom(userName) {
+    $.ajax({
+        url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
+        method: 'GET', // 요청 메소드 (GET, POST 등)
+        success: function (response) {
+
+            // response 사용자의 id
+            $.ajax({
+                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
+                method: 'GET', // 요청 메소드 (GET, POST 등)
+                success: function (response) {
+
+                    if (response.chatRoomList.length == 0) {
+                        // 해당 사용자가 속한 채팅방이 없다면
+                    }
+
+                    // 해당 사용자가 속한 채팅방이 있다면
+                    for (var i = 0; i < response.chatRoomList.length; i++) {
+                        $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
+                    }
+
+                },
+                error: function (xhr, status, error) {
+                    alert("불러오기 실패")
+                    console.log(xhr);
+                }
+            });
+        },
+        error: function (xhr, status, error) {
+            alert("불러오기 실패")
+            console.log(xhr);
+        }
+    });
+}

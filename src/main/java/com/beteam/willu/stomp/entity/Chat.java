@@ -1,9 +1,10 @@
 package com.beteam.willu.stomp.entity;
 
-import com.beteam.willu.common.Timestamped;
 import com.beteam.willu.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -11,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @Table(name = "Chats")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Chat extends Timestamped {
+public class Chat {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "Chat_id")
@@ -28,5 +29,9 @@ public class Chat extends Timestamped {
     // 채팅 내용
     @Column(name = "chatContent")
     private String chatContent;
+
+    // 채팅 저장 시점 내용
+    @Column(name = "created_date")
+    private LocalDateTime createdAt;
 
 }
