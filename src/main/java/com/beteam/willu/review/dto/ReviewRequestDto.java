@@ -8,5 +8,5 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ReviewRequestDto {
 	private String content;
-	private Double score;
+	private Integer score;
 }
