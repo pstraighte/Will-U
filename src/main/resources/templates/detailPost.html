@@ -153,26 +153,13 @@
         <button id="edit" onclick="updatePost()">수정하기</button>
         <button id="delete" onclick="confirmAndDelete()">삭제하기</button>
         <button id="back">돌아가기</button>
-
     </div>
 </div>
 
 </body>
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
-
     // console.log(post);
-    if (userAuth === post.username) {
-        // 작성자
-        $('#edit').show();
-        $('#delete').show();
-        $('#join').remove();
-    } else {
-        // 작성자 아닐때
-        $('#edit').remove();
-        $('#delete').remove();
-        $('#join').show();
-    }
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
