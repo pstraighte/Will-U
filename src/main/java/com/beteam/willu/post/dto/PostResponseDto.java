@@ -24,6 +24,8 @@ public class PostResponseDto extends ApiResponseDto {
 	private Long score;
 	private String category;
 	private boolean recruitment;
+	private Double score;
+	private String category;
 
 	public PostResponseDto(Post post) {
 		this.id = post.getId();
@@ -38,5 +40,7 @@ public class PostResponseDto extends ApiResponseDto {
 		this.score = post.getUser().getScore();
 		this.category = post.getCategory();
 		this.recruitment = post.getRecruitment();
+    this.score=post.getScore();
+    this.category=post.getCategory();
 	}
 }

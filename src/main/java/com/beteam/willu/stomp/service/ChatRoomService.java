@@ -36,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j(topic = "ChatRoomService")
 @RequiredArgsConstructor
 public class ChatRoomService {
+
 	private final ChatRoomRepository chatRoomRepository;
 	private final UserChatRoomsRepository userChatRoomsRepository;
 	private final PostRepository postRepository;
@@ -115,6 +116,7 @@ public class ChatRoomService {
 			.user(user.get())
 			.chatRooms(chatRoom)
 			.chatContent(chatSaveRequestDto.getChatContent())
+			.createdAt(chatSaveRequestDto.getCreatedAt())
 			.build();
 
 		chatRepository.save(chat);

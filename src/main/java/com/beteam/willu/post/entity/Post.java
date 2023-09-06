@@ -124,9 +124,7 @@ public class Post extends Timestamped {
 			this.category = postRequestDto.getCategory();
 		}
 	}
-  /*	//event publish method
-	//게시글 관련 알림:
-	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
-	}*/
-
+  public void updateRecruitment(boolean bool) {
+        this.recruitment = bool;
+    }
 }
