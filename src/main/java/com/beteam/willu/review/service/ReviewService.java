@@ -85,7 +85,7 @@ public class ReviewService {
 		// 업데이트 내용
 		String updateContent = requestDto.getContent();
 		// 업데이트 점수
-		Double updateScore = requestDto.getScore();
+		Integer updateScore = requestDto.getScore();
 
 		//리뷰 업데이트
 		review.updateReview(updateContent, updateScore);

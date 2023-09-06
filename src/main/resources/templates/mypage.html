@@ -1,159 +1,194 @@
+
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
-    <title>마이 페이지</title>
+    <link rel="stylesheet" href="/css/mypage.css">
 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+          integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" rel="stylesheet">
+    <script crossorigin="anonymous" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa"
+            src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+    <title>마이 페이지</title>
 </head>
 <body>
 
-<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}">
-
-</div>
-
+<div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}"></div>
 <div class="profile-container">
-    <img th:src="${user.picture}" alt="Profile Image" width="70" height="70 style=" src="">
-    <a th:text="${user.nickname}" class="navbar-brand nickname"> Nickname </a>
-    <br>
-    <button id="profile-button">프로필 보기</button>
-
-    <div class="interest">
-        <button id="interest-users-button">관심 유저</button>
+    <div class="profile-image">
+        <img th:src="${user.picture}" alt="Profile Image" width="70" height="70" src="">
     </div>
-    <div class="interest-users-tab tab-content" id="interest-users">
-        <ul class="interest-users-list">
+    <div class="profile-details">
+        <div class="nickname">
+            <a th:text="${user.nickname}" class="navbar-brand">Nickname</a>
+            <button id="profile-button" class="profile-button">프로필 보기</button>
+        </div>
+    </div>
+
+    <ul class="nav nav-tabs" id="Tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="interest-tab" data-toggle="tab" href="#interest-users" role="tab">관심 유저</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="blacklist-tab" data-toggle="tab" href="#blacklist-users" role="tab">차단 유저</a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="post-tab" data-toggle="tab" href="#posts" role="tab">모집한 활동</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="interest-users-tab tab-pane fade show active" id="interest-users" role="tabpanel">
             <!-- Thymeleaf 반복문으로 interestResponseDtos 데이터 출력 -->
-            <li th:each="interest : ${interests}">
+            <ul class="interest-users-list">
+                <li th:each="interest : ${interests}">
                 <span th:text="${interest.receiver.nickname}"
                       th:attr="data-user-id=${interest.receiver.id}"
                       class="interest-user"></span>
-            </li>
-        </ul>
-    </div>
-    <div>
-        <button id="blocked-users-button">차단 유저</button>
-    </div>
-    <div class="blacklist-users-tab tab-content" id="blacklist-users">
-        <ul class="blacklist-users-list">
+                </li>
+            </ul>
+        </div>
+        <div class="blacklist-users-tab tab-pane fade" id="blacklist-users" role="tabpanel">
             <!-- Thymeleaf 반복문으로 blacklistResponseDtos 데이터 출력 -->
-            <li th:each="blacklist : ${blacklists}">
+            <ul class="blacklist-users-list">
+                <li th:each="blacklist : ${blacklists}">
                 <span th:text="${blacklist.receiver.nickname}"
                       th:attr="data-user-id=${blacklist.receiver.id}"
                       class="blacklist-user"></span>
-            </li>
-        </ul>
-    </div>
-    <div>
-        <button id="recruitment-button">모집 활동 내역</button>
-    </div>
-    <div class="post-tab tab-content" id="posts">
-        <ul class="post-list">
+                </li>
+            </ul>
+        </div>
+        <div class="post-tab tab-pane fade" id="posts" role="tabpanel">
             <!-- Thymeleaf 반복문으로 PostResponseDtos 데이터 출력 -->
-            <li th:each="post : ${posts}">
-                <span th:text="${post.title}" th:attr="data-post-id=${post.id}" class="post-title"></span>
-            </li>
-        </ul>
+            <ul class="post-list">
+                <li th:each="post : ${posts}">
+                    <span th:text="${post.title}" th:attr="data-post-id=${post.id}" class="post-title"></span>
+                </li>
+            </ul>
+        </div>
     </div>
-    <button id="cancel-membership-button" th:data-user-id="${user.id}">회원 탈퇴</button>
-</div>
+    <button id="cancel-membership-button" th:data-user-id="${user.id}" class="leave-button">회원 탈퇴</button>
 
-<script th:inline="javascript">
-    var userId = [[${user.id}]];
-    const profileButton = document.getElementById("profile-button");
-    profileButton.addEventListener("click", () => {
-        // 프로필 페이지로 이동
-        window.location.href = `/profile/${userId}`;
-    });
+    <script src="/js/sidebar.js"></script>
+    <script th:inline="javascript">
+        var userId = [[${user.id}]];
+        const profileButton = document.getElementById("profile-button");
+        profileButton.addEventListener("click", () => {
+            // 프로필 페이지로 이동
+            window.location.href = `http://localhost:8080/users/profile/${userId}`;
+        });
 
-    const cancelMembershipButton = document.getElementById("cancel-membership-button");
+        const cancelMembershipButton = document.getElementById("cancel-membership-button");
 
-    cancelMembershipButton.addEventListener("click", () => {
-        const userId = cancelMembershipButton.getAttribute("data-user-id"); // 사용자 아이디 값 가져오기
+        cancelMembershipButton.addEventListener("click", () => {
+            const userId = cancelMembershipButton.getAttribute("data-user-id"); // 사용자 아이디 값 가져오기
 
-        // 비밀번호 확인 다이얼로그 표시
-        const password = prompt("비밀번호를 입력하세요:");
-        if (password === null) {
-            // 사용자가 취소를 눌렀을 경우 처리
-            return;
+            // 비밀번호 확인 다이얼로그 표시
+            const password = prompt("비밀번호를 입력하세요:");
+            if (password === null) {
+                // 사용자가 취소를 눌렀을 경우 처리
+                return;
+            }
+
+            // 정말 탈퇴할 것인지 묻는 다이얼로그 표시
+            const confirmResult = confirm("정말로 회원 탈퇴하시겠습니까?");
+            if (!confirmResult) {
+                // 사용자가 취소를 눌렀을 경우 처리
+                return;
+            }
+
+            fetch(`/api/users/${userId}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    password: password
+                })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // 회원 탈퇴 성공 시 처리할 로직
+                        deleteJwtCookie();
+                        deleteRefreshTokenCookie();
+                        alert("회원 탈퇴되었습니다.");
+                        window.location.href = "http://localhost:8080/view/users/user-login";
+                    } else {
+                        // 회원 탈퇴 실패 시 처리할 로직
+                        alert("회원 탈퇴에 실패했습니다.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                });
+        });
+
+
+        // 이벤트 핸들러를 등록
+        document.addEventListener('DOMContentLoaded', function () {
+            const postTitles = document.querySelectorAll('.post-title');
+            postTitles.forEach(title => {
+                title.addEventListener('click', function (event) {
+                    const postId = event.target.getAttribute('data-post-id');
+                    if (postId) {
+                        window.location.href = `/posts/${postId}`;
+                    }
+                });
+            });
+        });
+        // 관심 유저 클릭 이벤트 핸들러
+        const interestUsers = document.querySelectorAll('.interest-user');
+        interestUsers.forEach(user => {
+            user.addEventListener('click', function (event) {
+                const userId = event.target.getAttribute('data-user-id');
+                window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+            });
+        });
+
+        // 관심 유저 클릭 이벤트 핸들러
+        const blacklistUsers = document.querySelectorAll('.blacklist-user');
+        blacklistUsers.forEach(user => {
+            user.addEventListener('click', function (event) {
+                const userId = event.target.getAttribute('data-user-id');
+                window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+            });
+        });
+        document.addEventListener("DOMContentLoaded", function () {
+            const interestTab = document.getElementById("interest-tab");
+            const blacklistTab = document.getElementById("blacklist-tab");
+            const postTab = document.getElementById("post-tab");
+
+
+            interestTab.addEventListener("click", function (e) {
+                e.preventDefault(); // 기본 링크 동작을 막음
+                $(this).tab('show'); // 해당 탭을 활성화
+            });
+
+            blacklistTab.addEventListener("click", function (e) {
+                e.preventDefault(); // 기본 링크 동작을 막음
+                $(this).tab('show'); // 해당 탭을 활성화
+            });
+
+            postTab.addEventListener("click", function (e) {
+                e.preventDefault(); // 기본 링크 동작을 막음
+                $(this).tab('show'); // 해당 탭을 활성화
+            });
+        });
+        function deleteJwtCookie() {
+            const cookieName = 'Authorization'; // JWT가 저장된 쿠키의 이름
+            // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
+            document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
         }
 
-        // 정말 탈퇴할 것인지 묻는 다이얼로그 표시
-        const confirmResult = confirm("정말로 회원 탈퇴하시겠습니까?");
-        if (!confirmResult) {
-            // 사용자가 취소를 눌렀을 경우 처리
-            return;
+        function deleteRefreshTokenCookie() {
+            const refreshTokenCookieName = 'RT'; // refreshToken이 저장된 쿠키의 이름
+            // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
+            document.cookie = `${refreshTokenCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
         }
-
-        fetch(`/api/users/${userId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                password: password
-            })
-        })
-            .then(response => {
-                if (response.ok) {
-                    // 회원 탈퇴 성공 시 처리할 로직
-                    deleteJwtCookie();
-                    deleteRefreshTokenCookie();
-                    alert("회원 탈퇴되었습니다.");
-                    window.location.href = "/login";
-                } else {
-                    // 회원 탈퇴 실패 시 처리할 로직
-                    alert("회원 탈퇴에 실패했습니다.");
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-            });
-    });
-
-
-    // 이벤트 핸들러를 등록
-    document.addEventListener('DOMContentLoaded', function () {
-        const postTitles = document.querySelectorAll('.post-title');
-        postTitles.forEach(title => {
-            title.addEventListener('click', function (event) {
-                const postId = event.target.getAttribute('data-post-id');
-                if (postId) {
-                    window.location.href = `/posts/${postId}`;
-                }
-            });
-        });
-    });
-    // 관심 유저 클릭 이벤트 핸들러
-    const interestUsers = document.querySelectorAll('.interest-user');
-    interestUsers.forEach(user => {
-        user.addEventListener('click', function (event) {
-            const userId = event.target.getAttribute('data-user-id');
-            window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
-        });
-    });
-
-    // 관심 유저 클릭 이벤트 핸들러
-    const blacklistUsers = document.querySelectorAll('.blacklist-user');
-    blacklistUsers.forEach(user => {
-        user.addEventListener('click', function (event) {
-            const userId = event.target.getAttribute('data-user-id');
-            window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
-        });
-    });
-
-    function deleteJwtCookie() {
-        const cookieName = 'Authorization'; // JWT가 저장된 쿠키의 이름
-        // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    }
-
-    function deleteRefreshTokenCookie() {
-        const refreshTokenCookieName = 'RT'; // refreshToken이 저장된 쿠키의 이름
-        // 만료일을 예전 날짜로 설정하여 쿠키를 삭제합니다.
-        document.cookie = `${refreshTokenCookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-    }
-</script>
+    </script>
 </body>
 </html>

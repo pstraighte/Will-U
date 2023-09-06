@@ -40,9 +40,9 @@ public class Review extends Timestamped {
 
 	private String content;
 
-	private Double score;
+	private Integer score;
 
-	public Review(User receiver, User sender, ChatRoom userChatRoom, String content, Double score) {
+	public Review(User receiver, User sender, ChatRoom userChatRoom, String content, Integer score) {
 		this.receiver = receiver;
 		this.sender = sender;
 		this.chatRoom = userChatRoom;
@@ -51,7 +51,7 @@ public class Review extends Timestamped {
 	}
 
 	@Transactional
-	public void updateReview(String content, Double score) {
+	public void updateReview(String content, Integer score) {
 		this.content = content;
 		this.score = score;
 	}
