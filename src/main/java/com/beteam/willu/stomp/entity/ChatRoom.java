@@ -46,4 +46,7 @@ public class ChatRoom extends Timestamped {
     @Builder.Default
     private List<Review> reviewList = new ArrayList<>();
 
+    public void updateActivated(boolean bool) {
+        this.activated = bool;
+    }
 }
