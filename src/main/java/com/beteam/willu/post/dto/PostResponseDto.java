@@ -12,20 +12,18 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostResponseDto extends ApiResponseDto {
 
-	private Long id;
-	private String title;
-	private String content;
-	private String username; // 뭘 넣어야 하나?
-	private LocalDateTime promiseTime;
-	private String promiseArea;
-	private LocalDateTime createdAt;
-	private LocalDateTime modifiedAt;
-	private Long maxnum;
-	private Long score;
-	private String category;
-	private boolean recruitment;
-	private Double score;
-	private String category;
+	private final Long id;
+	private final String title;
+	private final String content;
+	private final String username; // 뭘 넣어야 하나?
+	private final LocalDateTime promiseTime;
+	private final String promiseArea;
+	private final LocalDateTime createdAt;
+	private final LocalDateTime modifiedAt;
+	private final Long maxnum;
+	private final String category;
+	private final boolean recruitment;
+	private final Double score;
 
 	public PostResponseDto(Post post) {
 		this.id = post.getId();
@@ -37,10 +35,8 @@ public class PostResponseDto extends ApiResponseDto {
 		this.createdAt = post.getCreatedAt();
 		this.modifiedAt = post.getModifiedAt();
 		this.maxnum = post.getMaxnum();
+		this.recruitment = post.getRecruitment();
 		this.score = post.getUser().getScore();
 		this.category = post.getCategory();
-		this.recruitment = post.getRecruitment();
-    this.score=post.getScore();
-    this.category=post.getCategory();
 	}
 }
