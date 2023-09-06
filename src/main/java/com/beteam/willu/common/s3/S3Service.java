@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -27,6 +28,7 @@ public class S3Service {
 		this.userRepository = userRepository;
 	}
 
+	@Transactional
 	public String uploadImage(MultipartFile imageFile) throws IOException {
 		String uniqueFileName = UUID.randomUUID() + "_" + imageFile.getOriginalFilename();  // 고유한 파일 이름 생성
 		String objectKey = "profile-images/" + uniqueFileName;  // S3에 저장할 객체 키 생성
@@ -40,6 +42,7 @@ public class S3Service {
 		return objectKey; // 업로드된 이미지의 S3 오브젝트 키를 반환
 	}
 
+	@Transactional
 	public void generateImageUrl(String objectKey, User user) {
 		String bucketBaseUrl = "https://willu-bucket.s3.ap-northeast-2.amazonaws.com"; // Replace with your bucket URL
 		user.setPicture(bucketBaseUrl + "/" + objectKey);

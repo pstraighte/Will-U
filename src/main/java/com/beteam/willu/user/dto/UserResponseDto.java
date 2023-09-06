@@ -13,7 +13,7 @@ public class UserResponseDto {
 	private String phoneNumber;
 	private String area;
 	private String picture;
-	private Long score;
+	private Double score;
 
 	public UserResponseDto(User user) {
 		this.username = user.getUsername();
