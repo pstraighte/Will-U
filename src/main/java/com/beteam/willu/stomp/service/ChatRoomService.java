@@ -101,6 +101,7 @@ public class ChatRoomService {
 
     // 생성된 채팅 저장 (확인 완료)
     public void createRooms(ChatSaveRequestDto chatSaveRequestDto) {
+        System.out.println("chatSaveRequestDto.getCreatedAt() = " + chatSaveRequestDto.getCreatedAt());
         // 채팅을 보낸 유저 조회
         Optional<User> user = userRepository.findByUsername(chatSaveRequestDto.getUserId());
         // 채팅을 저장할 채팅방
@@ -109,6 +110,7 @@ public class ChatRoomService {
                 .user(user.get())
                 .chatRooms(chatRoom)
                 .chatContent(chatSaveRequestDto.getChatContent())
+                .createdAt(chatSaveRequestDto.getCreatedAt())
                 .build();
 
         chatRepository.save(chat);

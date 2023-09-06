@@ -2,6 +2,18 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--    부트스트랩-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
+            integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.min.js"
+            integrity="sha384-Rx+T1VzGupg4BHQYs2gCW9It+akI2MM/mndMCy36UVfodzcJcF0GGLxZIzObiEfa"
+            crossorigin="anonymous"></script>
+
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -55,7 +67,6 @@
 
         /*채팅방*/
         .container {
-            width: 500px;
             margin: 0 auto;
             padding: 25px;
 
@@ -72,16 +83,84 @@
             margin-bottom: 20px;
         }
 
+        /*채팅 div*/
         .chatting {
+            padding: 20px;
             border: 1px solid gray;
+            border-radius: 20px;
             width: 700px;
             height: 700px;
             overflow: auto;
+            overflow-x: hidden;
         }
 
-        .chatting p {
-            text-align: left;
+        #sendBtn {
+            margin-left: 20px;
         }
+
+        #yourMsg {
+            padding-top: 5px;
+        }
+
+        #userBoxDiv {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #disconnectDiv {
+            margin-bottom: 10px;
+        }
+
+        /*유저 div*/
+        #userBox {
+            margin-left: 10px;
+            border-radius: 20px;
+            border: 1px solid gray;
+            padding: 20px;
+            width: 300px;
+            height: 750px;
+            overflow: auto;
+            overflow-x: hidden;
+        }
+
+        .chatRoomUser {
+            border-radius: 20px;
+            height: 70px;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .chatRoomUserName {
+            margin-left: 10px;
+            margin-right: 10px;
+        }
+
+        /*사이드바*/
+        .chatting::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .chatting::-webkit-scrollbar-thumb {
+            background-color: #2f3542;
+            border-radius: 10px;
+            background-clip: padding-box;
+            border: 2px solid transparent;
+        }
+
+        .chatting::-webkit-scrollbar-track {
+            background-color: grey;
+            border-radius: 10px;
+            box-shadow: inset 0px 0px 5px white;
+        }
+
+        /*.chatting p {*/
+        /*    text-align: left;*/
+        /*}*/
 
         input {
             width: 450px;
@@ -98,10 +177,85 @@
 
         .me {
             color: blue;
+            text-align: right;
+            word-break: break-all;
+
         }
 
         .other {
             color: red;
+            text-align: left;
+        }
+
+        /*채팅 me*/
+        .chatDivMe > div.chatUserMe {
+            color: black;
+            text-align: right;
+            word-break: break-all;
+            font-weight: 900;
+        }
+
+        .chatContentDivMe {
+            color: black;
+            text-align: right;
+            word-break: break-all;
+            margin: 0;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .chatContentMe {
+            background-color: antiquewhite;
+            border-radius: 20px;
+            padding: 15px;
+            margin-left: 10px;
+            text-align: center;
+            font-weight: 900;
+            font-size: large;
+        }
+
+        .chatContentTimeMe {
+            font-weight: 900;
+            font-size: small;
+        }
+
+        /*채팅 user*/
+
+        .chatDiv > div.chatUser {
+            color: black;
+            text-align: left;
+            word-break: break-all;
+            font-weight: 900;
+        }
+
+        .chatContentDiv {
+            color: black;
+            text-align: right;
+            word-break: break-all;
+            margin: 0;
+
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .chatContent {
+            background-color: coral;
+            border-radius: 20px;
+            padding: 15px;
+            margin-right: 10px;
+            text-align: center;
+            font-weight: 900;
+            font-size: large;
+        }
+
+        .chatContentTime {
+            font-weight: 900;
+            font-size: small;
         }
 
         /*모달창*/
@@ -130,6 +284,7 @@
             padding: 20px 30px;
             line-height: 23px;
         }
+
     </style>
 </head>
 <body>
@@ -146,14 +301,16 @@
     </div>
 </div>
 
+
 <div id="sideBarDiv" th:insert="~{sidebar2::sidebarFragment}">
 
 </div>
 
 <div class="container" id="container">
     <div id="chatBox">
-        <h1 id="title_room">채팅방제목</h1>
+        <h1 id="title_room"></h1>
         <div id="chatting" class="chatting">
+
         </div>
         <div id="yourMsg">
             <table class="inputTable">
@@ -161,19 +318,22 @@
                     <th>메시지</th>
                     <th><input id="msg" placeholder="보내실 메시지를 입력하세요."></th>
                     <th>
-                        <button onclick="send()" id="sendBtn">보내기</button>
-                        <button onclick="disconnectChatRoom()" id="disconnectChatRoomBtn">채팅방 나가기</button>
+                        <button class="btn btn-light" onclick="send()" id="sendBtn">보내기</button>
                     </th>
                 </tr>
             </table>
         </div>
     </div>
-
-    <div id="userBox">
-
+    <div id="userBoxDiv">
+        <div id="disconnectDiv" class="disconnectDiv">
+            <button class="btn btn-light" onclick="disconnectChatRoom()" id="disconnectChatRoomBtn">채팅방 나가기</button>
+        </div>
+        <div id="userBox">
+        </div>
     </div>
 
 </div>
+
 </body>
 <script src="/js/sidebar.js"></script>
 <script>
@@ -181,8 +341,6 @@
         let token = Cookies.get('Authorization');
         const payloads = JSON.parse(atob(token.split(".")[1]));
         const userAuth = payloads.sub;
-
-        console.log(token);
 
         // 쿼리스트링 값 불러오기
         urlSearch = new URLSearchParams(location.search);
@@ -197,8 +355,10 @@
             success: function (response) {
                 if (!response.activated) {
                     alert("활성화된 채팅방이 아닙니다.")
-                    window.location.href = "/api/users/chatList";
+                    window.location.href = "/";
                 }
+
+                $('#title_room').text(response.roomName);
             },
             error: function (xhr, status, error) {
                 alert("채팅방 활성화 체크 오류")
@@ -212,10 +372,8 @@
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                console.log(response.chatRoomList.length);
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
-
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
                         // 해당 채팅방에 속한 사용자
@@ -225,12 +383,7 @@
 
                 // 해당 채팅방에 속한 사용자가 아닐때 이동
                 if (!chackUser == true) {
-                    window.location.href = "/api/users/chatList"
-                }
-
-                // 해당 채팅방의 사용자가 1명일 떄
-                if (response.chatRoomList.length == 1) {
-                    $('#sendBtn').remove();
+                    window.location.href = "/"
                 }
 
                 // 채팅방에 저장된 채팅내용 조회
@@ -238,11 +391,28 @@
                     url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
                     method: 'GET', // 요청 메소드 (GET, POST 등)
                     success: function (response) {
-
+                        console.log("채팅내용 : ", response)
                         for (var i = 0; i < response.chatContentList.length; i++) {
-                            $(`<div id="chatContent" class="testChat">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatting`);
-                            $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatting`);
+
+                            if (userAuth == response.chatContentList[i].userName) {
+                                $(`<div id="chatDivMe-${i}" class="chatDivMe"></div>`).appendTo(`#chatting`);
+                                $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userName}</div>`).appendTo(`#chatDivMe-${i}`);
+
+                                $(`<div id="chatContentDivMe-${i}" class="chatContentDivMe"></div>`).appendTo(`#chatDivMe-${i}`);
+                                $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatContentDivMe-${i}`);
+                                $(`<div id="chatContentMe" class="chatContentMe">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDivMe-${i}`);
+                                continue;
+                            }
+
+                            $(`<div id="chatDiv-${i}" class="chatDiv"></div>`).appendTo(`#chatting`);
+                            $(`<div id="chatUser" class="chatUser">${response.chatContentList[i].userName}</div>`).appendTo(`#chatDiv-${i}`);
+
+                            $(`<div id="chatContentDiv-${i}" class="chatContentDiv"></div>`).appendTo(`#chatDiv-${i}`);
+                            $(`<div id="chatContent" class="chatContent">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDiv-${i}`);
+                            $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatContentDiv-${i}`);
                         }
+
+                        $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
                     },
                     error: function (xhr, status, error) {
                         alert("채팅 내용 불러오기 실패")
@@ -289,19 +459,16 @@
     var socket = new SockJS("/chatting");
     stompClient = Stomp.over(socket);
 
-
     function connect() {
         //StompConfig.java에 설정된 endpoint로 SockJS 객체, StompClient 객체 생성
 
-        console.log("socket", socket);
-        console.log("stompClient", stompClient);
-        // 사용자가 초대 되었을 때
-        // data = {
-        //     'type': 'connect',
-        //     'sender': userId,
-        //     'contents': '',
-        //     'roomNumber': roomNumber
-        // };
+        // 사용자가 채팅방에 들어왔을 때
+        data = {
+            'type': 'connect',
+            'sender': userId,
+            'contents': 'connect test',
+            'roomNumber': roomNumber
+        };
 
         // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
         // connect(header,연결 성공시 콜백,에러발생시 콜백)
@@ -311,11 +478,44 @@
 
                 //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
                 sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
-                    // 메세시가 강퇴 관련이면 alter창 띄우기 (미구현)
+                    // 강퇴 메세지가 떴을 때 사용자 목록에서 사용자 삭제
+                    var data = JSON.parse(e.body);
 
-                    showMessage(JSON.parse(e.body));
+                    if (data.type == 'kickOut') {
+
+                        $.ajax({
+                            url: `/api/chat/getUsers/${data.kickOutUser}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
+                            method: 'GET', // 요청 메소드 (GET, POST 등)
+                            success: function (response) {
+                                $(`#chatRoomUser-${response}`).remove();
+                                showMessage(JSON.parse(e.body));
+                            },
+                            error: function (xhr, status, error) {
+                                alert("강퇴 사용자 찾기 오류")
+                                console.log(xhr);
+                            }
+                        });
+                    } else if (data.type == 'connect') {
+                        $('#userBox').empty();
+                        chatUserAsk(roomNumber);
+                    } else {
+                        showMessage(JSON.parse(e.body));
+                    }
+
                 });
-                // stompClient.send("/app/chat/send", {}, JSON.stringify(data));
+
+                // 자기 자신 주소 구독
+                // 자신한테 오는 메세지를 받기 위헤서
+
+                sub = stompClient.subscribe(`/topic/` + userId, function (message) {
+                    // 메세지 강퇴 관련이면 alter창 띄우기
+                    alert(message.body);
+                    // 소켓 연결 해제
+                    disconnect();
+                    window.location.href = "/"
+                });
+
+                stompClient.send("/app/chat/send", {}, JSON.stringify(data));
             },
             function (e) {
                 alert('통신끊김');
@@ -333,15 +533,37 @@
 
     //화면에 메시지를 표시하는 함수
     function showMessage(data) {
+        console.log("채팅 데이터 : ", data)
         if (data.sender === userId) {
-            $('#chatting').append("<p class='me'>" + data.sender + " : " + data.contents + "</p>");
+            $(`<div id="chatDivMe" class="chatDivMe">
+                <div id="chatUserMe" class="chatUserMe">${data.sender}</div>
+
+                <div id="chatContentDivMe" class="chatContentDivMe">
+                    <div id="chatContentTimeMe" class="chatContentTimeMe">${data.date}</div>
+                    <div id="chatContentMe" class="chatContentMe">${data.contents}</div>
+                </div>
+            </div>`).appendTo(`#chatting`);
+
+
         } else {
-            $('#chatting').append("<p class='other'>" + data.sender + " : " + data.contents + "</p>");
+            $(`<div id="chatDiv" class="chatDiv">
+                <div id="chatUser" class="chatUser">${data.sender}</div>
+
+                <div id="chatContentDiv" class="chatContentDiv">
+                    <div id="chatContent" class="chatContent">${data.contents}</div>
+                    <div id="chatContentTime" class="chatContentTime">${data.date}</div>
+                </div>
+            </div>`).appendTo(`#chatting`);
         }
     }
 
     //메시지 브로커로 메시지 전송
     function send() {
+        var currentDate = new Date(); // 클라이언트 기준의 로컬 시간을 얻어옴
+        var koreanOffsetMinutes = 9 * 60; // 한국 시간대(UTC+9)의 시차를 분 단위로 계산
+
+        // 한국 시간대에 시차를 적용
+        var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
 
         //사용자가 채팅방에 속한 유저인지 확인
         $.ajax({
@@ -359,15 +581,17 @@
                 }
                 if (!chackUser == true) {
                     disconnect();
-                    window.location.href = "/api/users/chatList"
+                    window.location.href = "/"
                 }
 
                 data = {
                     'type': 'chat',
                     'sender': userId,
                     'contents': $("#msg").val(),
-                    'roomNumber': roomNumber
+                    'roomNumber': roomNumber,
+                    'date': koreanTime
                 };
+
                 // send(destination,헤더,페이로드)
                 stompClient.send("/app/chat/send", {}, JSON.stringify(data));
 
@@ -376,118 +600,87 @@
                     url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
                     method: 'POST', // 요청 메소드 (GET, POST 등)
                     contentType: "application/json",
-                    data: JSON.stringify({userId: userId, chatContent: $("#msg").val(), roomId: roomNumber}),
+                    data: JSON.stringify({
+                        userId: userId,
+                        chatContent: $("#msg").val(),
+                        roomId: roomNumber,
+                        createdAt: koreanTime
+                    }),
                     success: function (response) {
                         $("#msg").val('');
+
+                        $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
                     },
                     error: function (xhr, status, error) {
-                        console.log("채팅 발송 실패");
+                        console.log("채팅 저장 실패");
                         console.log(xhr);
                     }
                 });
 
             },
             error: function (xhr, status, error) {
-                alert("저장 실패")
+                alert("채팅방에 속한 유저가 아닙니다")
                 console.log(xhr);
             }
         });
 
-
     }
 
-    // 아코디언 메뉴바 메소드
-    // $(document).ready(function () {
-    //     $(".accordion-header").click(function () {
-    //         $(this).toggleClass("active");
-    //         $(this).next(".accordion-content").slideToggle();
-    //         $(".accordion-content").not($(this).next()).slideUp();
-    //         $(".accordion-header").not($(this)).removeClass("active");
-    //     });
-    // });
-
-    // $.ajax({
-    //     url: `/api/chat/getUsers/${userId}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
-    //     method: 'GET', // 요청 메소드 (GET, POST 등)
-    //     success: function (response) {
-    //         // response 사용자의 id
-    //         $.ajax({
-    //             url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
-    //             method: 'GET', // 요청 메소드 (GET, POST 등)
-    //             success: function (response) {
-    //
-    //                 if (response.chatRoomList.length == 0) {
-    //                     // 해당 사용자가 속한 채팅방이 없다면
-    //                     alert("채팅방 없음");
-    //                     $(`<div id="userChatRoom-1" class="userChatRoom" onclick="chatRoom(1)">1</div>`).appendTo(`.chatRoom`);
-    //                 }
-    //
-    //                 // 해당 사용자가 속한 채팅방이 있다면
-    //                 for (var i = 0; i < response.chatRoomList.length; i++) {
-    //                     $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
-    //                 }
-    //
-    //             },
-    //             error: function (xhr, status, error) {
-    //                 alert("불러오기 실패")
-    //                 console.log(xhr);
-    //             }
-    //         });
-    //     },
-    //     error: function (xhr, status, error) {
-    //         alert("불러오기 실패")
-    //         console.log(xhr);
-    //     }
-    // });
-
-    // function chatRoom(id) {
-    //     // 해당 채팅방의 id 전달 (채팅방 입장)
-    //     window.location.href = `/api/users/chat?number=${id}`;
-    // }
-
     // 채팅방 사용자들 조회
-    $.ajax({
-        url: `/api/chat/chatRooms/${roomNumber}/users`,
-        method: 'GET', // 요청 메소드 (GET, POST 등)
-        success: function (response) {
-            var chackUser;
-            // 해당 사용자가 ADMIN인지 판단
-            for (var j = 0; j < response.chatRoomList.length; j++) {
+    function chatUserAsk(roomNumber) {
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}/users`,
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                var chackUser;
+                // 해당 사용자가 ADMIN인지 판단
+                for (var j = 0; j < response.chatRoomList.length; j++) {
 
-                if ((userId == response.chatRoomList[j].userName) && (response.chatRoomList[j].role == "ADMIN")) {
-                    chackUser = true;
+                    if ((userId == response.chatRoomList[j].userName) && (response.chatRoomList[j].role == "ADMIN")) {
+                        chackUser = true;
+                    }
+
                 }
 
+                // 해당 채팅방 사용자 조회
+                for (var i = 0; i < response.chatRoomList.length; i++) {
+
+                    // 로그인한 유저인지 확인 (자기자신한테 후기 안남기게 하기)
+                    if (userId == response.chatRoomList[i].userName) {
+                        $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">
+                            <div id="chatRoomUserPro" class="chatRoomUserPro"></div>
+                            <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userName}</div>
+                        </div>`).appendTo(`#userBox`);
+                        continue;
+                    }
+
+                    // 로그인한 유저가 아닌 유저들 (사용자가 후기를 남길 사람들)
+                    $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">
+                       <div id="chatRoomUserPro" class="chatRoomUserPro"></div>
+
+                       <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userName}</div>
+
+                       <div id="reviewBtnBox" class="reviewBtnBox">
+                         <button class="btn btn-light" onclick="review(${response.chatRoomList[i].userId})">후 기</button>
+                       </div>
+                    </div>`).prependTo(`#userBox`);
+
+
+                    if (chackUser) {
+                        $(`
+                          <button class="btn btn-light" onclick="kickOut('${response.chatRoomList[i].userId}','${response.chatRoomList[i].userName}')">강 퇴</button>
+                         `).appendTo(`#reviewBtnBox`);
+                    }
+                }
+
+            },
+            error: function (xhr, status, error) {
+                alert("불러오기 실패")
+                console.log(xhr);
             }
+        });
+    }
 
-            // 해당 채팅방 사용자 조회
-            for (var i = 0; i < response.chatRoomList.length; i++) {
-
-                // 로그인한 유저인지 확인 (자기자신한테 후기 안남기게 하기)
-                if (userId == response.chatRoomList[i].userName) {
-                    $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">${response.chatRoomList[i].userName}</div>`).appendTo(`#userBox`);
-                    continue;
-                }
-
-                // 로그인한 유저가 아닌 유저들 (사용자가 후기를 남길 사람들)
-                $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">${response.chatRoomList[i].userName}</div>`).prependTo(`#userBox`);
-                $(`<div id="reviewBtnBox" class="reviewBtnBox">
-                    <button onclick="review(${response.chatRoomList[i].userId})">후기 남기기</button>
-                </div>`).appendTo(`#chatRoomUser-${response.chatRoomList[i].userId}`);
-
-                if (chackUser) {
-                    $(`<div id="kickOutBtn" class="kickOutBtn">
-                     <button onclick="kickOut('${response.chatRoomList[i].userId}','${response.chatRoomList[i].userName}')">강퇴하기</button>
-                     </div>`).appendTo(`#chatRoomUser-${response.chatRoomList[i].userId}`);
-                }
-            }
-
-        },
-        error: function (xhr, status, error) {
-            alert("불러오기 실패")
-            console.log(xhr);
-        }
-    });
 
     //review 남기기 모달창 띄우기
     //이미 review가 남겨저 있는 사용자 인지 확인.
@@ -508,7 +701,7 @@
                 }
                 if (!chackUser == true) {
                     disconnect();
-                    window.location.href = "/api/users/chatList"
+                    window.location.href = "/"
                 }
 
             },
@@ -750,14 +943,17 @@
                 // 성공시 사용자 목록에서 제거
                 $(`#chatRoomUser-${id}`).remove();
 
-                data = {
-                    'type': 'connect',
+                allMsg = {
+                    'type': 'kickOut',
                     'sender': kickOutUser,
+                    'kickOutUser': kickOutUser,
                     'contents': '님이 강퇴 당했습니다.',
                     'roomNumber': roomNumber
                 };
 
-                stompClient.send("/app/chat/send", {}, JSON.stringify(data));
+                stompClient.send("/app/chat/send", {}, JSON.stringify(allMsg));
+
+                kickOutMsg(kickOutUser);
 
                 // 기능 업그레이드는 개별 메세지를 보내고 개별 메세지를 받은 사용자가
                 // 확인버튼을 누르면 바로 채팅방이 나가지는 (리다이렉트)
@@ -777,5 +973,17 @@
         // 여기에 뒤로가기 시 실행할 작업을 추가하세요.
         // 예: 경고창 표시, 원하는 동작 수행 등
     });
+
+    // 특정 유저에게 메세지 (강퇴)
+    function kickOutMsg(kickOutUser) {
+        data = {
+            'type': 'kickOut',
+            'sender': kickOutUser, // 강퇴를 보내는 사람
+            'contents': '에 의해 강퇴되었습니다.',
+        };
+
+        stompClient.send(`/app/sendToUser/` + kickOutUser, {}, JSON.stringify(data));
+    }
+
 </script>
 </html>
