@@ -229,7 +229,7 @@ function reject(ntId, postId, publisherId) {
         console.log("거부했습니다.");
 
         sendReject(ntId, postId, publisherId);
-        read(ntId);
+        read(ntId); //읽기를 거절 알림 보내기에 추가
         //거절 알림 전송
         //window.location.reload();
     } else {
@@ -243,8 +243,6 @@ function approve(ntId, postId, publisherId) {
 
         sendApprove(ntId, postId, publisherId);
         read(ntId);
-        //chatroom user 추가
-        //window.location.reload();
     } else {
         window.focus();
     }
@@ -284,10 +282,10 @@ function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
                     <p>${nt}</p>
                 `;
     if (nt === "JOIN_REQUEST") {
-        newElement += `<input type="button" onclick="approve(${ntId},${postId},${publisherId})" value="승인">
-                                <input type="button" onclick="reject(${ntId},${postId},${publisherId})" value="거부">`
+        newElement += `<input type="button" class="btn btn-primary" onclick="approve(${ntId},${postId},${publisherId})" value="승인"  style="background-color:#1746A2">
+                                <input type="button" class="btn btn-primary" onclick="reject(${ntId},${postId},${publisherId})" value="거부" style="background-color:#1746A2">`
     } else {
-        newElement += `<input type="button" onclick="read(${ntId})" value="닫기">`;
+        newElement += `<input type="button" class="btn btn-primary" onclick="read(${ntId})" value="닫기" style="background-color:#1746A2">`;
     }
     newElement += `</div>`;
     eventList.append(newElement);
