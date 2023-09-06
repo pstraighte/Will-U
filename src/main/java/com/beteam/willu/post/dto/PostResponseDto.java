@@ -15,13 +15,15 @@ public class PostResponseDto extends ApiResponseDto {
 	private Long id;
 	private String title;
 	private String content;
-	//TODO
 	private String username; // 뭘 넣어야 하나?
 	private LocalDateTime promiseTime;
 	private String promiseArea;
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
 	private Long maxnum;
+	private Long score;
+	private String category;
+	private boolean recruitment;
 	private Double score;
 	private String category;
 
@@ -37,5 +39,8 @@ public class PostResponseDto extends ApiResponseDto {
 		this.maxnum = post.getMaxnum();
 		this.score = post.getUser().getScore();
 		this.category = post.getCategory();
+		this.recruitment = post.getRecruitment();
+    this.score=post.getScore();
+    this.category=post.getCategory();
 	}
 }

@@ -26,8 +26,10 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.review.dto.ReviewSetResponseDto;
 import com.beteam.willu.review.repository.ReviewRepository;
+
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
@@ -45,6 +47,7 @@ public class ViewController {
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final PostService postService;
+	private final ChatRoomService chatRoomService;
 	private final JwtUtil jwtUtil;
 	private final ReviewRepository reviewRepository;
 
@@ -71,10 +74,13 @@ public class ViewController {
 	public String detailPost(Model model, @PathVariable Long postId) {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
+
+		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
+		model.addAttribute("currentNum", userCount);
 		return "detailPost";
 	}
 
-	// 보드 수정 페이지
+	// 게시글 수정 페이지
 	@GetMapping("/posts/update/{postId}")
 	public String updatePost(Model model, @PathVariable Long postId) {
 		model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기

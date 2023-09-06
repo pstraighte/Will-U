@@ -120,15 +120,11 @@ public class Post extends Timestamped {
 		if (postRequestDto.getMaxnum() != null) {
 			this.maxnum = postRequestDto.getMaxnum();
 		}
+		if (postRequestDto.getCategory() != null) {
+			this.category = postRequestDto.getCategory();
+		}
 	}
-  
   public void updateRecruitment(boolean bool) {
         this.recruitment = bool;
     }
-
-  /*	//event publish method
-	//게시글 관련 알림:
-	public void publishEvent(ApplicationEventPublisher eventPublisher, NotificationType type) {
-	}*/
-
 }
