@@ -280,4 +280,10 @@ public class ChatRoomService {
 		return chatRoomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
 	}
 
+	@Transactional
+	public int findChatRoomByPostIdAndGetCount(Long postId) {
+		ChatRoom chatRoom = chatRoomRepository.findByPostId(postId)
+			.orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
+		return chatRoom.getUserChatRoomList().size();
+	}
 }

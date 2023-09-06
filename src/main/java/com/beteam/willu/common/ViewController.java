@@ -24,6 +24,7 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
@@ -41,6 +42,7 @@ public class ViewController {
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final PostService postService;
+	private final ChatRoomService chatRoomService;
 	private final JwtUtil jwtUtil;
 
 	//인덱스 페이지 게시글 목록
@@ -66,6 +68,9 @@ public class ViewController {
 	public String detailPost(Model model, @PathVariable Long postId) {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
+
+		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
+		model.addAttribute("currentNum", userCount);
 		return "detailPost";
 	}
 

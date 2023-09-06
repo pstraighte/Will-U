@@ -73,7 +73,7 @@
 <div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
 <div class="post-form">
     <h1>게시글 수정</h1>
-    <form id="post-form">
+    <div id="post-form">
         <label for="title">제목</label>
         <input type="text" id="title" name="title" required>
 
@@ -93,10 +93,10 @@
         <input type="number" id="maxnum" name="maxnum" min="2">
 
         <div class="buttons">
-            <button type="button" onclick="updatePost()">작성</button>
+            <button type="button" onclick="updatePost()">수정</button>
             <button type="button" id="back">취소</button>
         </div>
-    </form>
+    </div>
 </div>
 </body>
 

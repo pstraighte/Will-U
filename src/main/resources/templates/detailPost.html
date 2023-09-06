@@ -60,6 +60,9 @@
             color: #333;
         }
 
+        #titleBox {
+            display: flex;
+        }
 
         #sideBarDiv {
             width: 200px;
@@ -85,6 +88,35 @@
             line-height: 50px;
             margin: auto;
         }
+
+        #titleBox-title {
+            width: 80%;
+            height: auto;
+        }
+
+        #titleBox-status {
+            width: 20%;
+            height: auto;
+        }
+
+        #status-text {
+            margin: auto;
+            color: #FF731D;
+            text-shadow: 5px 5px 5px gray;
+            animation: blink-effect 1.5s step-end infinite;
+        }
+
+        #status-text-not {
+            margin: auto;
+            color: red;
+            text-shadow: 5px 5px 5px gray;
+        }
+
+        @keyframes blink-effect {
+            60% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 
@@ -95,7 +127,12 @@
 <div class="post-view">
     <div class="post" id="postbox">
         <div id="titleBox">
-            <h1>${response.title}</h1>
+            <div id="titleBox-title">
+                <h1>${response.title}</h1>
+            </div>
+            <div id="titleBox-status">
+                <h1 style="float: right">${status}</h1>
+            </div>
         </div>
         <div id="moreInfo">
             <h3>관심사</h3>
@@ -121,12 +158,43 @@
 
 </body>
 <script th:inline="javascript">
-
     var post = [[${ post }]];//타임리프-post.id에 사용
     // console.log(post);
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
-    createPostContent(post, formattedDateTime);
+    let status = post.recruitment ? "모집중" : "모집 종료";
+    let currentNum = [[${ currentNum }]];
+
+    createPostContent(post, formattedDateTime, status, currentNum);
+
+    //토큰에서 username 추출
+    const payloads = JSON.parse(atob(token.split(".")[1]));
+    const userName = payloads.sub;
+    //작성자인지 확인해서
+    checkWriterAndShowButtons(userName, post.username, status);
+
+    function checkWriterAndShowButtons(loginUserName, postUserName, status) {
+
+        /*        let join = document.getElementById('join');
+                let edit = document.querySelector('.login-btn-container');
+                let delete = document.querySelector('.login-btn-container');*/
+
+        if (loginUserName === postUserName) {
+            $("#join").css("display", "none");
+            $("#edit").css("display", "");
+            $("#delete").css("display", "");
+        } else {
+            if (status === "모집중") {
+                $("#join").css("display", "");
+                $("#edit").css("display", "none");
+                $("#delete").css("display", "none");
+            } else {
+                $("#join").css("display", "none");
+                $("#edit").css("display", "none");
+                $("#delete").css("display", "none");
+            }
+        }
+    }
 
     function makeDateFormat(dateTimeString) {
 
@@ -252,12 +320,22 @@
         window.location.href = "/"; // 뒤로가기 기능 실행
     });
 
-    function createPostContent(response, formattedDateTime) {
+    function createPostContent(response, formattedDateTime, status, currentNum) {
         var postbox = $('#postbox');
         postbox.empty();
         var postDiv = `
                     <div id="titleBox">
-                        <h1>${response.title}</h1>
+                        <div id="titleBox-title">
+                            <h1>${response.title}</h1>
+                        </div>
+                        <div id="titleBox-status">`
+        if (status === "모집중") {
+            postDiv += `<h1 id="status-text">${status}</h1>`
+        } else {
+            postDiv += `<h1 id="status-text-not">${status}</h1>`
+        }
+        postDiv += `
+                        </div>
                     </div>
                     <div id="moreInfo">
                         <h3>관심사</h3>
@@ -267,12 +345,12 @@
                         <h3>약속 장소</h3>
                         <h4 class="attr">${response.promiseArea}</h4>
                         <h3>모집 인원</h3>
-                        <h4 class="attr"> ${response.maxnum}</h4>
+                        <h4 class="attr"> ${currentNum} / ${response.maxnum}</h4>
                     </div>
                     <div id="contentBox">
                         <p>${response.content}</p>
                     </div>
-                `;
+            `;
         postbox.append(postDiv);
     }
 </script>
