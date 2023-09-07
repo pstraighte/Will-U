@@ -20,7 +20,8 @@ public class NotificationResponseDto {
 	private NotificationType notificationType;
 
 	private String nickname;
-	private Long userId;
+	private Long receiverId;
+	private Long publisherId;
 	private Long postId;
 
 	public NotificationResponseDto(Notification notification) {
@@ -30,7 +31,8 @@ public class NotificationResponseDto {
 		this.isRead = notification.getIsRead();
 		this.notificationType = notification.getNotificationType();
 		this.nickname = notification.getReceiver().getNickname();
-		this.userId = notification.getReceiver().getId();
+		this.receiverId = notification.getReceiver().getId();
+		this.publisherId = notification.getPublisher().getId();
 		this.postId = notification.getPostId();
 
 	}

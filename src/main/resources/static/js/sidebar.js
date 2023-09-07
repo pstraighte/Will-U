@@ -3,20 +3,18 @@ const token = getAuthorizationCookie();
 $("#logo").click(function () {
     window.location.href = '/';
 });
-// 클릭 이벤트가 발생했을 때 실행할 코드 작성
 
 
 if (token !== null) {
     const payloads = JSON.parse(atob(token.split(".")[1]));
     const userName = payloads.sub;
-    checkLoginStatus();
     console.log(token);
     console.log(userName);
     getChatRooms(userName);
 }
 
 checkLoginStatus(token);
-//채팅방 조회
+
 
 $(".accordion-header").click(function () {
     $(this).toggleClass("active");
@@ -39,7 +37,6 @@ let ntId;
 
 eventSource.onopen = e => {
     console.log("연결 완료");
-    console.log(e);
 };
 
 eventSource.onmessage = e => {
@@ -57,12 +54,13 @@ eventSource.onmessage = e => {
 
     if (nt !== "MAKE_CONNECTION") {
         const publisherId = jsonData.publisher.id;
+        const receiverId = jsonData.receiver.id;
         const postId = jsonData.postId;
         console.log("ntId: " + ntId);
         console.log("publisherId: " + publisherId);
         console.log("postId: " + postId);
         showNotification(content, nt, title, ntId);
-        addNotificationHTML(content, nt, title, ntId, publisherId, postId);
+        addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
 
         if (jsonData.notificationType == "APPROVE_REQUEST") {
             $('.accordion-content').empty();
@@ -77,7 +75,6 @@ eventSource.onerror = error => {
 
 //알림 허용 체크
 notifyMe();
-
 
 function getChatRooms(userName) {
     $.ajax({
@@ -138,46 +135,6 @@ function checkLoginStatus(authorizationToken) {
         loginBtnContainer.style.display = 'block';
     }
 }
-
-
-// function openSidebar() {
-//     var sidebar = document.getElementById("sidebar");
-//     var content = document.getElementById("content");
-//     var openBtn = document.getElementById("openBtn");
-//     var closeBtn = document.getElementById("closeBtn");
-//
-//     if (sidebar.style.width === "250px") {
-//         sidebar.style.width = "0";
-//         content.style.marginLeft = "0";
-//         closeBtn.style.display = "none";
-//         openBtn.style.display = "inline-block";
-//     } else {
-//         sidebar.style.width = "250px";
-//         content.style.marginLeft = "260px";
-//         closeBtn.style.display = "inline-block";
-//         openBtn.style.display = "none";
-//     }
-// }
-
-function openSidebar() {
-    let sidebar = document.getElementById("sidebar");
-    let content = document.getElementById("content");
-    let openBtn = document.getElementById("openBtn");
-    let closeBtn = document.getElementById("closeBtn");
-
-    if (sidebar.style.width === "250px") {
-        sidebar.style.width = "0";
-        content.style.marginLeft = "0";
-        closeBtn.style.display = "none";
-        openBtn.style.display = "inline-block";
-    } else {
-        sidebar.style.width = "250px";
-        content.style.marginLeft = "260px";
-        closeBtn.style.display = "inline-block";
-        openBtn.style.display = "none";
-    }
-}
-
 
 function logout() {
     //로그아웃 api 호출하고 로그인 페이지로
@@ -240,7 +197,6 @@ function read(ntId) {
         success: function (response) {
             console.log("알림 결과 : ", response);
             console.log("읽기 처리 완료");
-            //TODO 알림이 포함된 HTML 지우기
             removeNotificationHTML(ntId);
 
         },
@@ -250,10 +206,10 @@ function read(ntId) {
     });
 }
 
-function reject(ntId, postId, publisherId) {
+await function reject(ntId, postId, publisherId) {
     if (confirm("참가 요청을 거부하시겠습니까?")) {
         console.log("거부했습니다.");
-
+        //거절 알림 전송
         sendReject(ntId, postId, publisherId);
         read(ntId); //읽기를 거절 알림 보내기에 추가
         //거절 알림 전송
@@ -263,7 +219,7 @@ function reject(ntId, postId, publisherId) {
     }
 }
 
-function approve(ntId, postId, publisherId) {
+await function approve(ntId, postId, publisherId) {
     if (confirm("참가 요청을 승인하시겠습니까?")) {
         console.log("승인했습니다.");
 
@@ -300,7 +256,7 @@ function showNotification(content, notificationType, title, ntId) {
     };
 }
 
-function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
+function addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId) {
     let newElement =
         `<div class="unread-notification-${ntId}">
                     <h4>${title}</h4>
@@ -311,7 +267,7 @@ function addNotificationHTML(content, nt, title, ntId, publisherId, postId) {
         newElement += `<input type="button" class="btn btn-primary" onclick="approve(${ntId},${postId},${publisherId})" value="승인"  style="background-color:#1746A2">
                                 <input type="button" class="btn btn-primary" onclick="reject(${ntId},${postId},${publisherId})" value="거부" style="background-color:#1746A2">`
     } else {
-        newElement += `<input type="button" class="btn btn-primary" onclick="read(${ntId})" value="닫기" style="background-color:#1746A2">`;
+        newElement += `<input type="button" class="btn btn-primary" onclick="removeNotificationHTML(${ntId})" value="닫기" style="background-color:#1746A2">`;
     }
     newElement += `</div>`;
     eventList.append(newElement);
@@ -340,7 +296,7 @@ function sendReject(ntId, postId, publisherId) {
 
         },
         error: function (xhr, status, error) {
-            alert("저장 실패")
+            alert("전송 실패")
             console.log(xhr);
         }
     });
@@ -363,7 +319,7 @@ function sendApprove(ntId, postId, publisherId) {
 
         },
         error: function (xhr, status, error) {
-            alert("저장 실패")
+            alert("전송 실패")
             console.log(xhr);
         }
     });
@@ -384,51 +340,18 @@ function showMyNotification() {
                 // e.lastEventId = ntId;
 
                 if (nt !== "MAKE_CONNECTION") {
-                    const publisherId = notification.userId;
+                    const publisherId = notification.publisherId;
+                    const receiverId = notification.receiverId;
                     const postId = notification.postId;
                     console.log("ntId: " + ntId);
                     console.log("publisherId: " + publisherId);
+                    console.log("receiverId: " + receiverId);
                     console.log("postId: " + postId);
-                    addNotificationHTML(content, nt, title, ntId, publisherId, postId);
+                    addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
                 }
             });
         },
         error: function (xhr, status, error) {
-            console.log(xhr);
-        }
-    });
-}
-
-function showChatRoom(userName) {
-    $.ajax({
-        url: `/api/chat/getUsers/${userName}`, // 쿠키에 저장된 사용자의 이름으로 사용자 id 가져오기
-        method: 'GET', // 요청 메소드 (GET, POST 등)
-        success: function (response) {
-
-            // response 사용자의 id
-            $.ajax({
-                url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
-                method: 'GET', // 요청 메소드 (GET, POST 등)
-                success: function (response) {
-
-                    if (response.chatRoomList.length == 0) {
-                        // 해당 사용자가 속한 채팅방이 없다면
-                    }
-
-                    // 해당 사용자가 속한 채팅방이 있다면
-                    for (var i = 0; i < response.chatRoomList.length; i++) {
-                        $(`<div id="userChatRoom-${response.chatRoomList[i].id}" class="userChatRoom" onclick="chatRoom(${response.chatRoomList[i].id})">${response.chatRoomList[i].chatName}</div>`).appendTo(`.accordion-content`);
-                    }
-
-                },
-                error: function (xhr, status, error) {
-                    alert("불러오기 실패")
-                    console.log(xhr);
-                }
-            });
-        },
-        error: function (xhr, status, error) {
-            alert("불러오기 실패")
             console.log(xhr);
         }
     });
