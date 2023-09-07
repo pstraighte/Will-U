@@ -1,18 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <th:block th:replace="~{/fragments/sidebar::common-header}"></th:block>
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
+
     <title>게시글 상세 조회</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
+        .attr {
+            border: 1px solid black;
+            border-radius: 15px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
         }
 
         .post-view {
-            width: 400px;
+            width: 70%;
             margin: 50px auto;
             padding: 20px;
             border: 1px solid #ccc;
@@ -22,7 +26,7 @@
 
         h1 {
             text-align: center;
-            margin-bottom: 20px;
+            margin: 20px auto 30px auto;
         }
 
         .post {
@@ -30,14 +34,6 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 20px;
-        }
-
-        .profile {
-            border: 1px solid #ccc;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            display: flex;
         }
 
         .buttons {
@@ -64,53 +60,156 @@
             color: #333;
         }
 
+        #titleBox {
+            display: flex;
+        }
 
         #sideBarDiv {
             width: 200px;
             height: 100%;
         }
+
+        #moreInfo {
+            display: flex;
+        }
+
+        #contentBox {
+            margin-top: 30px;
+            min-height: 150px;
+            height: auto;
+        }
+
+        #moreInfo h3 {
+            margin: auto;
+            line-height: 50px;
+        }
+
+        h4 {
+            line-height: 50px;
+            margin: auto;
+        }
+
+        #titleBox-title {
+            width: 80%;
+            height: auto;
+        }
+
+        #titleBox-status {
+            width: 20%;
+            height: auto;
+        }
+
+        #status-text {
+            margin: auto;
+            color: #FF731D;
+            text-shadow: 5px 5px 5px gray;
+            animation: blink-effect 1.5s step-end infinite;
+        }
+
+        #status-text-not {
+            margin: auto;
+            color: red;
+            text-shadow: 5px 5px 5px gray;
+        }
+
+        @keyframes blink-effect {
+            60% {
+                opacity: 0;
+            }
+        }
     </style>
 </head>
+
 <body>
-
-<div id="sideBarDiv" th:insert="~{/fragments/sidebar::sidebarFragment}">
-
-</div>
+<div id="headerDiv" th:insert="~{fragments/sidebar::header}"></div>
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
 
 <div class="post-view">
     <div class="post" id="postbox">
-        <h1 id="title">게시글 제목</h1>
-        <div id="content">게시글 내용</div>
-        <div id="category">카테고리</div>
-        <div id="datetime">약속시간</div>
-        <div id="location">악속 장소</div>
-        <div id="maxnum">모집인원:</div>
+        <div id="titleBox">
+            <div id="titleBox-title">
+                <h1>${response.title}</h1>
+            </div>
+            <div id="titleBox-status">
+                <h1 style="float: right">${status}</h1>
+            </div>
+        </div>
+        <div id="moreInfo">
+            <h3>관심사</h3>
+            <h4 class="attr"> ${response.category}</h4>
+            <h3>약속 시간</h3>
+            <h4 class="attr">${response.promiseTime}</h4>
+            <h3>약속 장소</h3>
+            <h4 class="attr">${response.promiseArea}</h4>
+            <h3>모집 인원</h3>
+            <h4 class="attr"> ${response.maxnum}</h4>
+        </div>
+        <div id="contentBox">
+            <p>${response.content}</p>
+        </div>
     </div>
-
-    <div class="profile">
-        <img src="https://spartacodingclub.kr/_next/image?url=%2Fv5%2Ficons%2Flogged-in-rtan.png&w=1920&q=100
-    " alt="출저:스파르타로그인창">
-        <p>내이름이여기에붙어요<br>
-            내자기소개가여기에요<br>
-            #프로필 #관심사 #적는곳</p>
-    </div>
-
     <div class="buttons">
         <button id="join" onclick="joinRequest()">신청하기</button>
-        <button id="back">돌아가기</button>
         <button id="edit" onclick="updatePost()">수정하기</button>
         <button id="delete" onclick="confirmAndDelete()">삭제하기</button>
+        <button id="back">돌아가기</button>
     </div>
 </div>
 
 </body>
 <script th:inline="javascript">
-
-    var post = [[${post}]];//타임리프-post.id에 사용
+    var post = [[${ post }]];//타임리프-post.id에 사용
     // console.log(post);
 
+    let formattedDateTime = makeDateFormat(post.promiseTime);
+    let status = post.recruitment ? "모집중" : "모집 종료";
+    let currentNum = [[${ currentNum }]];
+
+    createPostContent(post, formattedDateTime, status, currentNum);
+
+    //토큰에서 username 추출
+    const payloads = JSON.parse(atob(token.split(".")[1]));
+    const userName = payloads.sub;
+    //작성자인지 확인해서
+    checkWriterAndShowButtons(userName, post.username, status);
+
+    function checkWriterAndShowButtons(loginUserName, postUserName, status) {
+
+        if (loginUserName === postUserName) {
+            $("#join").css("display", "none");
+            $("#edit").css("display", "");
+            $("#delete").css("display", "");
+        } else {
+            if (status === "모집중") {
+                $("#join").css("display", "");
+                $("#edit").css("display", "none");
+                $("#delete").css("display", "none");
+            } else {
+                $("#join").css("display", "none");
+                $("#edit").css("display", "none");
+                $("#delete").css("display", "none");
+            }
+        }
+    }
+
+    function makeDateFormat(dateTimeString) {
+        // Date 객체로 변환
+        let dateTime = new Date(dateTimeString);
+
+        // 원하는 형식으로 날짜와 시간을 가공
+        let year = dateTime.getFullYear();
+        let month = dateTime.getMonth();
+        let day = dateTime.getDate();
+        let hour = dateTime.getHours();
+        let minute = dateTime.getMinutes();
+
+        // 날짜와 시간을 원하는 형식으로 조합
+        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
+    }
+
+
     //==========게시글 내용 가져오기==========
-    $(document).ready(function () {
+    /*$(document).ready(function () {
         $.ajax({
             url: `/api/posts/${post.id}`, // postId를 URL에 연결
             type: 'GET',
@@ -126,13 +225,21 @@
                 postbox.empty();
 
                 var postDiv = `
-                    <div class="posts">
-                   <h1>${response.title}</h1>
-                    <p>${response.content}</p>
-                    <p>관심사: ${response.category}</p>
-                    <p>약속 시간: ${response.promiseTime}</p>
-                    <p>약속 장소: ${response.promiseArea}</p>
-                    <p>모집 인원: ${response.maxnum}</p>
+                    <div id="titleBox">
+                        <h1>${response.title}</h1>
+                    </div>
+                    <div id="moreInfo">
+                        <h3>관심사</h3>
+                        <h4 class="attr"> ${response.category}</h4>
+                        <h3>약속 시간</h3>
+                        <h4 class="attr">${response.promiseTime}</h4>
+                        <h3>약속 장소</h3>
+                        <h4 class="attr">${response.promiseArea}</h4>
+                        <h3>모집 인원</h3>
+                        <h4 class="attr"> ${response.maxnum}</h4>
+                    </div>
+                    <div id="contentBox">
+                        <p>${response.content}</p>
                     </div>
                 `;
                 postbox.append(postDiv);
@@ -141,7 +248,7 @@
                 console.log(error);
             }
         });
-    });
+    });*/
 
     // ============ 게시글 수정 ===============
     function updatePost() {
@@ -207,5 +314,39 @@
         window.location.href = "/"; // 뒤로가기 기능 실행
     });
 
+    function createPostContent(response, formattedDateTime, status, currentNum) {
+        var postbox = $('#postbox');
+        postbox.empty();
+        var postDiv = `
+                    <div id="titleBox">
+                        <div id="titleBox-title">
+                            <h1>${response.title}</h1>
+                        </div>
+                        <div id="titleBox-status">`
+        if (status === "모집중") {
+            postDiv += `<h1 id="status-text">${status}</h1>`
+        } else {
+            postDiv += `<h1 id="status-text-not">${status}</h1>`
+        }
+        postDiv += `
+                        </div>
+                    </div>
+                    <div id="moreInfo">
+                        <h3>관심사</h3>
+                        <h4 class="attr"> ${response.category}</h4>
+                        <h3>약속 시간</h3>
+                        <h4 class="attr">${formattedDateTime}</h4>
+                        <h3>약속 장소</h3>
+                        <h4 class="attr">${response.promiseArea}</h4>
+                        <h3>모집 인원</h3>
+                        <h4 class="attr"> ${currentNum} / ${response.maxnum}</h4>
+                    </div>
+                    <div id="contentBox">
+                        <p>${response.content}</p>
+                    </div>
+            `;
+        postbox.append(postDiv);
+    }
 </script>
+
 </html>

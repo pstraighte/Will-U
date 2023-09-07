@@ -60,10 +60,10 @@ public class WebSecurityConfig {
 			authorizeHttpRequests
 				.requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll() // resources 접근 허용 설정
 				.requestMatchers("/").permitAll() // 메인 페이지 요청
-				.requestMatchers("/view/users/user-login").permitAll()
+				.requestMatchers("/login").permitAll()
 				.requestMatchers("/api/users/**").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
-				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-				.requestMatchers("/api/search/**").permitAll()
+				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll() //update post view 허용되는 문제 있음
+				.requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
 				.anyRequest().authenticated()
 		);
 		// form 로그인 사용하지 않음

@@ -1,18 +1,12 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>게시글 수정</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
         .post-form {
-            width: 400px;
+            width: 50%;
             margin: 50px auto;
             padding: 20px;
             border: 1px solid #ccc;
@@ -40,7 +34,9 @@
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
+            margin-bottom: 15px;
             border-radius: 3px;
+            font-size: 1rem;
         }
 
         .buttons {
@@ -70,12 +66,76 @@
             background-color: #dc3545;
         }
 
+        /* The switch - the box around the slider */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round {
+            border-radius: 34px;
+        }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
     </style>
 </head>
 <body>
+<div id="headerDiv" th:insert="~{fragments/sidebar::header}"></div>
+<div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
 <div class="post-form">
     <h1>게시글 수정</h1>
-    <form id="post-form">
+    <div id="post-form">
         <label for="title">제목</label>
         <input type="text" id="title" name="title" required>
 
@@ -103,37 +163,102 @@
 
         <label for="maxnum">모임 인원</label>
         <input type="number" id="maxnum" name="maxnum" min="2">
+        <label for="recruit-status">모집 상태</label>
+        <label class="switch">
+            <input type="checkbox" id="recruit-status" name="recruit-status">
+            <span class="slider round"></span>
+        </label>
+        <p id="off-text">OFF</p>
+        <p id="on-text" style="display:none;">ON</p>
 
         <div class="buttons">
-            <button type="button" onclick="updatePost()">작성</button>
+            <button type="button" onclick="updatePost()">수정</button>
             <button type="button" id="back">취소</button>
         </div>
-    </form>
+    </div>
 </div>
 </body>
 
 <script th:inline="javascript">
     var postId = [[${postId}]];
     console.log(postId);
-
+    let status;
+    let toggle = $("#recruit-status");
     // ========== 게시글 정보 불러오기 ==========
-    $(document).ready(function () {
+    $.ajax({
+        url: `/api/posts/${postId}`,
+        method: 'GET',
+        success: function (response) {
+            $("#title").val(response.title);
+            $("#content").val(response.content);
+            $("#category").val(response.category);
+            $("#promiseTime").val(response.promiseTime);
+            $("#promiseArea").val(response.promiseArea);
+            $("#maxnum").val(response.maxnum);
+            status = response.recruitment;
+            console.log("status", status);
+
+            // status 변수의 값을 기반으로 체크박스의 상태를 설정합니다.
+            toggle.prop("checked", status);
+            if (status) {
+                $("#off-text").hide();
+                $("#on-text").show();
+            }
+        },
+        error: function (xhr, status, error) {
+            console.log(error);
+        }
+    });
+
+
+    // 체크박스의 변경 이벤트를 감지하여 status 변수를 업데이트합니다.
+    toggle.change(function () {
+        status = $(this).prop("checked");
+
+        if (status) {
+            // ON일 때
+            $("#off-text").hide();
+            $("#on-text").show();
+            // 여기에서 ON 상태일 때 수행할 작업을 추가하세요.
+            changeEnable(postId);
+        } else {
+            // OFF일 때
+            $("#on-text").hide();
+            $("#off-text").show();
+            // 여기에서 OFF 상태일 때 수행할 작업을 추가하세요.
+            changeDisable(postId);
+        }
+
+    });
+
+
+    function changeEnable(id) {
         $.ajax({
-            url: `/api/posts/${postId}`,
-            method: 'GET',
+            url: `/api/posts/${id}/activate-recruitment`, // 요청을 보낼 서버의 URL
+            method: 'PATCH', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
             success: function (response) {
-                $("#title").val(response.title);
-                $("#content").val(response.content);
-                $("#category").val(response.category);
-                $("#promiseTime").val(response.promiseTime);
-                $("#promiseArea").val(response.promiseArea);
-                $("#maxnum").val(response.maxnum);
+                console.log("모집으로 상태 변경 완료");
             },
             error: function (xhr, status, error) {
-                console.log(error);
+                console.log("모집으로 상태 변경 실패");
             }
         });
-    });
+    }
+
+    function changeDisable(id) {
+        $.ajax({
+            url: `/api/posts/${id}/complete-recruitment`, // 요청을 보낼 서버의 URL
+            method: 'PATCH', // 요청 메소드 (GET, POST 등)
+            contentType: "application/json",
+            success: function (response) {
+                console.log("모집종료로 상태 변경 완료");
+            },
+            error: function (xhr, status, error) {
+                console.log("모집 종료로 상태 변경 실패");
+            }
+        });
+    }
 
     // ========== 게시글 수정 ==========
     function updatePost() {
@@ -162,5 +287,7 @@
     document.getElementById("back").addEventListener("click", function () {
         window.location.href = "/posts/" + postId; // 뒤로가기 (상세페이지로)
     });
+
+
 </script>
 </html>

@@ -1,6 +1,7 @@
 package com.beteam.willu.stomp.controller;
 
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -32,5 +33,4 @@ public class StompController {
         simpMessagingTemplate.convertAndSend("/topic/" + data.get("sender"), data);
         System.out.println("data = " + data);
     }
-
 }
