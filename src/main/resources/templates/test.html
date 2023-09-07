@@ -182,8 +182,31 @@
                     tableBody.empty();
                     console.log("검색 response : " + response)
                     response.content.forEach(function (post) {
+
                         console.log(post);
-                        createPostHTML(post);
+
+                        $.ajax({    //게시글 전체 조회
+                            url: `/api/chat/chatRooms/${post.id}/users`,
+                            type: 'GET',
+                            contentType: 'application/json',
+                            success: function (response) {
+                                var newRow = $('<tr>'); // 새로운 행 생성
+                                var idCell = $('<th scope="row">').text(post.id);
+                                var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
+
+                                var maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
+                                // recruitment 값을 긍정 또는 부정으로 변환
+                                var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
+                                var recruitmentCell = $('<td>').text(recruitmentText);
+                                // 행에 셀들을 추가
+                                newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+                                tableBody.append(newRow);
+                            },
+                            error: function (xhr, status, error) {
+                                //alert("채팅방 유저 정보 불러오기 실패")
+                                // window.location.href = "/view/users/user-login";
+                            }
+                        });
                     });
                 },
                 error: function (xhr, status, error) {
@@ -192,8 +215,52 @@
                 }
             });
         });
-        //게시글 전체 조회
-        chPost(0);
+
+        $.ajax({    //게시글 전체 조회
+            url: `/api/posts?page=0&size=10`,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+
+                nodeCreate(response.totalPages, response.number, response.first, response.last);
+
+                console.log("postResponse값 :", response);
+                var tableBody = $('.table tbody');
+                tableBody.empty();
+
+                response.content.forEach(function (post) {//게시글 불러오기
+
+                    $.ajax({    //게시글 전체 조회
+                        url: `/api/chat/chatRooms/${post.id}/users`,
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            var newRow = $('<tr>'); // 새로운 행 생성
+                            var idCell = $('<th scope="row">').text(post.id);
+                            var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
+
+                            var maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
+
+                            // recruitment 값을 긍정 또는 부정으로 변환
+                            var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
+                            var recruitmentCell = $('<td>').text(recruitmentText);
+                            // 행에 셀들을 추가
+                            newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+                            tableBody.append(newRow);
+
+                        },
+                        error: function (xhr, status, error) {
+                            alert("채팅방 유저 정보 불러오기 실패")
+                            // window.location.href = "/view/users/user-login";
+                        }
+                    });
+                });
+            },
+            error: function (xhr, status, error) {
+                window.location.href = "/login";
+            }
+        });
+
     });
     document.getElementById("createPostButton").addEventListener("click", function () {
         window.location.href = "/post/create";
@@ -270,55 +337,46 @@
         $.ajax({
             url: `/api/posts?page=${i}&size=10`,
             type: 'GET',
-            contentType: 'application/json'
-        }).then((response) => {
-            $('#page-item1').empty();
-            $('#page-item2').empty();
-            $('#page-item3').empty();
-            $('#page-item4').empty();
-            $('#pagination').find($(`li[id^='page-']`)).empty();
+            contentType: 'application/json',
+            success: function (response) {
+                $('#page-item1').empty();
+                $('#page-item2').empty();
+                $('#page-item3').empty();
+                $('#page-item4').empty();
+                $('#pagination').find($(`li[id^='page-']`)).empty();
 
-            nodeCreate(response.totalPages, response.number);
+                nodeCreate(response.totalPages, response.number);
 
-            console.log("postResponse값 :", response);
-            var tableBody = $('.table tbody');
-            if (i !== 0) {
+                console.log("postResponse값 :", response);
+                var tableBody = $('.table tbody');
                 tableBody.empty();
+
+                response.content.forEach(function (post) {
+                    $.ajax({
+                        url: `/api/chat/chatRooms/${post.id}/users`,
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            var newRow = $('<tr>');
+                            var idCell = $('<th scope="row">').text(post.id);
+                            var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
+                            var maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
+
+                            var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
+                            var recruitmentCell = $('<td>').text(recruitmentText);
+
+                            newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+                            tableBody.append(newRow);
+                        },
+                        error: function (xhr, status, error) {
+                            alert("채팅방 유저 정보 불러오기 실패");
+                        }
+                    });
+                });
+            },
+            error: function (xhr, status, error) {
+                // Handle error
             }
-            response.content.forEach(function (post) {
-                createPostHTML(post);
-            });
-        }, () => {
-            console.log("페이징 조회 실패");
-        });
-    }
-
-    function createPostHTML(post) {
-        var tableBody = $('.table tbody');
-        var newRow = $('<tr>'); // 새로운 행 생성
-        var idCell = $('<th scope="row">').text(post.id);
-        var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
-        var maxnumCell = getChatRoomuserInfo(post);
-        var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
-        var recruitmentCell = $('<td>').text(recruitmentText);
-        // 행에 셀들을 추가
-        newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
-        tableBody.append(newRow);
-    }
-
-    //게시글 현재 인원 조회
-    function getChatRoomuserInfo(post) {
-        $.ajax({
-            url: `/api/chat/chatRooms/${post.id}/users`,
-            type: 'GET',
-            contentType: 'application/json'
-        }).then((response) => {
-            let maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
-            return maxnumCell;
-        }, () => {
-            console.log("현재 인원 조회 실패");
-            let maxnumCell = $('<td>').text(post.maxnum);
-            return maxnumCell;
         });
     }
 </script>

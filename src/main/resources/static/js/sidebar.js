@@ -11,6 +11,7 @@ if (token !== null) {
     console.log(token);
     console.log(userName);
     getChatRooms(userName);
+
 }
 
 checkLoginStatus(token);
@@ -58,7 +59,13 @@ eventSource.onmessage = e => {
         const postId = jsonData.postId;
         showNotification(content, nt, title, ntId);
         addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
+
+        if (jsonData.notificationType == "APPROVE_REQUEST") {
+            $('.accordion-content').empty();
+            showChatRoom(jsonData.receiver.nickname);
+        }
     }
+
 }
 eventSource.onerror = error => {
     console.log("에러 발생");
@@ -78,7 +85,6 @@ function getChatRooms(userName) {
                 url: `/api/chat/users/${response}`, // 가져온 사용자의 id로 사용자가 속한 채팅방들 조회
                 method: 'GET', // 요청 메소드 (GET, POST 등)
                 success: function (response) {
-
                     if (response.chatRoomList.length === 0) {
                         // 해당 사용자가 속한 채팅방이 없다면
                     }
