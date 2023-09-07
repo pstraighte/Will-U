@@ -175,6 +175,8 @@ public class ChatRoomService {
 
 	@Transactional
 	public void joinUserChatRoom(ChatroomJoinRequestDto requestDto, User loginUser) {
+		//기존 알림 읽음처리
+
 		Long postId = requestDto.getPostId();
 		Post post = findPost(postId);
 		ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId)
@@ -192,7 +194,7 @@ public class ChatRoomService {
 		} else if (userChatRoomsRepository.existsByUserAndChatRooms(joiner, chatRoom)) {
 			throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
 		}
-		//TODO 알림 읽음처리
+
 		UserChatRoom guestChatRoom = UserChatRoom.builder().user(joiner).chatRooms(chatRoom).role("GUEST").build();
 		//유저 채팅방 초대
 		userChatRoomsRepository.save(guestChatRoom);
@@ -203,7 +205,7 @@ public class ChatRoomService {
 			.receiver(joiner).publisher(loginUser).content(post.getTitle() + " 게시글에 초대됐습니다.")
 			.postId(postId).build();
 		eventPublisher.publishEvent(approveMessageEvent);
-		//추가 후 인원이 모두 찼는지 확인
+		//추가 후 인원이 모두 찼는지 확인하고 알림 발송
 		if (chatRoom.getUserChatRoomList().size() + 1 >= post.getMaxnum()) {
 			post.setRecruitment(false);
 			//기존 chatRoom에 있는 유저 목록

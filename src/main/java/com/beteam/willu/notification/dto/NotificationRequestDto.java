@@ -11,4 +11,5 @@ public class NotificationRequestDto {
 	private Long postId;
 	private NotificationType type;
 	private Long receiverId;
+	private Long notificationId;
 }

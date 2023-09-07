@@ -6,5 +6,6 @@ import lombok.Getter;
 public class ChatroomJoinRequestDto {
 	private Long postId;
 	private Long userId;
+	private Long notificationId;
 
 }
