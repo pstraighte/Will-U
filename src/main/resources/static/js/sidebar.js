@@ -56,17 +56,8 @@ eventSource.onmessage = e => {
         const publisherId = jsonData.publisher.id;
         const receiverId = jsonData.receiver.id;
         const postId = jsonData.postId;
-        console.log("ntId: " + ntId);
-        console.log("publisherId: " + publisherId);
-        console.log("receiverId: " + receiverId);
-        console.log("postId: " + postId);
         showNotification(content, nt, title, ntId);
         addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
-
-        if (jsonData.notificationType == "APPROVE_REQUEST") {
-            $('.accordion-content').empty();
-            showChatRoom(jsonData.receiver.nickname);
-        }
     }
 }
 eventSource.onerror = error => {
@@ -172,7 +163,7 @@ function goProfile() {
             window.location.href = `/profile/${response}`;
         },
         error: function (xhr, status, error) {
-            alert("불러오기 실패")
+            alert("프로필 페이지 이동 실패")
             console.log(xhr);
         }
     });
@@ -196,10 +187,7 @@ function read(ntId) {
         method: 'PATCH', // 요청 메소드 (GET, POST 등)
         contentType: "application/json",
         success: function (response) {
-            console.log("알림 결과 : ", response);
-            console.log("읽기 처리 완료");
             removeNotificationHTML(ntId);
-
         },
         error: function (xhr, status, error) {
             console.log("읽기 처리 실패");
@@ -250,10 +238,7 @@ function showNotification(content, notificationType, title, ntId) {
     const notification = new Notification(title, notificationOptions);
 
     notification.onclick = function () {
-        // 알림 클릭 시 수행할 동작 설정
         window.focus();
-        //사이드바 열고 알림 목록 보여주기
-
         notification.close();
 
     };
@@ -288,7 +273,6 @@ function sendReject(ntId, postId, publisherId) {
         "receiverId": publisherId,
         "notificationId": ntId
     };
-    console.log(ntId);
     //헤더에 토큰
     $.ajax({
         url: `/api/notifications`, // 요청을 보낼 서버의 URL
@@ -313,7 +297,6 @@ function sendApprove(ntId, postId, publisherId) {
         "userId": publisherId,
         "notificationId": ntId
     };
-    console.log(ntId);
     //승인 알림 전송
     $.ajax({
         url: `/api/chatRoom/join`, // 요청을 보낼 서버의 URL
@@ -321,8 +304,7 @@ function sendApprove(ntId, postId, publisherId) {
         contentType: "application/json",
         data: JSON.stringify(data),
         success: function (response) {
-            alert("전송 완료");
-
+            console.log("승인 알림 전송 성공");
         },
         error: function (xhr, status, error) {
             alert("전송 실패")
@@ -349,10 +331,6 @@ function showMyNotification() {
                     const publisherId = notification.publisherId;
                     const receiverId = notification.receiverId;
                     const postId = notification.postId;
-                    console.log("ntId: " + ntId);
-                    console.log("publisherId: " + publisherId);
-                    console.log("receiverId: " + receiverId);
-                    console.log("postId: " + postId);
                     addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
                 }
             });
