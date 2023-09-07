@@ -227,6 +227,21 @@
             line-height: 23px;
         }
 
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #reviewContent {
+            margin-bottom: 5px;
+        }
+
+        #dropdownDiv {
+            margin-bottom: 10px;
+        }
+
     </style>
 </head>
 <body>
@@ -235,8 +250,20 @@
     <div id="reviewModal">
         <div class="modal-content">
             <h2>후기를 남겨보세요</h2>
-            <p>유저 정보</p>
+            <p id="userImpor">유저 정보</p>
             <div class="modal-buttons">
+
+                <div id="dropdownDiv">
+                    <label for="dropdown">점수를 선택하세요</label>
+                    <select id="dropdown">
+                        <option value="0">0</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
 
             </div>
         </div>
@@ -314,7 +341,6 @@
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                console.log("채팅내용1 : ", response)
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
@@ -334,15 +360,16 @@
                     url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
                     method: 'GET', // 요청 메소드 (GET, POST 등)
                     success: function (response) {
-                        console.log("채팅내용2 : ", response)
                         for (var i = 0; i < response.chatContentList.length; i++) {
+
+                            var formattedDateTime = makeDateFormat(response.chatContentList[i].createAt);
 
                             if (userAuth == response.chatContentList[i].userName) {
                                 $(`<div id="chatDivMe-${i}" class="chatDivMe"></div>`).appendTo(`#chatting`);
                                 $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userName}</div>`).appendTo(`#chatDivMe-${i}`);
 
                                 $(`<div id="chatContentDivMe-${i}" class="chatContentDivMe"></div>`).appendTo(`#chatDivMe-${i}`);
-                                $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatContentDivMe-${i}`);
+                                $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>`).appendTo(`#chatContentDivMe-${i}`);
                                 $(`<div id="chatContentMe" class="chatContentMe">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDivMe-${i}`);
                                 continue;
                             }
@@ -352,7 +379,7 @@
 
                             $(`<div id="chatContentDiv-${i}" class="chatContentDiv"></div>`).appendTo(`#chatDiv-${i}`);
                             $(`<div id="chatContent" class="chatContent">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDiv-${i}`);
-                            $(`<div id="chatContentTime" class="chatContentTime">${response.chatContentList[i].createAt}</div>`).appendTo(`#chatContentDiv-${i}`);
+                            $(`<div id="chatContentTime" class="chatContentTime">${formattedDateTime}</div>`).appendTo(`#chatContentDiv-${i}`);
                         }
 
                         $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
@@ -451,8 +478,11 @@
                 // 자신한테 오는 메세지를 받기 위헤서
 
                 sub = stompClient.subscribe(`/topic/` + userId, function (message) {
+                    var data = JSON.parse(message.body);
+
                     // 메세지 강퇴 관련이면 alter창 띄우기
-                    alert(message.body);
+                    alert(`${data.sender}` + `${data.contents}`);
+
                     // 소켓 연결 해제
                     disconnect();
                     window.location.href = "/"
@@ -476,13 +506,15 @@
 
     //화면에 메시지를 표시하는 함수
     function showMessage(data) {
-        console.log("채팅 데이터 : ", data)
+
+        var formattedDateTime = makeDateFormat(data.date);
+
         if (data.sender === userId) {
             $(`<div id="chatDivMe" class="chatDivMe">
                 <div id="chatUserMe" class="chatUserMe">${data.sender}</div>
 
                 <div id="chatContentDivMe" class="chatContentDivMe">
-                    <div id="chatContentTimeMe" class="chatContentTimeMe">${data.date}</div>
+                    <div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>
                     <div id="chatContentMe" class="chatContentMe">${data.contents}</div>
                 </div>
             </div>`).appendTo(`#chatting`);
@@ -494,10 +526,41 @@
 
                 <div id="chatContentDiv" class="chatContentDiv">
                     <div id="chatContent" class="chatContent">${data.contents}</div>
-                    <div id="chatContentTime" class="chatContentTime">${data.date}</div>
+                    <div id="chatContentTime" class="chatContentTime">${formattedDateTime}</div>
                 </div>
             </div>`).appendTo(`#chatting`);
         }
+    }
+
+    function makeDateFormat(dateTimeString) {
+        // LocalDateTime 형식의 문자열
+        var localDateTimeString = dateTimeString;
+
+// LocalDateTime 문자열을 Date 객체로 변환
+        var parts = localDateTimeString.split('T'); // 날짜와 시간을 분리
+        var datePart = parts[0]; // 날짜 부분
+        var timePart = parts[1]; // 시간 부분
+
+        var dateParts = datePart.split('-');
+        var timeParts = timePart.split(':');
+
+        var year = parseInt(dateParts[0]);
+        var month = parseInt(dateParts[1]) - 1; // JavaScript의 월은 0부터 시작하므로 1을 빼줍니다.
+        var day = parseInt(dateParts[2]);
+        var hour = parseInt(timeParts[0]);
+        var minute = parseInt(timeParts[1]);
+        var second = parseInt(timeParts[2]);
+
+        var dateTime = new Date(year, month, day, hour, minute, second);
+
+        let years = dateTime.getFullYear();
+        let months = dateTime.getMonth();
+        let days = dateTime.getDate();
+        let hours = dateTime.getHours();
+        let minutes = dateTime.getMinutes();
+
+        // 날짜와 시간을 원하는 형식으로 조합
+        return years + "년 " + months + "월 " + days + "일 " + hours + "시 " + minutes + "분";
     }
 
     //메시지 브로커로 메시지 전송
@@ -508,12 +571,28 @@
         // 한국 시간대에 시차를 적용
         var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
 
+        //채팅방이 비활성화 상태인지 확인
+        $.ajax({
+            url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL
+            method: 'GET', // 요청 메소드 (GET, POST 등)
+            success: function (response) {
+                if (!response.activated) {
+                    alert("활성화된 채팅방이 아닙니다.")
+                    window.location.href = "/";
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("채팅방 활성화 체크 오류")
+                window.location.href = "/";
+                console.log(xhr);
+            }
+        });
+
         //사용자가 채팅방에 속한 유저인지 확인
         $.ajax({
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                console.log(response.chatRoomList.length);
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
@@ -604,7 +683,7 @@
                        <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userName}</div>
 
                        <div id="reviewBtnBox" class="reviewBtnBox">
-                         <button class="btn btn-light" onclick="review(${response.chatRoomList[i].userId})">후 기</button>
+                         <button class="btn btn-light" onclick="review(${response.chatRoomList[i].userId},'${response.chatRoomList[i].userName}')">후 기</button>
                        </div>
                     </div>`).prependTo(`#userBox`);
 
@@ -627,14 +706,13 @@
 
     //review 남기기 모달창 띄우기
     //이미 review가 남겨저 있는 사용자 인지 확인.
-    function review(id) {
+    function review(id, user) {
         //id 값은 로그인한 사용자가 후기를 남길 유저의 id
         $.ajax({
             url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                console.log(response.chatRoomList.length);
-                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                // 채팅방에 속한 사용자인지 판단 api에 이기능을 넣을지 여기서 정할지 정하기)
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
@@ -659,7 +737,6 @@
             url: `/api/review/chatRooms/${roomNumber}`,
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                console.log("채팅방 review 데이터 :", response.reviews);
                 var reviewCheck = false;
                 var reviewContent = "";
                 var reviewScore = "";
@@ -672,32 +749,39 @@
                         reviewCheck = true;
                         reviewContent = response.reviews[i].content;
                         reviewScore = response.reviews[i].score;
+                        senderNickname = response.reviews[i].senderNickname;
                     }
                 }
 
                 if (reviewCheck) {
                     // 리뷰 수정창 띄우기
                     $("#reviewModalOverlay").fadeIn();
+                    $(".modal-content").find($(`p[id^='userImpor']`)).text(user);
 
                     //후기 입력 노드
-                    $(`<input type="text" id="reviewUpdateContent" value="${reviewContent}" />
-                      <input type="text" id="reviewUpdateScore" value="${reviewScore}" />
-                    `).appendTo(`.modal-buttons`);
+                    $(`<input type="text" id="reviewContent" class="form-control"  value="${reviewContent}" />
+                      <input type="text" id="reviewScore" class="form-control"  value="${reviewScore}" disabled/>
+                    `).prependTo(`.modal-buttons`);
 
-                    $(` <button id="reviewUpdateInsert" onclick="reviewUpdate(${id})">확인</button>
-                    <button id="reviewDelete" onclick="reviewDelete(${id})">리뷰삭제</button>
-                    <button id="reviewUpdateCancle" onclick="reviewCancle()">닫기</button>
+                    $(` <div id="reviewBtn" >
+                            <button id="reviewUpdateInsert" class="btn btn-light" onclick="reviewUpdate(${id})">확인</button>
+                            <button id="reviewDelete" class="btn btn-light" onclick="reviewDelete(${id})">리뷰삭제</button>
+                            <button id="reviewUpdateCancle" class="btn btn-light" onclick="reviewCancle()">닫기</button>
+                        </div>
                     `).appendTo(`.modal-buttons`);
                 } else {
                     $("#reviewModalOverlay").fadeIn();
+                    $(".modal-content").find($(`p[id^='userImpor']`)).text(user);
 
                     //후기 입력 노드
-                    $(`<input type="text" id="reviewContent" />
-                      <input type="text" id="reviewScore" />
-                    `).appendTo(`.modal-buttons`);
+                    $(`<input type="text" id="reviewContent" class="form-control" placeholder="후기를 입력하세요" />
+                      <input type="text" id="reviewScore" class="form-control" placeholder="점수를 선택하세요" disabled/>
+                    `).prependTo(`.modal-buttons`);
 
-                    $(` <button id="reviewInsert" onclick="reviewInsert(${id})">확인</button>
-                    <button id="reviewCancle" onclick="reviewCancle()">닫기</button>
+                    $(` <div id="reviewBtn" >
+                            <button id="reviewInsert" class="btn btn-light" onclick="reviewInsert(${id})">확인</button>
+                            <button id="reviewCancle" class="btn btn-light" onclick="reviewCancle()">닫기</button>
+                        </div>
                     `).appendTo(`.modal-buttons`);
                 }
 
@@ -715,15 +799,12 @@
     // review 남기기 모달창 끄기
     function reviewCancle() {
         // 수정 노드 삭제
-        $("#reviewUpdateContent").remove();
-        $("#reviewUpdateScore").remove();
         $("#reviewUpdateInsert").remove();
         $("#reviewUpdateCancle").remove();
         $("#reviewDelete").remove();
 
         // 리뷰 입력 노드 삭제
-        $("#reviewInsert").remove();
-        $("#reviewCancle").remove();
+        $("#reviewBtn").remove();
         $("#reviewContent").remove();
         $("#reviewScore").remove();
 
@@ -740,16 +821,12 @@
             data: JSON.stringify({content: $("#reviewContent").val(), score: $("#reviewScore").val()}),
             success: function (response) {
                 alert("후기남기기 성공")
-                // 수정 노드 삭제
-                $("#reviewUpdateContent").remove();
-                $("#reviewUpdateScore").remove();
                 $("#reviewUpdateInsert").remove();
                 $("#reviewUpdateCancle").remove();
                 $("#reviewDelete").remove();
 
                 // 리뷰 입력 노드 삭제
-                $("#reviewInsert").remove();
-                $("#reviewCancle").remove();
+                $("#reviewBtn").remove();
                 $("#reviewContent").remove();
                 $("#reviewScore").remove();
 
@@ -765,25 +842,20 @@
     // review 수정 api
     function reviewUpdate(id) {
         // 수정가능한 리뷰가 아닌지 확인(3일이 지난 리뷰인지 확인 필요)
-        console.log($("#reviewUpdateContent").val(), $("#reviewUpdateScore").val());
-
         $.ajax({
             url: `/api/review/users/${id}/chatRooms/${roomNumber}`,
             method: 'PUT', // 요청 메소드 (GET, POST 등)
             contentType: "application/json",
-            data: JSON.stringify({content: $("#reviewUpdateContent").val(), score: $("#reviewUpdateScore").val()}),
+            data: JSON.stringify({content: $("#reviewContent").val(), score: $("#reviewScore").val()}),
             success: function (response) {
                 alert("리뷰가 수정되었습니다");
                 // 수정 노드 삭제
-                $("#reviewUpdateContent").remove();
-                $("#reviewUpdateScore").remove();
                 $("#reviewUpdateInsert").remove();
                 $("#reviewUpdateCancle").remove();
                 $("#reviewDelete").remove();
 
                 // 리뷰 입력 노드 삭제
-                $("#reviewInsert").remove();
-                $("#reviewCancle").remove();
+                $("#reviewBtn").remove();
                 $("#reviewContent").remove();
                 $("#reviewScore").remove();
 
@@ -804,15 +876,12 @@
             success: function (response) {
                 alert("리뷰가 삭제되었습니다.");
                 // 수정 노드 삭제
-                $("#reviewUpdateContent").remove();
-                $("#reviewUpdateScore").remove();
                 $("#reviewUpdateInsert").remove();
                 $("#reviewUpdateCancle").remove();
                 $("#reviewDelete").remove();
 
                 // 리뷰 입력 노드 삭제
-                $("#reviewInsert").remove();
-                $("#reviewCancle").remove();
+                $("#reviewBtn").remove();
                 $("#reviewContent").remove();
                 $("#reviewScore").remove();
 
@@ -966,6 +1035,13 @@
 
         stompClient.send(`/app/sendToUser/` + kickOutUser, {}, JSON.stringify(data));
     }
+
+    // 드롭다운 메뉴에서 옵션을 선택할 때마다 호출되는 함수를 정의합니다.
+    document.getElementById("dropdown").addEventListener("change", function () {
+        // 선택된 옵션의 값을 가져와서 숨겨진 input 필드에 저장합니다.
+        var selectedOption = document.getElementById("dropdown").value;
+        document.getElementById("reviewScore").value = selectedOption;
+    });
 
 </script>
 </html>
