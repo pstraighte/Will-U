@@ -127,4 +127,39 @@ public class Post extends Timestamped {
   public void updateRecruitment(boolean bool) {
         this.recruitment = bool;
     }
+    /**
+     * 연관관계 편의 메소드 - 반대쪽에는 연관관계 편의 메소드가 없도록 주의합니다.
+     */
+    /**
+     * 서비스 메소드 - 외부에서 엔티티를 수정할 메소드를 정의합니다. (단일 책임을 가지도록 주의합니다.)
+     */
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public void setRecruitment(Boolean recruitment) {
+        this.recruitment = recruitment;
+    }
+
+    public void update(PostRequestDto postRequestDto) {
+        if (postRequestDto.getTitle() != null) {
+            this.title = postRequestDto.getTitle();
+        }
+        if (postRequestDto.getContent() != null) {
+            this.content = postRequestDto.getContent();
+        }
+        if (postRequestDto.getPromiseTime() != null) {
+            this.promiseTime = postRequestDto.getPromiseTime();
+        }
+        if (postRequestDto.getPromiseArea() != null) {
+            this.promiseArea = postRequestDto.getPromiseArea();
+        }
+        if (postRequestDto.getMaxnum() != null) {
+            this.maxnum = postRequestDto.getMaxnum();
+        }
+        if (postRequestDto.getCategory() != null) {
+            this.category = postRequestDto.getCategory();
+        }
+    }
+
 }
