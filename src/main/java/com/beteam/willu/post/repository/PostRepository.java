@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByOrderByCreatedAtDesc();
+    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     // 제목으로 검색
     Page<Post> findByTitleContaining(String keyword, Pageable pageable);

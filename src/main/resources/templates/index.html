@@ -139,6 +139,25 @@
             </table>
         </div>
 
+        <!--        추가한 내용-->
+        <nav aria-label="Page navigation example">
+            <ul class="pagination" id="pagination">
+                <li class="page-item" id="page-item1">
+                    <!--                    <a class="page-link" href="#" aria-label="Previous">-->
+                    <!--                        <span aria-hidden="true">&laquo;</span>-->
+                    <!--                    </a>-->
+                </li>
+
+                <!--                노드 들어갈곳-->
+
+                <li class="page-item" id="page-item2">
+                    <!--                    <a class="page-link" href="#" aria-label="Next">-->
+                    <!--                        <span aria-hidden="true">&raquo;</span>-->
+                    <!--                    </a>-->
+                </li>
+            </ul>
+        </nav>
+
         <div class="nav-list">
             <form id="searchForm">
                 <select id="criteria">
@@ -168,49 +187,171 @@
             <li>기타</li>
         </ul>
     </div>
+
 </div>
 </body>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
-        // 게시글 필터 조회인데 작동 안됌
-        // $("#searchForm").submit(function (event) {
-        //     event.preventDefault(); // 폼 제출 기본 동작 방지
-        //
-        //     var keyword = $("#keyword").val();
-        //     var criteria = $("#criteria").val();
-        //     var recruitment = $("#recruitment").is(":checked");
-        //
-        //     $.ajax({
-        //         url: "/search/posts",
-        //         type: "GET",
-        //         data: {
-        //             keyword: keyword,
-        //             criteria: criteria,
-        //             recruitment: recruitment
-        //         },
-        //         success: function (response) {
-        //             // 검색 결과를 화면에 표시
-        //             var postsContainer = $('#posts');
-        //             postsContainer.empty(); // 이전 결과 삭제
-        //             response.content.forEach(function (post) {
-        //                 var postLink = '<a href="/posts/' + post.id + '">' + post.title + '</a>';
-        //                 var postDiv = '<div>' + postLink + '</div>';
-        //                 postsContainer.append(postDiv);
-        //             });
-        //         },
-        //         error: function (xhr, status, error) {
-        //             // window.location.href = "/";
-        //         }
-        //     });
-        // });
+        // 게시글 필터 조회
+        $("#searchForm").submit(function (event) {
+            event.preventDefault(); // 폼 제출 기본 동작 방지
+
+            var keyword = $("#keyword").val();
+            var criteria = $("#criteria").val();
+            var recruitment = $("#recruitment").is(":checked");
+
+            $.ajax({
+                url: "/api/search/posts",
+                type: "GET",
+                data: {
+                    keyword: keyword,
+                    criteria: criteria,
+                    recruitment: recruitment
+                },
+                success: function (response) {
+                    // 검색 결과를 화면에 표시
+                    var tableBody = $('.table tbody');
+                    tableBody.empty();
+
+                    response.content.forEach(function (post) {
+
+                        console.log(post);
+
+                        $.ajax({    //게시글 전체 조회
+                            url: `/api/chat/chatRooms/${post.id}/users`,
+                            type: 'GET',
+                            contentType: 'application/json',
+                            success: function (response) {
+                                var newRow = $('<tr>'); // 새로운 행 생성
+                                var idCell = $('<th scope="row">').text(post.id);
+                                var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
+
+                                var maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
+                                // recruitment 값을 긍정 또는 부정으로 변환
+                                var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
+                                var recruitmentCell = $('<td>').text(recruitmentText);
+                                // 행에 셀들을 추가
+                                newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+                                tableBody.append(newRow);
+                            },
+                            error: function (xhr, status, error) {
+                                alert("채팅방 유저 정보 불러오기 실패")
+                                // window.location.href = "/view/users/user-login";
+                            }
+                        });
+
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert("검색 실패")
+                    // window.location.href = "/";
+                }
+            });
+        });
 
         $.ajax({    //게시글 전체 조회
-            url: '/api/posts',
+            url: `/api/posts?page=0&size=10`,
             type: 'GET',
             contentType: 'application/json',
             success: function (response) {
+
+                nodeCreate(response.totalPages, response.number, response.first, response.last);
+
+                console.log("postResponce값 :", response);
+                var tableBody = $('.table tbody');
+                tableBody.empty();
+
+                response.content.forEach(function (post) {//게시글 불러오기
+
+                    $.ajax({    //게시글 전체 조회
+                        url: `/api/chat/chatRooms/${post.id}/users`,
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (response) {
+                            var newRow = $('<tr>'); // 새로운 행 생성
+                            var idCell = $('<th scope="row">').text(post.id);
+                            var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
+
+                            var maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
+
+                            // recruitment 값을 긍정 또는 부정으로 변환
+                            var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
+                            var recruitmentCell = $('<td>').text(recruitmentText);
+                            // 행에 셀들을 추가
+                            newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+                            tableBody.append(newRow);
+
+                        },
+                        error: function (xhr, status, error) {
+                            alert("채팅방 유저 정보 불러오기 실패")
+                            // window.location.href = "/view/users/user-login";
+                        }
+                    });
+                });
+            },
+            error: function (xhr, status, error) {
+                // window.location.href = "/view/users/user-login";
+            }
+        });
+
+    });
+    document.getElementById("createPostButton").addEventListener("click", function () {
+        window.location.href = "/post/create";
+    });
+
+    function nodeCreate(totalPages, number, first, last) {
+
+        if (number == 0) {
+            // 첫페이지 일때
+            $(`
+                <a class="page-link" onclick="chPost(${0})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            `).prependTo(`#page-item1`);
+
+            $(`
+                    <a class="page-link" onclick="chPost(${1})" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+            `).prependTo(`#page-item2`);
+
+        } else {
+            $(`
+                <a class="page-link" onclick="chPost(${number - 1})" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            `).prependTo(`#page-item1`);
+
+            $(`
+                    <a class="page-link" onclick="chPost(${number + 1})" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+            `).prependTo(`#page-item2`);
+        }
+
+
+        for (var i = 0; i < totalPages; i++) {
+            $(`<li class="page-item" id="pages"><a class="page-link" onclick="chPost(${i})">${i + 1}</a></li>`).insertBefore(`#page-item2`);
+        }
+
+
+    }
+
+    function chPost(i) {
+        $.ajax({    //게시글 전체 조회
+            url: `/api/posts?page=${i}&size=10`,
+            type: 'GET',
+            contentType: 'application/json',
+            success: function (response) {
+                $('#page-item1').empty();
+                $('#page-item2').empty();
+                $('#pagination').find($(`li[id^='pages']`)).remove();
+
+                nodeCreate(response.totalPages, response.number);
+
+
                 console.log("postResponce값 :", response);
                 var tableBody = $('.table tbody');
                 tableBody.empty();
@@ -221,8 +362,6 @@
                     var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
 
                     var maxnumCell = $('<td>').text(post.maxnum);
-                    // var nownumCell = $('<td>').text(chatRoom.getUserChatRoomList().size());
-                    // var numCell = nownumCell + "/" + maxnumCell;
 
                     // recruitment 값을 긍정 또는 부정으로 변환
                     var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
@@ -238,9 +377,6 @@
             }
         });
 
-    });
-    document.getElementById("createPostButton").addEventListener("click", function () {
-        window.location.href = "/post/create";
-    });
+    }
 </script>
 </html>

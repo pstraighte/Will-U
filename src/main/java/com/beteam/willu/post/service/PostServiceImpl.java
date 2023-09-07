@@ -57,7 +57,9 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional(readOnly = true)
     public Page<PostResponseDto> getPosts(Pageable pageable) {
-        Page<Post> posts = postRepository.findAll(pageable);
+        Page<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
+
+//        Page<Post> posts = postRepository.findAll(pageable);
         return posts.map(PostResponseDto::new);
     }
     // @Override
