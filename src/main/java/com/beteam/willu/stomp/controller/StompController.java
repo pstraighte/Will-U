@@ -32,5 +32,4 @@ public class StompController {
         simpMessagingTemplate.convertAndSend("/topic/" + data.get("sender"), data);
         System.out.println("data = " + data);
     }
-
 }
