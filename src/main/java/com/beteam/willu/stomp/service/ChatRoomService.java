@@ -175,6 +175,8 @@ public class ChatRoomService {
 
 	@Transactional
 	public void joinUserChatRoom(ChatroomJoinRequestDto requestDto, User loginUser) {
+		//기존 알림 읽음처리
+
 		Long postId = requestDto.getPostId();
 		Post post = findPost(postId);
 		ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId)

@@ -58,6 +58,7 @@ eventSource.onmessage = e => {
         const postId = jsonData.postId;
         console.log("ntId: " + ntId);
         console.log("publisherId: " + publisherId);
+        console.log("receiverId: " + receiverId);
         console.log("postId: " + postId);
         showNotification(content, nt, title, ntId);
         addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, postId);
@@ -206,12 +207,13 @@ function read(ntId) {
     });
 }
 
-await function reject(ntId, postId, publisherId) {
+function reject(ntId, postId, publisherId) {
     if (confirm("참가 요청을 거부하시겠습니까?")) {
         console.log("거부했습니다.");
         //거절 알림 전송
         sendReject(ntId, postId, publisherId);
-        read(ntId); //읽기를 거절 알림 보내기에 추가
+        //read(ntId); //읽기를 거절 알림 보내기에 추가
+        removeNotificationHTML(ntId);
         //거절 알림 전송
         //window.location.reload();
     } else {
@@ -219,12 +221,13 @@ await function reject(ntId, postId, publisherId) {
     }
 }
 
-await function approve(ntId, postId, publisherId) {
+function approve(ntId, postId, publisherId) {
     if (confirm("참가 요청을 승인하시겠습니까?")) {
         console.log("승인했습니다.");
 
         sendApprove(ntId, postId, publisherId);
-        read(ntId);
+        // read(ntId);
+        removeNotificationHTML(ntId);
     } else {
         window.focus();
     }
@@ -279,12 +282,13 @@ function removeNotificationHTML(ntId) {
 }
 
 function sendReject(ntId, postId, publisherId) {
-
     const data = {
         "postId": postId,
         "type": "REJECT_REQUEST",
-        "receiverId": publisherId
+        "receiverId": publisherId,
+        "notificationId": ntId
     };
+    console.log(ntId);
     //헤더에 토큰
     $.ajax({
         url: `/api/notifications`, // 요청을 보낼 서버의 URL
@@ -306,8 +310,10 @@ function sendApprove(ntId, postId, publisherId) {
     console.log("승인 전송");
     const data = {
         "postId": postId,
-        "userId": publisherId
+        "userId": publisherId,
+        "notificationId": ntId
     };
+    console.log(ntId);
     //승인 알림 전송
     $.ajax({
         url: `/api/chatRoom/join`, // 요청을 보낼 서버의 URL
