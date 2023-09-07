@@ -63,6 +63,7 @@ public class WebSecurityConfig {
 				.requestMatchers("/login").permitAll()
 				.requestMatchers("/api/users/**").permitAll() // "/api/user/" 로 시작하는 요청 모두 접근 허가
 				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll() //update post view 허용되는 문제 있음
+				.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
 				.anyRequest().authenticated()
 		);

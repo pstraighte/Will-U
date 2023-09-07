@@ -60,22 +60,8 @@ public class PostServiceImpl implements PostService {
 	@Transactional(readOnly = true)
 	public Page<PostResponseDto> getPosts(Pageable pageable) {
 		Page<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
-
-		//        Page<Post> posts = postRepository.findAll(pageable);
 		return posts.map(PostResponseDto::new);
 	}
-	// @Override
-	// public List<PostResponseDto> getPosts() {
-	// 	return postRepository.findAllByOrderByCreatedAtDesc()
-	// 		.stream()
-	// 		.map(PostResponseDto::new)
-	// 		.toList();
-	// }
-	//    @Override
-	//    public Page<PostResponseDto> getPosts(Pageable pageable) {
-	//        Page<Post> posts = postRepository.findAll(pageable);
-	//        return posts.map(post -> new PostResponseDto(post));
-	//    }
 
 	// 게시글 상세 조회
 
