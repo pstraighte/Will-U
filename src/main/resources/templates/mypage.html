@@ -70,7 +70,7 @@
         const profileButton = document.getElementById("profile-button");
         profileButton.addEventListener("click", () => {
             // 프로필 페이지로 이동
-            window.location.href = `http://localhost:8080/users/profile/${userId}`;
+            window.location.href = `/profile/${userId}`;
         });
 
         const cancelMembershipButton = document.getElementById("cancel-membership-button");
@@ -107,7 +107,7 @@
                         deleteJwtCookie();
                         deleteRefreshTokenCookie();
                         alert("회원 탈퇴되었습니다.");
-                        window.location.href = "http://localhost:8080/view/users/user-login";
+                        window.location.href = "/login";
                     } else {
                         // 회원 탈퇴 실패 시 처리할 로직
                         alert("회원 탈퇴에 실패했습니다.");
@@ -136,7 +136,7 @@
         interestUsers.forEach(user => {
             user.addEventListener('click', function (event) {
                 const userId = event.target.getAttribute('data-user-id');
-                window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+                window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
             });
         });
 
@@ -145,7 +145,7 @@
         blacklistUsers.forEach(user => {
             user.addEventListener('click', function (event) {
                 const userId = event.target.getAttribute('data-user-id');
-                window.location.href = `/users/profile/${userId}`; // 적절한 URL로 변경해야 함
+                window.location.href = `/profile/${userId}`; // 적절한 URL로 변경해야 함
             });
         });
         document.addEventListener("DOMContentLoaded", function () {

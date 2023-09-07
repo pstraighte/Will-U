@@ -21,9 +21,8 @@ public class PostResponseDto extends ApiResponseDto {
 	private final LocalDateTime modifiedAt;
 	private final Long maxnum;
 	private final String category;
-	private final boolean recruitment;
 	private final Double score;
-	private Boolean recruitment = true;
+	private Boolean recruitment;
 
 	public PostResponseDto(Post post) {
 		this.id = post.getId();

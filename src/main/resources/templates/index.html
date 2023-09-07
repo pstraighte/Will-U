@@ -6,18 +6,6 @@
     <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
     <title>willu</title>
     <style>
-        header {
-            display: flex; /* 요소들을 가로로 배치하기 위한 설정 */
-            flex-direction: row; /* 가로로 배치 (기본값은 row이므로 생략 가능) */
-            align-items: center; /* 요소들을 수직 가운데 정렬 */
-            justify-content: center;
-        }
-
-        .logo {
-            width: 200px;
-            height: auto;
-        }
-
         #createPostButton {
             background-color: #FF731D;
             color: #fff; /* 버튼 텍스트 색상 (예: 흰색) */
@@ -96,14 +84,10 @@
 </head>
 
 <body>
+<div id="headerDiv" th:insert="~{fragments/sidebar::header}"></div>
 <div id="sideBarDiv" th:insert="~{fragments/sidebar::sidebarFragment}"></div>
-<header>
-    <img class="logo" src="/images/logo.png">
-</header>
-
 <div class="postbox">
     <div id="posts">
-        <link rel="stylesheet" type="text/css" th:href="@{/bootstrap.min.css}">
         <div class="container my-3">
             <table class="table caption-top">
                 <thead>
@@ -174,8 +158,6 @@
 
 </div>
 </body>
-
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {
         // 게시글 필터 조회
@@ -221,11 +203,10 @@
                                 tableBody.append(newRow);
                             },
                             error: function (xhr, status, error) {
-                                alert("채팅방 유저 정보 불러오기 실패")
+                                //alert("채팅방 유저 정보 불러오기 실패")
                                 // window.location.href = "/view/users/user-login";
                             }
                         });
-
                     });
                 },
                 error: function (xhr, status, error) {

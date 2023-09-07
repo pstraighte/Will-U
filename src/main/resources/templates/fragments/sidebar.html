@@ -27,15 +27,9 @@
 </head>
 <body>
 <div class="headerTop" th:fragment="header">
-    <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-            <a id="headerTopText" class="navbar-brand" href="/">
-                <img id="logoIcon" src="/images/LOGO.png" alt="Logo" width="90" height="72"
-                     class="d-inline-block align-text-top">
-                할래?
-            </a>
-        </div>
-    </nav>
+    <header>
+        <img class="logo" src="/images/logo.png" onclick="window.location.href='/'">
+    </header>
 </div>
 <div th:fragment="sidebarFragment">
     <!--    사이드바 호출 버튼-->

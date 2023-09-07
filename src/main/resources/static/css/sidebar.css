@@ -8,6 +8,18 @@ body {
     height: 100%;
 }
 
+header {
+    display: flex; /* 요소들을 가로로 배치하기 위한 설정 */
+    flex-direction: row; /* 가로로 배치 (기본값은 row이므로 생략 가능) */
+    align-items: center; /* 요소들을 수직 가운데 정렬 */
+    justify-content: center;
+}
+
+.logo {
+    width: 200px;
+    height: auto;
+}
+
 #sidebar {
     width: 0;
     background-color: #333;
