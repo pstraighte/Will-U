@@ -142,8 +142,18 @@
         <label for="content">내용</label>
         <textarea id="content" name="content" required></textarea>
 
-        <label for="category">관심사</label>
-        <input type="text" id="category" name="category">
+        <label for="category">관심분야</label>
+        <select id="category" name="category">
+            <option value="">카테고리 선택</option>
+            <option value="운동">운동</option>
+            <option value="커뮤니케이션">커뮤니케이션</option>
+            <option value="게임">게임</option>
+            <option value="문화생활">문화생활</option>
+            <option value="자기개발">자기개발</option>
+            <option value="동물">동물</option>
+            <option value="맛집투어">맛집투어</option>
+            <option value="기타">기타</option>
+        </select><br>
 
         <label for="promiseTime">약속 시간</label>
         <input type="datetime-local" id="promiseTime" name="promiseTime">

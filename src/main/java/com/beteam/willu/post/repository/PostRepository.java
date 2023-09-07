@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    List<Post> findAllByOrderByCreatedAtDesc();
+    Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
     // 제목으로 검색
     Page<Post> findByTitleContaining(String keyword, Pageable pageable);
@@ -29,7 +29,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 내용으로 검색하고 모집 상태가 true인 게시글만 검색
     Page<Post> findByContentContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
 
-    List<Post> findByUser(User user);
+	// 관심사으로 검색하고 모집 상태가 true인 게시글만 검색
+    Page<Post> findByCategoryContainingAndRecruitmentIsTrue(String keyword, Pageable pageable);
+
+    //관심사로 검색
+    Page<Post> findByCategoryContaining(String keyword, Pageable pageable);
 
     List<Post> findAllByRecruitment(boolean b);
 }
