@@ -175,10 +175,6 @@
 
     function checkWriterAndShowButtons(loginUserName, postUserName, status) {
 
-        /*        let join = document.getElementById('join');
-                let edit = document.querySelector('.login-btn-container');
-                let delete = document.querySelector('.login-btn-container');*/
-
         if (loginUserName === postUserName) {
             $("#join").css("display", "none");
             $("#edit").css("display", "");
@@ -197,8 +193,6 @@
     }
 
     function makeDateFormat(dateTimeString) {
-
-
         // Date 객체로 변환
         let dateTime = new Date(dateTimeString);
 
