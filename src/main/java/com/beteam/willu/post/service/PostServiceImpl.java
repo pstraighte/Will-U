@@ -79,6 +79,11 @@ public class PostServiceImpl implements PostService {
 			throw new RejectedExecutionException("작성자만 수정 가능합니다.");
 		}
 		post.update(postRequestDto);
+		String modifiedTitle = postRequestDto.getTitle();
+		if (modifiedTitle != null) { //제목 수정되면 채팅방 이름 수정
+			ChatRoom chatRoom = chatRoomRepository.findByPostId(id).orElseThrow();
+			chatRoom.updateTitle(modifiedTitle);
+		}
 		return new PostResponseDto(post);
 	}
 
