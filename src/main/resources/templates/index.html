@@ -27,7 +27,7 @@
 
         #posts {
             width: 1100px;
-            height: 600px;
+            height: 650px;
             margin: 20px;
             padding: 20px;
             border: 1px solid #ccc;
@@ -243,15 +243,10 @@
             async: false
         }).then((response) => {
 
-            $('#page-item1').empty();
-            $('#page-item2').empty();
-            $('#page-item3').empty();
-            $('#page-item4').empty();
-            $('#pagination').find($(`li[id^='page-']`)).empty();
+            clearHTML();
 
             nodeCreate(response.totalPages, response.number);
 
-            console.log("postResponse값 :", response);
             var tableBody = $('.table tbody');
             tableBody.empty();
 
@@ -264,7 +259,6 @@
     }
 
     function createPostHTML(post) {
-        console.log("createPost 실행");
         var tableBody = $('.table tbody');
         var newRow = $('<tr>'); // 새로운 행 생성
         var idCell = $('<th scope="row">').text(post.id);
@@ -294,7 +288,6 @@
                 value = post.maxnum;
             }
         });
-        console.log(value);
         return value;
     }
 
@@ -309,12 +302,14 @@
         $.ajax({
             url: "/api/search/posts",
             type: "GET",
+            async: false,
             data: {
                 keyword: keyword,
                 criteria: criteria,
                 recruitment: recruitment
             },
             success: function (response) {
+                clearHTML();
                 // 검색 결과를 화면에 표시
                 var tableBody = $('.table tbody');
                 tableBody.empty();
@@ -325,10 +320,17 @@
                 });
             },
             error: function (xhr, status, error) {
-                alert("검색 실패")
-                // window.location.href = "/";
+                chPost(0);
             }
         });
     });
+
+    function clearHTML() {
+        $('#page-item1').empty();
+        $('#page-item2').empty();
+        $('#page-item3').empty();
+        $('#page-item4').empty();
+        $('#pagination').find($(`li[id^='page-']`)).empty();
+    }
 </script>
 </html>
