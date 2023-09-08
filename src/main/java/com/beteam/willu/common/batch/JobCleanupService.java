@@ -31,7 +31,7 @@ public class JobCleanupService {
 			System.out.println("작업 사이즈: " + jobExecutions.size());
 			for (JobExecution jobExecution : jobExecutions) {
 
-				if (jobExecution.getExitStatus().toString().equals("COMPLETED")) {
+				if (jobExecution.getExitStatus().getExitCode().equals("COMPLETED")) {
 					System.out.println("jobExecution DELETION = " + jobExecution.getEndTime());
 					jobRepository.deleteJobExecution(jobExecution);
 					jobRepository.deleteJobInstance(jobInstance);

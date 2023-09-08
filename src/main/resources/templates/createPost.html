@@ -110,32 +110,40 @@
 
 <script>
     function createPost() {
-        console.log("title:" + $("#title").val(),
-            "content: " + $("#content").val(),
-            "category: " + $("#category").val(),
-            "promiseTime: " + $("#promiseTime").val(),
-            "promiseArea: " + $("#promiseArea").val(),
-            "maxnum:" + $("#maxnum").val());
-        $.ajax({
-            url: `/api/post`, // 컨트롤러 url 작성
-            method: 'POST',
-            contentType: "application/json",
-            data: JSON.stringify({
-                title: $("#title").val(),
-                content: $("#content").val(),
-                category: $("#category").val(),
-                promiseTime: $("#promiseTime").val(),
-                promiseArea: $("#promiseArea").val(),
-                maxnum: $("#maxnum").val()
-            }),
-            success: function (response) {
-                window.location.href = "/";
-            },
-            error: function (xhr, status, error) {
-                alert("글 작성 실패")
-                console.log(xhr);
-            }
-        });
+        let title = $("#title").val();
+        let content = $("#content").val();
+        let category = $("#category").val();
+        let promiseTime = $("#promiseTime").val();
+        let promiseArea = $("#promiseArea").val();
+        let maxnum = $("#maxnum").val();
+        if (title === '' || content === '' || category === '' || promiseTime === '' || promiseArea === '' || maxnum === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: '게시글 등록 실패',
+                text: "게시글 정보를 모두 입력해주세요"
+            });
+        } else {
+            $.ajax({
+                url: `/api/post`, // 컨트롤러 url 작성
+                method: 'POST',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    title: $("#title").val(),
+                    content: $("#content").val(),
+                    category: $("#category").val(),
+                    promiseTime: $("#promiseTime").val(),
+                    promiseArea: $("#promiseArea").val(),
+                    maxnum: $("#maxnum").val()
+                }),
+                success: function (response) {
+                    window.location.href = "/";
+                },
+                error: function (xhr, status, error) {
+                    alert("글 작성 실패")
+                    console.log(xhr);
+                }
+            });
+        }
     }
 
     document.getElementById("back").addEventListener("click", function () {
