@@ -63,4 +63,8 @@ public class ChatRoom extends Timestamped {
 	public void updateActivated(boolean bool) {
 		this.activated = bool;
 	}
+
+	public void updateTitle(String modifiedTitle) {
+		this.chatTitle = modifiedTitle;
+	}
 }
