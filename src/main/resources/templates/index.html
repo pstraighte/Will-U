@@ -94,7 +94,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">제목</th>
-                    <th scope="col">모집상황</th>
+                    <th scope="col">모집인원</th>
                     <th scope="col">모집여부</th>
                 </tr>
                 </thead>
@@ -160,38 +160,7 @@
 </body>
 <script>
     $(document).ready(function () {
-        // 게시글 필터 조회
-        $("#searchForm").submit(function (event) {
-            event.preventDefault(); // 폼 제출 기본 동작 방지
 
-            var keyword = $("#keyword").val();
-            var criteria = $("#criteria").val();
-            var recruitment = $("#recruitment").is(":checked");
-
-            $.ajax({
-                url: "/api/search/posts",
-                type: "GET",
-                data: {
-                    keyword: keyword,
-                    criteria: criteria,
-                    recruitment: recruitment
-                },
-                success: function (response) {
-                    // 검색 결과를 화면에 표시
-                    var tableBody = $('.table tbody');
-                    tableBody.empty();
-                    console.log("검색 response : " + response)
-                    response.content.forEach(function (post) {
-                        console.log(post);
-                        createPostHTML(post);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    alert("검색 실패")
-                    // window.location.href = "/";
-                }
-            });
-        });
         //게시글 전체 조회
         chPost(0);
     });
@@ -270,8 +239,10 @@
         $.ajax({
             url: `/api/posts?page=${i}&size=10`,
             type: 'GET',
-            contentType: 'application/json'
+            contentType: 'application/json',
+            async: false
         }).then((response) => {
+
             $('#page-item1').empty();
             $('#page-item2').empty();
             $('#page-item3').empty();
@@ -282,9 +253,8 @@
 
             console.log("postResponse값 :", response);
             var tableBody = $('.table tbody');
-            if (i !== 0) {
-                tableBody.empty();
-            }
+            tableBody.empty();
+
             response.content.forEach(function (post) {
                 createPostHTML(post);
             });
@@ -294,32 +264,71 @@
     }
 
     function createPostHTML(post) {
+        console.log("createPost 실행");
         var tableBody = $('.table tbody');
         var newRow = $('<tr>'); // 새로운 행 생성
         var idCell = $('<th scope="row">').text(post.id);
         var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
-        var maxnumCell = getChatRoomuserInfo(post);
+        let content = getChatRoomUserInfo(post);
+        var maxnumCell = $('<td>').text(content);
         var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
         var recruitmentCell = $('<td>').text(recruitmentText);
+
         // 행에 셀들을 추가
         newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
         tableBody.append(newRow);
     }
 
     //게시글 현재 인원 조회
-    function getChatRoomuserInfo(post) {
+    function getChatRoomUserInfo(post) {
+        let value;
         $.ajax({
             url: `/api/chat/chatRooms/${post.id}/users`,
             type: 'GET',
-            contentType: 'application/json'
-        }).then((response) => {
-            let maxnumCell = $('<td>').text(response.chatRoomList.length + "/" + post.maxnum);
-            return maxnumCell;
-        }, () => {
-            console.log("현재 인원 조회 실패");
-            let maxnumCell = $('<td>').text(post.maxnum);
-            return maxnumCell;
+            contentType: 'application/json',
+            async: false,
+            success: function (response) {
+                value = response.chatRoomList.length + "/" + post.maxnum;
+            },
+            error: function () {
+                value = post.maxnum;
+            }
         });
+        console.log(value);
+        return value;
     }
+
+    // 게시글 필터 조회
+    $("#searchForm").submit(function (event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        var keyword = $("#keyword").val();
+        var criteria = $("#criteria").val();
+        var recruitment = $("#recruitment").is(":checked");
+
+        $.ajax({
+            url: "/api/search/posts",
+            type: "GET",
+            data: {
+                keyword: keyword,
+                criteria: criteria,
+                recruitment: recruitment
+            },
+            success: function (response) {
+                // 검색 결과를 화면에 표시
+                var tableBody = $('.table tbody');
+                tableBody.empty();
+                console.log("검색 response : " + response)
+                response.content.forEach(function (post) {
+                    console.log(post);
+                    createPostHTML(post);
+                });
+            },
+            error: function (xhr, status, error) {
+                alert("검색 실패")
+                // window.location.href = "/";
+            }
+        });
+    });
 </script>
 </html>
