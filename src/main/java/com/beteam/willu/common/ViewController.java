@@ -1,5 +1,7 @@
 package com.beteam.willu.common;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,9 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.review.dto.ReviewSetResponseDto;
+import com.beteam.willu.review.repository.ReviewRepository;
+import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
@@ -41,8 +46,11 @@ public class ViewController {
 	private final PostRepository postRepository;
 	private final UserService userService;
 	private final PostService postService;
+	private final ChatRoomService chatRoomService;
 	private final JwtUtil jwtUtil;
+	private final ReviewRepository reviewRepository;
 
+	//인덱스 페이지 게시글 목록
 	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
@@ -61,14 +69,17 @@ public class ViewController {
 	}
 
 	//게시글 단건 조회
-	@GetMapping("/view/posts/{postId}")
+	@GetMapping("/posts/{postId}")
 	public String detailPost(Model model, @PathVariable Long postId) {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
+
+		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
+		model.addAttribute("currentNum", userCount);
 		return "detailPost";
 	}
 
-	// 보드 수정 페이지
+	// 게시글 수정 페이지
 	@GetMapping("/posts/update/{postId}")
 	public String updatePost(Model model, @PathVariable Long postId) {
 		model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
@@ -101,7 +112,7 @@ public class ViewController {
 		}
 		model.addAttribute("blacklists", blacklistResponseDtos);
 
-		List<PostResponseDto> postResponseDtos = postRepository.findByUser(userDetails.getUser())
+		List<PostResponseDto> postResponseDtos = postRepository.findByUserOrderByCreatedAtDesc(userDetails.getUser())
 			.stream()
 			.map(PostResponseDto::new)
 			.toList();
@@ -110,16 +121,45 @@ public class ViewController {
 		return "mypage";
 	}
 
-	@GetMapping("/users/profile/{id}")
+	@GetMapping("/profile/{id}")
 	public String Profile(Model model, @PathVariable Long id) {
+
 		User user = userService.findUser(id);
 		model.addAttribute("user", user);
+
+		Double score = user.getScore();
+
+		BigDecimal bd = new BigDecimal(score);
+
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+
+		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+			// 소수 부분이 0일 경우 정수 부분만 사용
+			Integer userScore = bd.intValue();
+			model.addAttribute("userScore", userScore);
+		} else {
+			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+			Double userScore = bd.doubleValue();
+			model.addAttribute("userScore", userScore);
+		}
+
+		List<ReviewSetResponseDto> receiveReviewResponseDtos = reviewRepository.findByReceiverId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("receiveReviews", receiveReviewResponseDtos);
+
+		List<ReviewSetResponseDto> sendReviewResponseDtos = reviewRepository.findBySenderId(id)
+			.stream()
+			.map(ReviewSetResponseDto::new)
+			.toList();
+		model.addAttribute("sendReviews", sendReviewResponseDtos);
 
 		return "profile";
 	}
 
 	// 로그인 페이지
-	@GetMapping("/view/users/user-login")
+	@GetMapping("/login")
 	public String getLoginPage(HttpServletResponse response) {
 		jwtUtil.expireCookie(response, "Authorization");
 		jwtUtil.expireCookie(response, "RT");

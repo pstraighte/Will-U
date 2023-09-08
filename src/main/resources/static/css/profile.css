@@ -1,49 +1,126 @@
-/*사이드바*/
-#sidebar {
-    width: 0;
-    background-color: #333;
-    color: gray;
-    height: 100vh;
-    position: fixed;
-    transition: 0.5s;
-    overflow: hidden;
+/* 공통 스타일 */
+body {
+    background-color: #FFF7E9;
 }
 
-#openBtn {
-    position: absolute;
-    top: 20px;
-    left: 10px;
-    cursor: pointer;
+/* 프로필 이미지 스타일 */
+.profile-image {
+    float: left; /* 이미지를 왼쪽으로 띄웁니다. */
+    margin-right: 10px; /* 이미지와 닉네임/점수 사이의 간격을 조절합니다. */
 }
 
-/*아코디언 스타일 메뉴바*/
-.accordion {
-    width: 300px;
-    margin: 20px auto;
+/* 닉네임 및 점수 스타일 */
+.nickname {
+    font-size: 18px; /* 닉네임의 글꼴 크기를 조절합니다. */
+    font-weight: bold; /* 글꼴을 굵게 설정합니다. */
+    margin-bottom: 5px; /* 닉네임과 점수 사이의 간격을 조절합니다. */
 }
 
-.accordion-item {
-    border: 1px solid #ccc;
-    margin-bottom: 5px;
+.score {
+    font-size: 16px; /* 점수의 글꼴 크기를 조절합니다. */
 }
 
-.accordion-header {
-    padding: 10px;
-    background-color: #f0f0f0;
-    cursor: pointer;
-}
-
-.accordion-content {
-    padding: 10px;
-    display: none;
-}
-
-a {
-    text-decoration: none;
+/* 탭 버튼 스타일 */
+.nav-tabs .nav-link {
+    margin-top: 10px;
     color: #333;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px 5px 0 0;
+    margin-right: 2px;
 }
 
-#sideBarDiv {
-    width: 200px;
-    height: 100%;
+.nav-tabs .nav-link.active {
+    background-color: #fff; /* 활성화된 탭의 배경색 */
+    border-color: #ccc #ccc #fff; /* 활성화된 탭의 테두리 색상 */
+}
+
+.tab-content {
+    margin-top: 10px;
+}
+
+/* 후기 목록 스타일 */
+.review-list {
+    list-style: none;
+    padding: 0;
+}
+
+.review-list li {
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #f0f0f0;
+}
+
+.review {
+    color: #333;
+    font-size: 16px;
+}
+
+/* 새로 추가한 스타일 */
+.review-content {
+    display: block; /* 내용은 블록 요소로 표시 */
+    font-weight: bold; /* 내용을 굵게 표시 */
+    margin-bottom: 5px; /* 내용 아래 여백 추가 */
+}
+
+.review-details {
+    font-size: 14px; /* 평점과 작성자/받은 유저 정보의 글자 크기 조절 */
+    color: #777; /* 평점과 작성자/받은 유저 정보의 색상 설정 */
+}
+
+.review-score {
+    margin-right: 10px; /* 평점과 받은 유저 정보 사이 여백 추가 */
+}
+
+.review-receiver {
+    font-style: italic; /* 받은 유저 정보를 이탤릭체로 표시 */
+}
+
+
+/* 마우스 오버시 스타일 */
+.review-list li:hover {
+    background-color: #fff;
+}
+
+/* 작성자 이름을 마우스 오버(호버)할 때 스타일 변경 */
+.review:hover {
+    color: #5F9DF7; /* 호버 시 글자색 변경 */
+    text-decoration: underline; /* 호버 시 밑줄 추가 */
+    cursor: pointer;
+}
+
+.profile-container {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    border-radius: 5px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* 프로필 수정 버튼 스타일 */
+.edit-button {
+    text-align: right; /* 오른쪽 정렬 */
+    margin-top: -30px; /* 버튼을 프로필 이미지 위에 겹치도록 설정 */
+}
+
+.edit-button button {
+    border: none;
+    border-radius: 5px 5px 5px 5px; /* 버튼을 동그랗게 만듭니다. */
+    background-color: #5F9DF7; /* 배경색 설정 */
+    color: white; /* 글자색 설정 */
+    padding: 10px 20px; /* 버튼 내부 여백 설정 */
+    cursor: pointer;
+}
+
+.edit-button button:hover {
+    background-color: #007bff; /* 호버 시 배경색 변경 */
+}
+
+/* 레이블 스타일 */
+.label {
+    font-weight: bold;
+    margin-left: 5px;
 }

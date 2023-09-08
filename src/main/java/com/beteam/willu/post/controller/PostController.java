@@ -42,12 +42,6 @@ public class PostController {
 		return ResponseEntity.status(201).body(post);
 	}
 
-	// 게시글 전체 조회
-	// @GetMapping("/posts")
-	// public ResponseEntity<List<PostResponseDto>> getPosts() {
-	// 	List<PostResponseDto> result = postService.getPosts();
-	// 	return ResponseEntity.ok().body(result);
-	// }
 	@GetMapping("/posts")
 	public ResponseEntity<Page<PostResponseDto>> getPosts(
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
@@ -57,19 +51,14 @@ public class PostController {
 		Page<PostResponseDto> posts = postService.getPosts(pageable);
 		return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
 	}
-	//    @GetMapping("/posts")
-	//    public String getPosts(Pageable pageable, Model model) {
-	//        Page<PostResponseDto> postPage = postService.getPosts(pageable);
-	//        model.addAttribute("postPage", postPage);
-	//        return null; // 게시글 목록 view 이름 (html)
-	//    }
 
 	// 게시글 상세 조회
 	@GetMapping("/posts/{id}")
 	public PostResponseDto getPost(@PathVariable Long id) {
 		return postService.getPost(id);
 	}
-	
+
+	//
 	//게시글 수정
 	@PutMapping("/posts/{id}")
 	public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto,
@@ -131,12 +120,14 @@ public class PostController {
 		@RequestParam(value = "size", defaultValue = "10") int size, // 페이지당 항목 수 파라미터 (기본값: 10)
 		@RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment // 모집중인 게시글만 검색할 것인가?
 	) {
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
 		if (keyword.length() < 2) {
 			// 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
+			if (keyword.isEmpty()) {
+				return ResponseEntity.ok().body(postService.getPosts(pageable));
+			}
 			return ResponseEntity.badRequest().build();
 		}
-
-		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
 		Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
 			pageable); // 서비스를 통해 검색 실행
 		return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환

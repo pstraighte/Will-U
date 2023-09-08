@@ -1,4 +1,25 @@
-/*사이드바*/
+@import url('https://fonts.googleapis.com/css2?family=East+Sea+Dokdo&family=Gamja+Flower&family=Nanum+Brush+Script&display=swap&family=Noto+Sans+KR:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+body {
+    font-family: 'Noto Sans KR', sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+}
+
+header {
+    display: flex; /* 요소들을 가로로 배치하기 위한 설정 */
+    flex-direction: row; /* 가로로 배치 (기본값은 row이므로 생략 가능) */
+    align-items: center; /* 요소들을 수직 가운데 정렬 */
+    justify-content: center;
+}
+
+.logo {
+    width: 200px;
+    height: auto;
+}
+
 #sidebar {
     width: 0;
     background-color: #333;
@@ -7,6 +28,27 @@
     position: fixed;
     transition: 0.5s;
     overflow: hidden;
+}
+
+.headerTop {
+    width: 100%;
+    min-height: 100px;
+    height: auto;
+    border-radius: 15px;
+    margin: auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#headerTopText {
+    width: 100%;
+    height: 85px;
+    font-size: 3.5rem;
+    font-family: 'Nanum Brush Script', cursive;
+}
+
+
+body {
+    color: black;
 }
 
 #openBtn {
@@ -37,21 +79,64 @@
 }
 
 .accordion-header {
-    padding: 10px;
     background-color: #f0f0f0;
     cursor: pointer;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 1.6em;
+    color: black;
+    border-radius: 3px;
 }
 
 .accordion-content {
-    padding: 10px;
     display: none;
+    min-height: 30px;
+    white-space: nowrap; /* 텍스트가 한 줄에 표시되도록 설정 */
+    overflow: hidden; /* 넘치는 텍스트를 숨김 */
+    text-overflow: ellipsis; /* 텍스트가 넘치면 말줄임표 표시 */
+}
+
+.accordion-header2 {
+    background-color: #f0f0f0;
+    cursor: pointer;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    font-size: 1.6em;
+    color: black;
+    border-radius: 3px;
+}
+
+.accordion-content2 {
+    display: none;
+    min-height: 30px;
 }
 
 .profile-btn-container, .login-btn-container {
     display: none;
 }
 
+.profile-btn-container {
+    width: 100%;
+    height: 30px;
+    padding-left: 15px;
+}
+
 .login-btn-container a {
     text-decoration: none;
     color: gray;
+}
+
+#loginSignupBtn {
+    width: 100%;
+    height: 38px;
+    border-radius: 10px;
+    background-color: #5F9DF7;
+
+}
+
+#logo {
+    width: 100%;
+    height: 110px;
 }

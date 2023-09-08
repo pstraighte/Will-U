@@ -1,6 +1,7 @@
 function googleLogin() {
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-os264ffg5u5a27545p76e535cuhf1v0u.apps.googleusercontent.com&redirect_uri=http://43.201.154.114:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-rr40njqgkvh758r32q783es0oflajmh2.apps.googleusercontent.com&redirect_uri=http://localhost:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
 }
+
 
 function kakaoLogin() {
     window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=http://43.201.154.114:8080/api/users/kakao/callback&response_type=code'
@@ -133,7 +134,7 @@ function signup() {
                 icon: 'success',
                 title: '회원가입 성공'
             }).then(() => {
-                window.location.href = "/view/users/user-login";
+                window.location.href = "/login";
             });
 
         },

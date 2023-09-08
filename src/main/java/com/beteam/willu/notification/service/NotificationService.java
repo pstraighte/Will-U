@@ -27,31 +27,32 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class NotificationService {
-	private static final Long DEFAULT_TIMEOUT = 60 * 60L * 1000; //테스트를 위해
+	private static final Long DEFAULT_TIMEOUT = 30 * 60L * 1000; //테스트를 위해
 	private final EmitterRepository emitterRepository;
 	private final NotificationRepository notificationRepository;
 	private final PostRepository postRepository;
 	private final UserRepository userRepository;
 
-	//참가 요청 알림 보내기
-	public void sendRequestNotification(NotificationRequestDto requestDto, User user) {
+	//참가 요청 알림 보내기,거절알림 보내기
+	public void sendRequestNotification(NotificationRequestDto requestDto, User loginUser) {
 		Long postId = requestDto.getPostId();
 		Post post = postRepository.findById(postId).orElseThrow();
 		String type = requestDto.getType().getDescription();
 		switch (type) {
 			case "참가 신청" -> {
 				log.info("참가 신청 알림");
-				send(user, post.getUser(), requestDto.getType(),
-					user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 요청했습니다", "참가 요청 알림", postId);
+				send(loginUser, post.getUser(), requestDto.getType(),
+					loginUser.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 요청했습니다", "참가 요청 알림", postId);
+
 			}
 			case "참가 거절" -> {
 				log.info("참가 거절 알림");
 				User receiver = userRepository.findById(requestDto.getReceiverId()).orElseThrow();
-				if (!Objects.equals(post.getUser().getId(), user.getId())) {
+				if (!Objects.equals(post.getUser().getId(), loginUser.getId())) {
 					throw new IllegalArgumentException("게시글 작성자가 아닙니다. 알림을 보낼 수 없습니다.");
 				}
-				send(user, receiver, requestDto.getType(),
-					user.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 거절했습니다", "요청 거절 알림", postId);
+				send(loginUser, receiver, requestDto.getType(),
+					loginUser.getNickname() + " 님이 " + post.getTitle() + " 게시글 참가를 거절했습니다", "요청 거절 알림", postId);
 			}
 		}
 
@@ -110,25 +111,37 @@ public class NotificationService {
 			log.info("eventCache 저장 key: " + eventId + " notification: " + notification);
 			emitterRepository.saveEventCache(eventId, notification);
 		}
-
 	}
 
 	private Notification createNotification(User publisher, User receiver, NotificationType notificationType,
-		String content,
-		String title, Long postId) {
-		return Notification.builder()
-			.receiver(receiver)
-			.publisher(publisher)
-			.notificationType(notificationType)
-			.content(content)
-			.title(title)
-			.isRead(false)
-			.postId(postId)
-			.build();
+		String content, String title, Long postId) {
+		Notification notification;
+		if (Objects.equals(notificationType, NotificationType.JOIN_REQUEST)) {
+			notification = Notification.builder()
+				.receiver(receiver)
+				.publisher(publisher)
+				.notificationType(notificationType)
+				.content(content)
+				.title(title)
+				.postId(postId)
+				.isRead(false)
+				.build();
+		} else {
+			notification = Notification.builder()
+				.receiver(receiver)
+				.publisher(publisher)
+				.notificationType(notificationType)
+				.content(content)
+				.title(title)
+				.postId(postId)
+				.isRead(true)
+				.build();
+		}
+		return notification;
 	}
 
 	private boolean hasLostData(String lastEventId) {
-		return !lastEventId.isEmpty();
+		return !(lastEventId.endsWith("null") || lastEventId.isEmpty());
 	}
 
 	private void sendLostData(String lastEventId, Long userId, String emitterId, SseEmitter emitter) {
