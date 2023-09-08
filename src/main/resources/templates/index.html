@@ -160,15 +160,21 @@
 </body>
 <script>
     $(document).ready(function () {
-
         //게시글 전체 조회
         chPost(0);
     });
+    // 게시글 필터 조회
+    $("#searchForm").submit(function (event) {
+        event.preventDefault(); // 폼 제출 기본 동작 방지
+
+        getPostsInAllWay(0);
+    });
+
     document.getElementById("createPostButton").addEventListener("click", function () {
         window.location.href = "/post/create";
     });
 
-    function nodeCreate(totalPages, number) {
+    function nodeCreateAll(totalPages, number) {
 
         if (number === 0) {
             // 첫페이지 일때
@@ -183,6 +189,19 @@
                         <span aria-hidden="true">▶</span>
                     </a>
             `).prependTo(`#page-item3`);
+
+        } else if (number === totalPages - 1) {
+            $(`
+                <a class="page-link" onclick="chPost(${number - 1})" aria-label="Previous">
+                    <span aria-hidden="true">◀</span>
+                </a>
+            `).prependTo(`#page-item2`);
+
+            $(`
+                <a class="page-link" onclick="chPost(${0})" aria-label="First">
+                    <span aria-hidden="true">◀◀</span>
+                </a>
+            `).prependTo(`#page-item1`);
 
         } else if (number === totalPages - 1) {
             $(`
@@ -235,6 +254,74 @@
         }
     }
 
+    function nodeCreate(totalPages, number) {
+        //clearHTML()
+        if (number === 0) {
+            // 첫페이지 일때
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${totalPages - 1})" aria-label="Last">
+                    <span aria-hidden="true">▶▶</span>
+                </a>
+            `).prependTo(`#page-item4`);
+
+            $(`
+                    <a class="page-link" onclick="getPostsInAllWay(${1})" aria-label="Next">
+                        <span aria-hidden="true">▶</span>
+                    </a>
+            `).prependTo(`#page-item3`);
+
+        } else if (number === totalPages - 1) {
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${number - 1})" aria-label="Previous">
+                    <span aria-hidden="true">◀</span>
+                </a>
+            `).prependTo(`#page-item2`);
+
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${0})" aria-label="First">
+                    <span aria-hidden="true">◀◀</span>
+                </a>
+            `).prependTo(`#page-item1`);
+
+        } else {
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${0})" aria-label="First">
+                    <span aria-hidden="true">◀◀</span>
+                </a>
+            `).prependTo(`#page-item1`);
+
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${number - 1})" aria-label="Previous">
+                    <span aria-hidden="true">◀</span>
+                </a>
+            `).prependTo(`#page-item2`);
+
+            $(`
+                    <a class="page-link" onclick="getPostsInAllWay(${number + 1})" aria-label="Next">
+                        <span aria-hidden="true">▶</span>
+                    </a>
+            `).prependTo(`#page-item3`);
+
+            $(`
+                <a class="page-link" onclick="getPostsInAllWay(${totalPages - 1})" aria-label="Last">
+                    <span aria-hidden="true">▶▶</span>
+                </a>
+            `).prependTo(`#page-item4`);
+        }
+        // 중간 페이지 버튼을 만듭니다.
+        var start = Math.max(0, number - 4);
+        var end = Math.min(totalPages - 1, number + 4);
+
+        for (var i = start; i <= end; i++) {
+            var pageButton = $(`<li class="page-item" id="page-${i}"><a class="page-link" onclick="getPostsInAllWay(${i})">${i + 1}</a></li>`);
+            if (i === number) {
+                pageButton.addClass('active');
+            }
+            pageButton.insertBefore(`#page-item3`);
+        }
+    }
+
+
     function chPost(i) {
         $.ajax({
             url: `/api/posts?page=${i}&size=10`,
@@ -242,10 +329,13 @@
             contentType: 'application/json',
             async: false
         }).then((response) => {
+            $('#page-item1').empty();
+            $('#page-item2').empty();
+            $('#page-item3').empty();
+            $('#page-item4').empty();
+            $('#pagination').find($(`li[id^='page-']`)).empty();
 
-            clearHTML();
-
-            nodeCreate(response.totalPages, response.number);
+            nodeCreateAll(response.totalPages, response.number);
 
             var tableBody = $('.table tbody');
             tableBody.empty();
@@ -291,46 +381,51 @@
         return value;
     }
 
-    // 게시글 필터 조회
-    $("#searchForm").submit(function (event) {
-        event.preventDefault(); // 폼 제출 기본 동작 방지
 
+    function getPostsInAllWay(i) {
         var keyword = $("#keyword").val();
         var criteria = $("#criteria").val();
         var recruitment = $("#recruitment").is(":checked");
+        console.log(keyword, criteria, recruitment);
+        if (keyword !== null || recruitment === true) {
+            $.ajax({
+                url: "/api/search/posts",
+                type: "GET",
+                async: false,
+                data: {
+                    keyword: keyword,
+                    criteria: criteria,
+                    recruitment: recruitment,
+                    page: i,
+                    size: 10
+                },
+                success: function (response) {
+                    $('#page-item1').empty();
+                    $('#page-item2').empty();
+                    $('#page-item3').empty();
+                    $('#page-item4').empty();
+                    $('#pagination').find($(`li[id^='page-']`)).empty();
 
-        $.ajax({
-            url: "/api/search/posts",
-            type: "GET",
-            async: false,
-            data: {
-                keyword: keyword,
-                criteria: criteria,
-                recruitment: recruitment
-            },
-            success: function (response) {
-                clearHTML();
-                // 검색 결과를 화면에 표시
-                var tableBody = $('.table tbody');
-                tableBody.empty();
-                console.log("검색 response : " + response)
-                response.content.forEach(function (post) {
-                    console.log(post);
-                    createPostHTML(post);
-                });
-            },
-            error: function (xhr, status, error) {
-                chPost(0);
-            }
-        });
-    });
+                    //검색용 페이지 버튼이 필요
+                    nodeCreate(response.totalPages, response.number);
+                    //nodeCreateAll(response.totalPages, response.number);
+                    // 검색 결과를 화면에 표시
+                    var tableBody = $('.table tbody');
+                    tableBody.empty();
 
-    function clearHTML() {
-        $('#page-item1').empty();
-        $('#page-item2').empty();
-        $('#page-item3').empty();
-        $('#page-item4').empty();
-        $('#pagination').find($(`li[id^='page-']`)).empty();
+                    response.content.forEach(function (post) {
+                        createPostHTML(post);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    console.log("검색실패");
+                }
+            });
+        } else {
+            chPost(i);
+        }
+
     }
+
 </script>
 </html>

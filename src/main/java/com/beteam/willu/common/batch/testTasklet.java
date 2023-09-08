@@ -38,7 +38,7 @@ public class testTasklet implements Tasklet {
 		jobCleanupService.cleanupOldJobData();
 
 		// 활성화 되어있는 게시글을 가져온다.
-		List<Post> truePostList = postRepository.findAllByRecruitment(true);
+		List<Post> truePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(true);
 
 		// 현재 시간 데이터를 생성
 		LocalDateTime dateTime;
@@ -58,7 +58,7 @@ public class testTasklet implements Tasklet {
 		}
 
 		// 비활성화 되어있는 게시글을 가져온다.
-		List<Post> falsePostList = postRepository.findAllByRecruitment(false);
+		List<Post> falsePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(false);
 
 		// 활성화 되어있는 채팅방을 가져온다.
 		//List<ChatRoom> chatRoomList = chatRoomRepository.findAllByActivated(true);
