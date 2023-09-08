@@ -63,6 +63,10 @@ dependencies {
     // Batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
+    //Spring Doc
+    implementation "org.springdoc:springdoc-openapi-ui:1.6.11"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2"
+
     implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.4.0-b180830.0359'
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.2")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
