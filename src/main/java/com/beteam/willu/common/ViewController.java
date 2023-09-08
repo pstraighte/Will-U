@@ -26,10 +26,9 @@ import com.beteam.willu.interest.repository.InterestRepository;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
-import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.review.dto.ReviewSetResponseDto;
 import com.beteam.willu.review.repository.ReviewRepository;
-
+import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.service.UserService;
 
@@ -113,7 +112,7 @@ public class ViewController {
 		}
 		model.addAttribute("blacklists", blacklistResponseDtos);
 
-		List<PostResponseDto> postResponseDtos = postRepository.findByUser(userDetails.getUser())
+		List<PostResponseDto> postResponseDtos = postRepository.findByUserOrderByCreatedAtDesc(userDetails.getUser())
 			.stream()
 			.map(PostResponseDto::new)
 			.toList();
