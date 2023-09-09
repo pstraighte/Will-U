@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class ReviewController {
     @Parameter(name = "score", required = true, schema = @Schema(type = "Integer"), description = "후기 점수")
     @PostMapping("/review/users/{userId}/chatRooms/{chatRoomId}")
     public void createReview(@PathVariable Long userId, @PathVariable Long chatRoomId,
-                             @RequestBody ReviewRequestDto requestDto,
+                             @Valid @RequestBody ReviewRequestDto requestDto,
                              @AuthenticationPrincipal UserDetailsImpl userDetails) {
         reviewService.createReview(userId, chatRoomId, requestDto, userDetails);
         reviewService.updateUserScore(userId);
@@ -54,7 +55,7 @@ public class ReviewController {
     @Parameter(name = "score", required = true, schema = @Schema(type = "Integer"), description = "후기 점수")
     @PutMapping("/review/users/{userId}/chatRooms/{chatRoomId}")
     public void updateReview(@PathVariable Long userId, @PathVariable Long chatRoomId,
-                             @RequestBody ReviewRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
+                             @Valid @RequestBody ReviewRequestDto requestDto, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         reviewService.updateReview(userId, chatRoomId, requestDto, userDetails);
         reviewService.updateUserScore(userId);
     }

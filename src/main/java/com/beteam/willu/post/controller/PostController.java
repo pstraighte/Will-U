@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,7 +38,7 @@ public class PostController {
     @Parameter(name = "maxnum", required = true, schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
     @Parameter(name = "category", required = true, schema = @Schema(type = "string"), description = "게시글 분류")
     @PostMapping("/post")
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostRequestDto postRequestDto,
+    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto postRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         PostResponseDto post = postService.createPost(postRequestDto, userDetails.getUser());
         return ResponseEntity.status(201).body(post);
@@ -71,7 +72,7 @@ public class PostController {
     @Parameter(name = "maxnum", schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
     @Parameter(name = "category", schema = @Schema(type = "string"), description = "게시글 분류")
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @RequestBody PostRequestDto postRequestDto,
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @Valid @RequestBody PostRequestDto postRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
         PostResponseDto result = postService.updatePost(id, postRequestDto, userDetails.getUsername());
         return ResponseEntity.status((HttpStatus.OK)).body(result);

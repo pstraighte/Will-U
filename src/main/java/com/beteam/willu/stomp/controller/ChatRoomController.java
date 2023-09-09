@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,7 +62,7 @@ public class ChatRoomController {
     @Parameter(name = "roomId", required = true, schema = @Schema(type = "Long"), description = "채팅방 아이디")
     @Parameter(name = "createdAt", required = true, schema = @Schema(type = "LocalDateTime", format = "date"), description = "지역")
     @PostMapping("/chat/chatRooms")
-    public void createRooms(@RequestBody ChatSaveRequestDto chatSaveRequestDto) {
+    public void createRooms(@Valid @RequestBody ChatSaveRequestDto chatSaveRequestDto) {
         chatRoomService.createRooms(chatSaveRequestDto);
     }
 

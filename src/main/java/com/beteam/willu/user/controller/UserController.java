@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class UserController {
     @Parameter(name = "password", required = true, schema = @Schema(type = "String"), description = "사용자 비밀번호")
     @Parameter(name = "email", required = true, schema = @Schema(type = "String", format = "email"), description = "사용자 이메일")
     @PostMapping("/users/signup")
-    public ResponseEntity<ApiResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
+    public ResponseEntity<ApiResponseDto> userSignup(@Valid @RequestBody UserRequestDto requestDto) {
         userService.userSignup(requestDto);
         return ResponseEntity.status(201).body(new ApiResponseDto("회원가입 성공", 201));
     }
@@ -69,7 +70,7 @@ public class UserController {
     @Parameter(name = "nickname", schema = @Schema(type = "String"), description = "사용자 닉네임")
     @Parameter(name = "picture", schema = @Schema(type = "String"), description = "사용자 프로필 사진 정보")
     @PutMapping("/users")
-    public ResponseEntity<UserResponseDto> userUpdate(@RequestBody UserUpdateRequestDto updateRequestDto,
+    public ResponseEntity<UserResponseDto> userUpdate(@Valid @RequestBody UserUpdateRequestDto updateRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl user) {
         return ResponseEntity.ok(userService.userUpdate(updateRequestDto, user));
     }

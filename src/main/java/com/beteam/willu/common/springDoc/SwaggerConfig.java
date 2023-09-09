@@ -23,5 +23,4 @@ public class SwaggerConfig {
                 .description("할래? 웹 서비스 동작에 필요한 API");
     }
 
-
 }
