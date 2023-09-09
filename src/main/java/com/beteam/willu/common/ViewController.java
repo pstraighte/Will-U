@@ -90,6 +90,7 @@ public class ViewController {
 	@GetMapping("/posts/update/{postId}")
 	public String updatePost(Model model, @PathVariable Long postId) {
 		model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
+		model.addAttribute("apiKey", kakaomapApiKey);
 		return "updatePost";
 	}
 
