@@ -32,9 +32,9 @@ public class UserController {
 	private final UserService userService;
 
 	@PostMapping("/users/signup")
-	public ResponseEntity<ApiResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
-		userService.userSignup(requestDto);
-		return ResponseEntity.status(201).body(new ApiResponseDto("회원가입 성공", 201));
+	public ResponseEntity<UserResponseDto> userSignup(@RequestBody UserRequestDto requestDto) {
+		UserResponseDto responseDto = userService.userSignup(requestDto);
+		return ResponseEntity.ok(responseDto);
 	}
 
 	@PostMapping("/users/login")

@@ -31,7 +31,7 @@ public class UserService {
 	private final JwtUtil jwtUtil;
 	private final RedisUtil redisUtil;
 
-	public void userSignup(UserRequestDto requestDto) {
+	public UserResponseDto userSignup(UserRequestDto requestDto) {
 
 		if (userRepository.findByUsername(requestDto.getUsername()).isPresent()) {
 			throw new IllegalArgumentException("해당 유저가 이미 있습니다.");
@@ -58,6 +58,8 @@ public class UserService {
 			.build();
 
 		userRepository.save(user);
+		System.out.println("테스트");
+		return new UserResponseDto(user);
 	}
 
 	@Transactional

@@ -2,18 +2,25 @@ package com.beteam.willu.user.dto;
 
 import com.beteam.willu.user.entity.User;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @NoArgsConstructor
+@Builder
+@ToString
+@AllArgsConstructor
 public class UserResponseDto {
 	private String username;
 	private String nickname;
 	private String phoneNumber;
 	private String area;
 	private String picture;
-	private Double score;
+	@Builder.Default
+	private Double score = 0d;
 
 	public UserResponseDto(User user) {
 		this.username = user.getUsername();

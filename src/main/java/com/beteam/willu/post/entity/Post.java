@@ -19,12 +19,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "posts")
 public class Post extends Timestamped {
 
@@ -41,6 +45,7 @@ public class Post extends Timestamped {
 	@Column(name = "post_content")
 	private String content;
 
+	@Builder.Default
 	private Boolean recruitment = true;
 
 	@Column(name = "post_time")

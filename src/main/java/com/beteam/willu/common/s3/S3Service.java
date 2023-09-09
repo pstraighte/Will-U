@@ -3,6 +3,7 @@ package com.beteam.willu.common.s3;
 import java.io.IOException;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,7 +21,10 @@ public class S3Service {
 
 	private final AmazonS3 s3Client; // AmazonS3 클라이언트 주입
 
-	private static final String BUCKET_NAME = "willu-bucket"; // 생성한 버킷 이름
+	@Value("${s3.bucket}")
+	private String BUCKET_NAME;
+	@Value("${s3.url}")
+	private String BUCKET_URL;
 	private final UserRepository userRepository;
 
 	public S3Service(AmazonS3 s3Client, UserRepository userRepository) {
@@ -44,8 +48,7 @@ public class S3Service {
 
 	@Transactional
 	public void generateImageUrl(String objectKey, User user) {
-		String bucketBaseUrl = "https://willu-bucket.s3.ap-northeast-2.amazonaws.com"; // Replace with your bucket URL
-		user.setPicture(bucketBaseUrl + "/" + objectKey);
+		user.setPicture(BUCKET_URL + "/" + objectKey);
 		userRepository.save(user);
 	}
 }
