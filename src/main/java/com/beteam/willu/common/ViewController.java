@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -50,6 +51,9 @@ public class ViewController {
 	private final JwtUtil jwtUtil;
 	private final ReviewRepository reviewRepository;
 
+	@Value("${kakao.api.key}") // 프로퍼티에서 API 키 읽어옴
+	private String kakaomapApiKey;
+
 	//인덱스 페이지 게시글 목록
 	@GetMapping("/")    //주소 입력값
 	public String postsView(Model model,
@@ -64,7 +68,10 @@ public class ViewController {
 
 	//게시글 작성
 	@GetMapping("/post/create")
-	public String createPost() {
+	public String createPost(Model model) {
+		// 카카오맵 API 키를 모델에 추가
+		model.addAttribute("apiKey", kakaomapApiKey);
+
 		return "createPost";
 	}
 
@@ -83,6 +90,7 @@ public class ViewController {
 	@GetMapping("/posts/update/{postId}")
 	public String updatePost(Model model, @PathVariable Long postId) {
 		model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
+		model.addAttribute("apiKey", kakaomapApiKey);
 		return "updatePost";
 	}
 
