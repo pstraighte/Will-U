@@ -30,12 +30,9 @@ jobs:
         run: chmod +x gradlew
 
       # Gradle Build (test 제외)
+      # gradlew 빌드
       - name: Build with Gradle
-        run: ./gradlew clean
-      - name: Build with Gradle2
-        run: ./gradlew build --exclude-task test
-      - name: Build with Gradle3
-        run: ./gradlew wrapper
+        run: ./gradlew clean build --exclude-task test
 
       # DockerHub 로그인
       - name: DockerHub Login
