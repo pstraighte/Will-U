@@ -71,3 +71,7 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+//jar 파일 하나만 생성->도커 오류 방지용
+jar {
+    enabled = false
+}
