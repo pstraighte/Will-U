@@ -5,9 +5,7 @@ name: Spring Boot & Gradle CI/CD
 on:
   # main 브랜치에 push나 pull request 발생 시
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches: [ "CICD_test" ]
 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
