@@ -31,7 +31,11 @@ jobs:
 
       # Gradle Build (test 제외)
       - name: Build with Gradle
-        run: ./gradlew clean build --exclude-task test
+        run: ./gradlew clean
+      - name: Build with Gradle2
+        run: ./gradlew build --exclude-task test
+      - name: Build with Gradle3
+        run: ./gradlew wrapper
 
       # DockerHub 로그인
       - name: DockerHub Login
