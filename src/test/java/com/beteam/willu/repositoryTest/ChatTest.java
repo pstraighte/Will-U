@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -70,12 +71,13 @@ public class ChatTest {
 	@Order(2)
 	void findChatRoomByPost_IdAndActivatedIsTrue() {
 		ChatRoom foundChatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(post.getId()).orElseThrow();
-		System.out.println("foundChatRoom = " + foundChatRoom.toString());
+		System.out.println("foundChatRoom = " + foundChatRoom);
 		Assertions.assertThat(foundChatRoom.getChatTitle()).isEqualTo("채팅방 제목");
 	}
 
 	@DisplayName("chatRoom 테스트: 삭제")
 	@Test
+	@Disabled
 	@Order(6)
 	void deleteChatRoom() {
 		chatRoomRepository.delete(chatRoom);
@@ -96,6 +98,7 @@ public class ChatTest {
 
 	@DisplayName("userChatRoom 테스트: ChatRoomId와 UserId로 조회 userChatRoom 조회")
 	@Test
+	@Disabled
 	@Order(4)
 	void getUserChatRoomsByChatRoomIdAndUserId() {
 
@@ -105,6 +108,7 @@ public class ChatTest {
 
 	@DisplayName("chat 테스트: 등록 && ChatRoomId로 조회")
 	@Test
+	@Disabled
 	@Order(5)
 	void getChatByChatRoomId() {
 

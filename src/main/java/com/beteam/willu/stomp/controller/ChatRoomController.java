@@ -33,7 +33,7 @@ public class ChatRoomController {
 	// 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
 	@PostMapping("/chat/posts/{id}/creatRoom")
 	public void createRoom(@PathVariable Long id, @AuthenticationPrincipal UserDetailsImpl userDetails) {
-		chatRoomService.createRoom(id, userDetails);
+		chatRoomService.createRoom(id, userDetails.getUser());
 	}
 
 	// 사용자가 속한 채팅방(모두) 불러오기 (확인 완료) (프론트 적용 완료)

@@ -21,7 +21,7 @@ import com.beteam.willu.user.repository.UserRepository;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@DisplayName("Notification Repository Test")
+@DisplayName("Notification Repository Test OK")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 public class NotificationTest {
 	@Autowired
@@ -61,6 +61,26 @@ public class NotificationTest {
 		notificationRepository.save(notification1);
 		Notification notification2 = Notification.builder()
 			.id(2L)
+			.receiver(writer)
+			.publisher(joiner)
+			.notificationType(NotificationType.JOIN_REQUEST)
+			.content("참가신청했습니다.")
+			.title("게시글 참가신청")
+			.isRead(false)
+			.build();
+		notificationRepository.save(notification2);
+		Notification notification3 = Notification.builder()
+			.id(3L)
+			.receiver(writer)
+			.publisher(joiner)
+			.notificationType(NotificationType.JOIN_REQUEST)
+			.content("참가신청했습니다.")
+			.title("게시글 참가신청")
+			.isRead(false)
+			.build();
+		notificationRepository.save(notification3);
+		Notification notification4 = Notification.builder()
+			.id(4L)
 			.receiver(joiner)
 			.publisher(writer)
 			.notificationType(NotificationType.APPROVE_REQUEST)
@@ -69,7 +89,7 @@ public class NotificationTest {
 			.isRead(true)
 			.build();
 
-		notificationRepository.save(notification2);
+		notificationRepository.save(notification4);
 	}
 
 	@DisplayName("Notification 테스트: 알림 Id로 조회")
@@ -77,7 +97,7 @@ public class NotificationTest {
 	@Order(1)
 	void findById() {
 		Assertions.assertEquals("게시글 참가신청", notificationRepository.findById(1L).get().getTitle());
-		Assertions.assertEquals("게시글 참가 승인", notificationRepository.findById(2L).get().getTitle());
+		Assertions.assertEquals("게시글 참가 승인", notificationRepository.findById(4L).get().getTitle());
 	}
 
 	@DisplayName("Notification 테스트: 특정 수신자에게 온 읽지 않은 알림 조회")
@@ -89,7 +109,7 @@ public class NotificationTest {
 		//when
 		List<Notification> list = notificationRepository.findNotificationByReceiver_IdAndIsReadIsFalse(writer.getId());
 		//then
-		Assertions.assertEquals(1, list.size());
+		Assertions.assertEquals(3, list.size());
 	}
 
 }

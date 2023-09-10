@@ -46,7 +46,7 @@ public class ChatRoomService {
 
 	// 게시물이 생성되었을때 채팅룸 생성 (확인 완료)
 
-	public void createRoom(Long id, UserDetailsImpl userDetails) {
+	public void createRoom(Long id, User user) {
 		Post post = findPost(id);
 
 		String chatTitle = post.getTitle();
@@ -60,8 +60,6 @@ public class ChatRoomService {
 		chatRoomRepository.save(chatRoom);
 
 		// UserChatRooms 생성
-
-		User user = userDetails.getUser();
 
 		UserChatRoom userChatRoom = UserChatRoom.builder().user(user).chatRooms(chatRoom).role("ADMIN").build();
 

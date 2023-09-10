@@ -1,6 +1,7 @@
 package com.beteam.willu.common.batch;
 
-import lombok.RequiredArgsConstructor;
+import java.util.Map;
+
 import org.aspectj.util.SoftHashMap;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameter;
@@ -11,33 +12,32 @@ import org.springframework.batch.core.repository.JobExecutionAlreadyRunningExcep
 import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 public class JobScheduler {
-    private final Job job;
-    private final JobLauncher jobLauncher;
+	private final Job job;
+	private final JobLauncher jobLauncher;
 
-    @Scheduled(cron = "0 0/1 * * * *", zone = "Asia/Seoul")
-    public void nine() {
-        this.schedulerRun(this.job);
-    }
+	@Scheduled(cron = "0 0/1 * * * *", zone = "Asia/Seoul")
+	public void nine() {
+		this.schedulerRun(this.job);
+	}
 
-    private void schedulerRun(final Job job) {
-        final Map<String, JobParameter<?>> stringJobParameterMap = new SoftHashMap<>();
-        stringJobParameterMap.put("time", new JobParameter<>(System.currentTimeMillis(), Long.class));
-        final JobParameters jobParameters = new JobParameters(stringJobParameterMap);
-        try {
-            this.jobLauncher.run(job, jobParameters);
-        } catch (
-                JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException |
-                JobParametersInvalidException |
-                JobRestartException e) {
-            e.printStackTrace();
-        }
-    }
+	private void schedulerRun(final Job job) {
+		final Map<String, JobParameter<?>> stringJobParameterMap = new SoftHashMap<>();
+		stringJobParameterMap.put("time", new JobParameter<>(System.currentTimeMillis(), Long.class));
+		final JobParameters jobParameters = new JobParameters(stringJobParameterMap);
+		try {
+			this.jobLauncher.run(job, jobParameters);
+		} catch (
+			JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException |
+			JobParametersInvalidException |
+			JobRestartException e) {
+			e.printStackTrace();
+		}
+	}
 }
 

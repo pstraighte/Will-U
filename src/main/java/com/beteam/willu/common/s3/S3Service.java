@@ -40,7 +40,7 @@ public class S3Service {
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setContentLength(imageFile.getSize());  // 파일 크기 설정
 
-		s3Client.putObject(BUCKET_NAME, objectKey, imageFile.getInputStream(), metadata);  // S3에 이미지 업로드
+		s3Client.putObject("willu-bucket", objectKey, imageFile.getInputStream(), metadata);  // S3에 이미지 업로드
 
 		log.info(objectKey);
 		return objectKey; // 업로드된 이미지의 S3 오브젝트 키를 반환

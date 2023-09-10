@@ -49,8 +49,10 @@ public class PostRepositoryTest {
 			.category("운동")
 			.user(user)
 			.build();
+		postRepository.save(post);
+		Post savedPost = postRepository.findById(post.getId()).get();
 
-		Assertions.assertThat(post.getTitle()).isEqualTo("게시글 제목13131");
+		Assertions.assertThat(savedPost.getTitle()).isEqualTo("게시글 제목13131");
 	}
 
 	@DisplayName("게시글 페이징 조회 테스트")
@@ -58,13 +60,18 @@ public class PostRepositoryTest {
 	@Order(2)
 	public void allByCreatedDateDesc() {
 		Pageable pageable = PageRequest.of(1, 5);
+		initPost();
 		Page<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
 		List<String> getPagingPostsTitle = new ArrayList<>();
-		posts.stream().forEach((post) -> {
+		for (Post post : posts) {
 			getPagingPostsTitle.add(post.getTitle());
-			System.out.println("post.getTitle() = " + post.getTitle());
-		});
-		int i = 5;
+			System.out.println("post.getTitle():" + post.getTitle());
+		}
+		// posts.stream().forEach((post) -> {
+		// 	getPagingPostsTitle.add(post.getTitle());
+		// 	System.out.println("post.getTitle() = " + post.getTitle());
+		// });
+		int i = 16;
 		for (String title : getPagingPostsTitle) {
 			Assertions.assertThat(title).isEqualTo("게시글 제목" + i--);
 		}
@@ -110,6 +117,7 @@ public class PostRepositoryTest {
 
 	private List<Post> initPost() {
 		User writer = user();
+		userRepository.save(writer);
 		List<Post> posts = new ArrayList<>();
 		for (int i = 11; i <= 21; i++) {
 			post = Post.builder()

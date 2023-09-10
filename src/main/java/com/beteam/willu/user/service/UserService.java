@@ -57,8 +57,8 @@ public class UserService {
 			.picture("https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg?w=826")
 			.build();
 
+		System.out.println(password);
 		userRepository.save(user);
-		System.out.println("테스트");
 		return new UserResponseDto(user);
 	}
 
