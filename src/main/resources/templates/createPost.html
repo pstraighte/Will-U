@@ -299,7 +299,7 @@
                     map.panTo(markerPosition);
 
                     // 선택한 장소 정보를 입력 필드에 표시
-                    document.getElementById('promiseArea').value = place.place_name;
+                    document.getElementById('promiseArea').value = place.place_name + '_' + place.address_name;
                     closeModal(); // 모달 창 닫기
 
                     // 클릭한 마커의 정보를 InfoWindow에 표시
