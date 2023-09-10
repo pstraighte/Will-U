@@ -101,6 +101,30 @@
             color: red;
         }
 
+        /* 검색 결과 목록 스타일링 */
+        .location-result {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .location-result:hover {
+            background-color: #e0e0e0;
+        }
+
+        .place-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .address-name {
+            font-size: 14px;
+            color: #555;
+        }
     </style>
 
 </head>
@@ -247,13 +271,13 @@
                 var placeDiv = document.createElement('div');
                 placeDiv.className = 'location-result';
 
-                var leftSpan = document.createElement('span');
-                leftSpan.className = 'place-name';
-                leftSpan.innerText = place.place_name;
+                var leftDiv = document.createElement('div');
+                leftDiv.className = 'place-name';
+                leftDiv.innerText = place.place_name;
 
-                var rightSpan = document.createElement('span');
-                rightSpan.className = 'address-name';
-                rightSpan.innerText = place.address_name;
+                var rightDiv = document.createElement('div');
+                rightDiv.className = 'address-name';
+                rightDiv.innerText = place.address_name;
 
                 // 목록 클릭 시 해당 장소 정보를 입력 필드에 표시
                 placeDiv.addEventListener('click', function () {
@@ -279,14 +303,14 @@
                     closeModal(); // 모달 창 닫기
 
                     // 클릭한 마커의 정보를 InfoWindow에 표시
-                    var content = '<div style="padding:5px;font-size:12px;">' + place.place_name + '<br>' + place.address_name + '</div>';
+                    var content = '<div style="padding:5px;font-size:12px;">' + place.place_name + '<br>' + place.address_name + '<br>' + '</div>';
                     infowindow.setContent(content);
                     infowindow.open(map, currentMarker);
                 });
 
                 // 왼쪽과 오른쪽 엘리먼트를 부모에 추가
-                placeDiv.appendChild(leftSpan);
-                placeDiv.appendChild(rightSpan);
+                placeDiv.appendChild(leftDiv);
+                placeDiv.appendChild(rightDiv);
 
                 resultsDiv.appendChild(placeDiv);
             });
