@@ -30,6 +30,8 @@ public class BlacklistController {
 			blacklistService.addBlacklist(id, userDetails.getUser());
 		} catch (DuplicateRequestException e) {
 			return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+		} catch (IllegalArgumentException b) {
+			return ResponseEntity.badRequest().body(new ApiResponseDto("자신을 차단 할 수 없습니다.", 400));
 		}
 		return ResponseEntity.status(HttpStatus.ACCEPTED)
 			.body(new ApiResponseDto("해당 유저를 차단했습니다", HttpStatus.ACCEPTED.value()));

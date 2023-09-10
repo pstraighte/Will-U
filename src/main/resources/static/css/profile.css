@@ -124,3 +124,32 @@ body {
     font-weight: bold;
     margin-left: 5px;
 }
+
+/* 버튼 스타일 클래스 */
+.button {
+    padding: 10px 20px;
+    cursor: pointer;
+    border: none;
+    color: white;
+    font-weight: bold;
+    border-radius: 5px;
+    text-transform: uppercase;
+    font-size: 14px;
+    width: 200px;
+    transition: background-color 0.3s; /* 호버 시 배경색 전환 효과 추가 */
+
+}
+
+/* 추가 버튼 스타일 */
+.button.add-button {
+    background-color: #5F9DF7; /* 배경색 설정 */
+}
+
+/* 해제 버튼 스타일 */
+.button.remove-button {
+    background-color: #5F9DF7; /* 배경색 설정 */
+}
+
+.button:hover {
+    background-color: #007bff;
+}

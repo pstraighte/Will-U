@@ -30,6 +30,8 @@ public class InterestController {
 			interestService.addInterest(id, userDetails.getUser());
 		} catch (DuplicateRequestException e) {
 			return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+		} catch (IllegalArgumentException b) {
+			return ResponseEntity.badRequest().body(new ApiResponseDto("자신에게 관심등록을 할 수 없습니다.", 400));
 		}
 		return ResponseEntity.status(HttpStatus.ACCEPTED)
 			.body(new ApiResponseDto("관심 유저를 추가했습니다", HttpStatus.ACCEPTED.value()));
