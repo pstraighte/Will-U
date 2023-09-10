@@ -284,8 +284,12 @@
                 $("#off-text").hide();
                 $("#on-text").show();
             }
-            if (response.promiseArea) {
-                getCoordinatesFromAddress(response.promiseArea)
+            let area = response.promiseArea;
+            if (area) {
+                if (area.includes("_")) {
+                    area = area.split("_")[1];
+                }
+                getCoordinatesFromAddress(area)
             }
         },
         error: function (xhr, status, error) {
