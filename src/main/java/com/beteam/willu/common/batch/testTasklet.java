@@ -34,6 +34,9 @@ public class testTasklet implements Tasklet {
 
         // 생성된 job 데이터 삭제
         jobCleanupService.cleanupOldJobData();
+      
+	    	// 활성화 되어있는 게시글을 가져온다.
+	    	List<Post> truePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(true);
 
         // 활성화 되어있는 게시글을 가져온다.
         List<Post> truePostList = postRepository.findAllByRecruitment(true);
@@ -43,6 +46,7 @@ public class testTasklet implements Tasklet {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String startTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         dateTime = LocalDateTime.parse(startTime, formatter);
+
 
         // 시간이 지난 게시글은 비활성화로 변경
         for (Post truePost : truePostList) {
@@ -54,6 +58,9 @@ public class testTasklet implements Tasklet {
                 }
             }
         }
+
+    		// 비활성화 되어있는 게시글을 가져온다.
+	    	List<Post> falsePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(false);
 
         // 비활성화 되어있는 게시글을 가져온다.
         List<Post> falsePostList = postRepository.findAllByRecruitment(false);

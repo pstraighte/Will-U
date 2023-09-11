@@ -210,4 +210,5 @@ public class PostServiceImpl implements PostService {
     public Post findPost(Long id) {
         return postRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
+
 }

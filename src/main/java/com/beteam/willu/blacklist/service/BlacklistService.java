@@ -7,8 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
-import com.beteam.willu.notification.dto.NotificationEvent;
-import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 import com.sun.jdi.request.DuplicateRequestException;
@@ -29,18 +27,20 @@ public class BlacklistService {
 
 		if (blacklistRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
 			throw new DuplicateRequestException("이미 차단된 유저 입니다.");
+		} else if (receiver.getId().equals(user.getId())) {
+			throw new IllegalArgumentException("자신을 차단 할 수 없습니다.");
 		} else {
 			Blacklist blacklist = new Blacklist(receiver, user);
 			blacklistRepository.save(blacklist);
 		}
-		//sse 테스트용
-		NotificationEvent event = NotificationEvent.builder()
-			.title("차단 유저 추가")
-			.notificationType(NotificationType.LOGIN_DONE)
-			.receiver(receiver)
-			.publisher(user)
-			.content(receiver.getNickname() + "님을 차단했습니다")
-			.build();
+		// //sse 테스트용
+		// NotificationEvent event = NotificationEvent.builder()
+		// 	.title("차단 유저 추가")
+		// 	.notificationType(NotificationType.LOGIN_DONE)
+		// 	.receiver(receiver)
+		// 	.publisher(user)
+		// 	.content(receiver.getNickname() + "님을 차단했습니다")
+		// 	.build();
 	}
 
 	@Transactional  //차단 유저 해제

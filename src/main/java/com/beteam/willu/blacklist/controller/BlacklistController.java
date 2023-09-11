@@ -19,19 +19,20 @@ import org.springframework.web.bind.annotation.*;
 public class BlacklistController {
     private final BlacklistService blacklistService;
 
-    //차단 유저 추가
-    @Operation(summary = "사용자 차단", description = "PathVariabl형태의 사용자 id를 이용해 해당 사용자를 차단한다.")
-    @PostMapping("/blacklist/{id}")
-    public ResponseEntity<ApiResponseDto> addBlacklist(@PathVariable Long id,
-                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        try {
-            blacklistService.addBlacklist(id, userDetails.getUser());
-        } catch (DuplicateRequestException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
-        }
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(new ApiResponseDto("해당 유저를 차단했습니다", HttpStatus.ACCEPTED.value()));
-    }
+	//차단 유저 추가
+	@PostMapping("/blacklist/{id}")
+	public ResponseEntity<ApiResponseDto> addBlacklist(@PathVariable Long id,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		try {
+			blacklistService.addBlacklist(id, userDetails.getUser());
+		} catch (DuplicateRequestException e) {
+			return ResponseEntity.badRequest().body(new ApiResponseDto(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
+		} catch (IllegalArgumentException b) {
+			return ResponseEntity.badRequest().body(new ApiResponseDto("자신을 차단 할 수 없습니다.", 400));
+		}
+		return ResponseEntity.status(HttpStatus.ACCEPTED)
+			.body(new ApiResponseDto("해당 유저를 차단했습니다", HttpStatus.ACCEPTED.value()));
+	}
 
     //차단 유저 해제
     @Operation(summary = "사용자 차단 해제", description = "PathVariabl형태의 사용자 id를 이용해 해당 사용자의 차단을 해제한다.")

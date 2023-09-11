@@ -144,9 +144,20 @@
                 <h1 style="float: right">${status}</h1>
             </div>
         </div>
+        <div class="profile-container">
+            <div class="profile-image">
+                <img src="" alt="Profile Image" width="70" height="70" id="profile-image">
+            </div>
+            <div class="profile-details">
+                <div class="nickname">
+                    <a href="#" class="navbar-brand" id="user-nickname">Nickname</a>
+                </div>
+                <div class="score">
+                    <span>점수: <span id="user-score"></span></span>
+                </div>
+            </div>
+        </div>
         <div id="moreInfo">
-            <!--            <h3>관심사</h3>-->
-            <!--            <h4 class="attr"> ${response.category}</h4>-->
             <h3>약속 시간</h3>
             <h4 class="attr">${response.promiseTime}</h4>
             <h3>약속 장소</h3>
@@ -169,13 +180,17 @@
 </body>
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
-    // console.log(post);
+
+    var user = [[${ user }]];
+    var nickname = [[${ nickname }]];
+    var picture = [[${ picture }]]
+    var userScore = [[${ userScore }]]
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
     let currentNum = [[${ currentNum }]];
 
-    createPostContent(post, formattedDateTime, status, currentNum);
+    createPostContent(post, formattedDateTime, status, currentNum, nickname, picture, userScore);
 
     //토큰에서 username 추출
     const payloads = JSON.parse(atob(token.split(".")[1]));
@@ -324,9 +339,7 @@
         window.location.href = "/"; // 뒤로가기 기능 실행
     });
 
-    function createPostContent(response, formattedDateTime, status, currentNum) {
-
-        console.log("response : ", response);
+    function createPostContent(response, formattedDateTime, status, currentNum, nickname, picture, userScore) {
         var postbox = $('#postbox');
         postbox.empty();
         var postDiv = `
@@ -343,6 +356,19 @@
         postDiv += `
                         </div>
                     </div>
+    <div class="profile-container" style="display:flex">
+        <div class="profile-image">
+            <img src="${picture}" width="70" height="70">
+        </div>
+        <div class="profile-details">
+            <div class="nickname">
+                <a th:text="${nickname}" class="navbar-brand">작성자 : ${nickname}</a>
+            </div>
+            <div class="score">
+                <span>점수: ${userScore}</span>
+            </div>
+        </div>
+    </div>
                     <div id="moreInfo">
                         <h3>약속 시간</h3>
                         <h4 class="attr">${formattedDateTime}</h4>

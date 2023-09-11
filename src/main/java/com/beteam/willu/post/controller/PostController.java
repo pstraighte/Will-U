@@ -138,14 +138,17 @@ public class PostController {
             @RequestParam(value = "size", defaultValue = "10") int size, // 페이지당 항목 수 파라미터 (기본값: 10)
             @RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment // 모집중인 게시글만 검색할 것인가?
     ) {
-        if (keyword.length() < 2) {
-            // 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
-            return ResponseEntity.badRequest().build();
-        }
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		if (keyword.length() < 2) {
+			// 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
+			if (keyword.isEmpty()) {
+				return ResponseEntity.ok().body(postService.getPosts(pageable));
+			}
+			return ResponseEntity.badRequest().build();
+		}
+		Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
+			pageable); // 서비스를 통해 검색 실행
+		return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
+	}
 
-        Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-        Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
-                pageable); // 서비스를 통해 검색 실행
-        return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
-    }
 }

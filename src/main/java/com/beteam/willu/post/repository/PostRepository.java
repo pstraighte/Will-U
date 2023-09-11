@@ -11,6 +11,7 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByOrderByCreatedAtDesc(Pageable pageable);
 
+
     // 제목으로 검색
     Page<Post> findByTitleContaining(String keyword, Pageable pageable);
 
@@ -38,4 +39,5 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findAllByRecruitment(boolean b);
 
     List<Post> findByUser(User user);
+
 }
