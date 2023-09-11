@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -15,7 +16,7 @@ public class PostRequestDto {
 
     @NotBlank(message = "게시글 내용을 입력해 주세요")
     private String content;
-    
+
     private LocalDateTime promiseTime;
 
     @NotBlank(message = "지역을 입력해 주세요")
@@ -24,6 +25,5 @@ public class PostRequestDto {
     @Min(2) //최소 2명
     private Long maxnum;
 
-    @NotBlank(message = "카테고리를 입력해 주세요")
-    private String category;
+    List<String> tags;
 }

@@ -144,15 +144,12 @@
     <div id="category">
         <h5>관심사별 모아보기✨</h5>
         <hr>
+        <div>
+            <input type="text" id="tagInput" placeholder="태그로 검색하세요">
+            <button type="submit" onclick="tagSearch()">태그 검색</button>
+        </div>
         <ul class="large">
-            <li>운동</li>
-            <li>커뮤니케이션</li>
-            <li>게임</li>
-            <li>문화생활</li>
-            <li>자기개발</li>
-            <li>동물</li>
-            <li>맛집투어</li>
-            <li>기타</li>
+
         </ul>
     </div>
 
@@ -160,7 +157,7 @@
 </body>
 <script>
     $(document).ready(function () {
-
+        getTags();
         //게시글 전체 조회
         chPost(0);
     });
@@ -242,7 +239,7 @@
             contentType: 'application/json',
             async: false
         }).then((response) => {
-
+            console.log("responseresponseresponse : ", response);
             clearHTML();
 
             nodeCreate(response.totalPages, response.number);
@@ -313,7 +310,6 @@
                 // 검색 결과를 화면에 표시
                 var tableBody = $('.table tbody');
                 tableBody.empty();
-                console.log("검색 response : " + response)
                 response.content.forEach(function (post) {
                     console.log(post);
                     createPostHTML(post);
@@ -333,5 +329,60 @@
         $('#pagination').find($(`li[id^='page-']`)).empty();
     }
 
+
+    // 게시글 태그별 조회
+    function tagSearch(con) {
+        var value;
+        if (!con) {
+            //값이 없을 때
+            value = $('#tagInput').val()
+        } else {
+            value = con
+        }
+
+        $.ajax({
+            url: "/api/tag",
+            type: "GET",
+            async: false,
+            data: {
+                content: value
+            },
+            success: function (response) {
+                clearHTML();
+                // 검색 결과를 화면에 표시
+                var tableBody = $('.table tbody');
+                tableBody.empty();
+                response.content.forEach(function (post) {
+                    console.log(post);
+                    createPostHTML(post);
+                });
+
+                $('#tagInput').val('');
+            },
+            error: function (xhr, status, error) {
+                alert("두글자이상 입력하지 않았거나 해당 태그를 가진 게시글이 없습니다.")
+                chPost(0);
+            }
+        });
+
+    }
+
+    function getTags() {
+        $.ajax({
+            url: "/api/tags",
+            type: "GET",
+            async: false,
+            success: function (response) {
+                for (var i = 0; i < response.length; i++) {
+                    $(`<li>
+                        <a onclick="tagSearch('${response[i].tagName}')">${response[i].tagName}</a> : ${response[i].count}
+                    </li>`).appendTo(`.large`);
+                }
+            },
+            error: function (xhr, status, error) {
+                alert("태그 불러오기 실패")
+            }
+        });
+    }
 </script>
 </html>
