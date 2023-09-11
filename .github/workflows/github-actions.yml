@@ -10,7 +10,7 @@ on:
 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
-  Create-Application-Properties:
+  addProperties:
     runs-on: ubuntu-latest
     steps:
       - run: mkdir -p ./src/main/resources
@@ -19,6 +19,7 @@ jobs:
       - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
       - run: cat ./src/main/resources/application.properties
   build:
+    needs: addProperties
     # VM의실행 환경 지정 => 우분투 최신 버전
     runs-on: ubuntu-latest
 
