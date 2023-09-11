@@ -122,7 +122,7 @@
     </button>
 </div>
 <script th:inline="javascript">
-    var nickname = [[${ nick }]];
+    var user = [[${ user }]];
 </script>
 <script src="/js/sidebar.js"></script>
 <script>
@@ -291,10 +291,10 @@
     if (token) {
         const payloads = JSON.parse(atob(token.split(".")[1]));
         const userName = payloads.sub;
-        checkWriterAndShowButtons(userName, nickname);
+        checkWriterAndShowButtons(userName, user.username);
     } else {
         const userName = null;
-        checkWriterAndShowButtons(userName, nickname);
+        checkWriterAndShowButtons(userName, user.username);
     }
 
     function checkWriterAndShowButtons(loginUserName, profileUserName) {

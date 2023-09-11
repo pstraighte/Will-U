@@ -181,18 +181,13 @@
 </body>
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
-
     var user = [[${ user }]];
-    var nickname = [[${ nickname }]];
-    var picture = [[${ picture }]]
-    var userScore = [[${ userScore }]]
-    var userId = [[${ userId }]]
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
     let currentNum = [[${ currentNum }]];
 
-    createPostContent(post, formattedDateTime, status, currentNum, nickname, picture, userScore);
+    createPostContent(post, formattedDateTime, status, currentNum, user);
 
     //토큰에서 username 추출
     if (token) {
@@ -353,7 +348,7 @@
         window.location.href = "/"; // 뒤로가기 기능 실행
     });
 
-    function createPostContent(response, formattedDateTime, status, currentNum, nickname, picture, userScore) {
+    function createPostContent(response, formattedDateTime, status, currentNum, user) {
         var postbox = $('#postbox');
         postbox.empty();
         var postDiv = `
@@ -372,16 +367,16 @@
                     </div>
     <div class="profile-container" style="display:flex">
         <div class="profile-image">
-            <img src="${picture}" width="70" height="70">
+            <img src="${user.picture}" width="70" height="70">
         </div>
         <div class="profile-details">
-    <div class="nickname">
-        <a href="#" onclick="goToUserProfile('${userId}');" class="navbar-brand" th:text="${nickname}">작성자 : ${nickname}</a>
-    </div>
-    <div class="score">
-        <span>점수: ${userScore}</span>
-    </div>
-</div>
+             <div class="nickname">
+                <a href="#" onclick="goToUserProfile('${user.id}');" class="navbar-brand">작성자 : ${user.nickname}</a>
+            </div>
+            <div class="score">
+                <span>점수: ${user.score.toFixed(2)}</span>
+            </div>
+        </div>
     </div>
                     <div id="moreInfo">
                         <h3>약속 시간</h3>
