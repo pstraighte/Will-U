@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk
+FROM azul/zulu-openjdk:17
 
 # 독커 작업 디렉토리 지정
 WORKDIR /app
@@ -10,4 +10,4 @@ COPY build/libs/Will-U-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # 컨테이너 실행 시 사용할 명령어
-CMD java -jar app.jar &
+ENTRYPOINT ["java", "-jar", "app.jar"]
