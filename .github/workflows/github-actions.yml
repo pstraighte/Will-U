@@ -65,9 +65,10 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
-            sudo docker run -p 8080:8080 \
+            sudo nohup docker run -p 8080:8080 \
             --name ${{ secrets.PROJECT_NAME }} \
             -e SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} \
             -e SPRING_DATASOURCE_USERNAME=admin \
             -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -d -it ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            -d -it ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }} &
+ 
