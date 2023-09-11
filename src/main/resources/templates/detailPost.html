@@ -117,6 +117,16 @@
                 opacity: 0;
             }
         }
+
+        #tagBox {
+            list-style-type: none; /* 리스트 마커(점) 제거 */
+            padding: 0; /* 내부 여백 제거 */
+        }
+
+        #tagBox > li {
+            display: inline; /* 가로로 나타내기 */
+            margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
+        }
     </style>
 </head>
 
@@ -149,8 +159,6 @@
             </div>
         </div>
         <div id="moreInfo">
-            <h3>관심사</h3>
-            <h4 class="attr"> ${response.category}</h4>
             <h3>약속 시간</h3>
             <h4 class="attr">${response.promiseTime}</h4>
             <h3>약속 장소</h3>
@@ -173,7 +181,7 @@
 </body>
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
-    // console.log(post);
+
     var user = [[${ user }]];
     var nickname = [[${ nickname }]];
     var picture = [[${ picture }]]
@@ -376,8 +384,6 @@
 </div>
     </div>
                     <div id="moreInfo">
-                        <h3>관심사</h3>
-                        <h4 class="attr"> ${response.category}</h4>
                         <h3>약속 시간</h3>
                         <h4 class="attr">${formattedDateTime}</h4>
                         <h3>약속 장소</h3>
@@ -388,8 +394,17 @@
                     <div id="contentBox">
                         <p>${response.content}</p>
                     </div>
+                    <ul id="tagBox">
+                    </ul>
             `;
         postbox.append(postDiv);
+
+
+        for (var i = 0; i < response.tagList.length; i++) {
+            $(`<li>
+                 #${response.tagList[i].tag}
+              </li>`).appendTo(`#tagBox`);
+        }
     }
 
     function goToUserProfile(username) {

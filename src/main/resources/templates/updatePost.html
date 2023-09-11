@@ -133,6 +133,17 @@
             border-radius: 50%;
         }
 
+
+        #tagList {
+            list-style-type: none; /* 리스트 마커(점) 제거 */
+            padding: 0; /* 내부 여백 제거 */
+        }
+
+        #tagList > li {
+            display: inline; /* 가로로 나타내기 */
+            margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
+        }
+      
         /* 모달 스타일 */
         .modal {
             display: none;
@@ -193,7 +204,6 @@
             color: #555;
         }
 
-
     </style>
 </head>
 <body>
@@ -208,19 +218,6 @@
         <label for="content">내용</label>
         <textarea id="content" name="content" required></textarea>
 
-        <label for="category">관심분야</label>
-        <select id="category" name="category">
-            <option value="">카테고리 선택</option>
-            <option value="운동">운동</option>
-            <option value="커뮤니케이션">커뮤니케이션</option>
-            <option value="게임">게임</option>
-            <option value="문화생활">문화생활</option>
-            <option value="자기개발">자기개발</option>
-            <option value="동물">동물</option>
-            <option value="맛집투어">맛집투어</option>
-            <option value="기타">기타</option>
-        </select><br>
-
         <label for="promiseTime">약속 시간</label>
         <input type="datetime-local" id="promiseTime" name="promiseTime">
 
@@ -233,6 +230,15 @@
         </label>
         <p id="off-text">OFF</p>
         <p id="on-text" style="display:none;">ON</p>
+
+        <label for="tag">태그</label>
+        <input type="text" id="tag" name="tag">
+
+        <ul id="tagList">
+
+        </ul>
+        <button onclick="arrayAdd()">태그 입력</button>
+
         <br><br>
         <label for="promiseArea">약속 장소</label>
         <input type="text" id="promiseArea" name="promiseArea" readonly>
@@ -249,6 +255,7 @@
                 <div id="modalLocationResults"></div>
             </div>
         </div>
+
         <div class="buttons">
             <button type="button" onclick="updatePost()">수정</button>
             <button type="button" id="back">취소</button>
@@ -264,11 +271,16 @@
     let status;
     let toggle = $("#recruit-status");
 
+    // 태그 배열
+    const emptyArray = [];
+
     // ========== 게시글 정보 불러오기 ==========
     $.ajax({
         url: `/api/posts/${postId}`,
         method: 'GET',
         success: function (response) {
+            console.log("responseresponseresponse : ", response);
+
             $("#title").val(response.title);
             $("#content").val(response.content);
             $("#category").val(response.category);
@@ -277,6 +289,17 @@
             $("#maxnum").val(response.maxnum);
             status = response.recruitment;
             console.log("status", status);
+
+            // 태그
+            for (var i = 0; i < response.tagList.length; i++) {
+                $(`<li id="${response.tagList[i].tag}">
+                  #${response.tagList[i].tag}
+                  <button class="btn-close" onclick="delTag('${response.tagList[i].tag}')"></button>
+                </li>`).appendTo(`#tagList`);
+
+                emptyArray.push(response.tagList[i].tag);
+            }
+
 
             // status 변수의 값을 기반으로 체크박스의 상태를 설정합니다.
             toggle.prop("checked", status);
@@ -349,33 +372,81 @@
 
     // ========== 게시글 수정 ==========
     function updatePost() {
-        $.ajax({
-            url: `/api/posts/${postId}`,
-            method: 'PUT',
-            contentType: "application/json",
-            data: JSON.stringify({
-                title: $("#title").val(),
-                content: $("#content").val(),
-                category: $("#category").val(),
-                promiseTime: $("#promiseTime").val(),
-                promiseArea: $("#promiseArea").val(),
-                maxnum: $("#maxnum").val()
-            }),
-            success: function (response) {
-                window.location.href = "/posts/" + postId;
-            },
-            error: function (xhr, status, error) {
-                alert("글 수정 실패");
-                console.log(xhr);
-            }
-        });
+        let title = $("#title").val();
+        let content = $("#content").val();
+        let promiseTime = $("#promiseTime").val();
+        let promiseArea = $("#promiseArea").val();
+        let maxnum = $("#maxnum").val();
+        let tags = emptyArray;
+
+        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '' || tags.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: '게시글 수정 실패',
+                text: "게시글 정보를 모두 입력해주세요"
+            });
+        } else {
+            $.ajax({
+                url: `/api/posts/${postId}`,
+                method: 'PUT',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    title: $("#title").val(),
+                    content: $("#content").val(),
+                    category: $("#category").val(),
+                    promiseTime: $("#promiseTime").val(),
+                    promiseArea: $("#promiseArea").val(),
+                    maxnum: $("#maxnum").val(),
+                    tags: emptyArray
+                }),
+                success: function (response) {
+                    window.location.href = "/posts/" + postId;
+                },
+                error: function (xhr, status, error) {
+                    alert("글 수정 실패");
+                    console.log(xhr);
+                }
+            });
+        }
     }
 
     document.getElementById("back").addEventListener("click", function () {
         window.location.href = "/posts/" + postId; // 뒤로가기 (상세페이지로)
     });
 
+    function delTag(tagName) {
+        const index = emptyArray.indexOf(`${tagName}`);
+        if (index !== -1) {
+            emptyArray.splice(index, 1);
+        }
 
+        $(`#${tagName}`).remove();
+        console.log("삭제시 : ", emptyArray);
+    }
+
+    function arrayAdd() {
+        console.log("배열 상황 ", emptyArray);
+
+        var tagName = $("#tag").val()
+        // 이미 배열에 있는 값인지
+        if (emptyArray.includes(tagName)) {
+            alert("이미 입력한 태그입니다.")
+            $("#tag").val('');
+        } else if (tagName.includes(' ') || tagName === '') {
+            alert("공백을 이용할 수 없습니다.")
+        } else {
+            emptyArray.push(tagName);
+
+            console.log("넣은 상황", emptyArray);
+            $(`<li id="${tagName}">
+            ${tagName}
+            <button class="btn-close" onclick="delTag('${tagName}')"></button>
+            </li>`).appendTo(`#tagList`);
+            $("#tag").val('');
+
+        }
+    }
+    
 </script>
 <script type="text/javascript">
     var infowindow = new kakao.maps.InfoWindow({zIndex: 1});
