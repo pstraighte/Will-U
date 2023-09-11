@@ -176,7 +176,7 @@ function goProfile() {
 }
 
 function goMypage() {
-    window.location.href = `/users/mypage`;
+    window.location.href = `/mypage`;
 }
 
 function chatRoom(id) {

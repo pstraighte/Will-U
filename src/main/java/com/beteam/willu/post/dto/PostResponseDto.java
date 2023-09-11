@@ -25,7 +25,7 @@ public class PostResponseDto extends ApiResponseDto {
     private final Long maxnum;
     private final Double score;
     private Boolean recruitment;
-    private final List<tagSetResponseDto> tagList = new ArrayList<>();
+    private List<tagSetResponseDto> tagList = new ArrayList<>();
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
