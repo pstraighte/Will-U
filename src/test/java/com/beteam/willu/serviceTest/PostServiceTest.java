@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
@@ -34,6 +35,7 @@ import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
 
 @DisplayName("POST SERVICE TEST")
+@ActiveProfiles("test")
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
 	@InjectMocks

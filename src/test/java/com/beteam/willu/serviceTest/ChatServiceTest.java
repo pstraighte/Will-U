@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
@@ -27,6 +28,7 @@ import com.beteam.willu.user.entity.User;
 
 @DisplayName("CHAT SERVICE TEST")
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 public class ChatServiceTest {
 	@InjectMocks
 	private ChatRoomService chatRoomService;

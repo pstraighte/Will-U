@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.amazonaws.services.s3.AmazonS3;
@@ -24,6 +25,7 @@ import com.beteam.willu.user.repository.UserRepository;
 
 @DisplayName("S3 TEST")
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 public class ImageUploadTest {
 	@InjectMocks
 	private S3Service s3Service;

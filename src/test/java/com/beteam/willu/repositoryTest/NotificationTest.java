@@ -12,6 +12,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.notification.entity.Notification;
 import com.beteam.willu.notification.entity.NotificationType;
@@ -23,6 +24,7 @@ import com.beteam.willu.user.repository.UserRepository;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("Notification Repository Test OK")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class NotificationTest {
 	@Autowired
 	private UserRepository userRepository;

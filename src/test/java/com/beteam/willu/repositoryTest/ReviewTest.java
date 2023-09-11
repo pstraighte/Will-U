@@ -13,6 +13,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.entity.Post;
@@ -29,6 +30,7 @@ import com.beteam.willu.user.repository.UserRepository;
 @DisplayName("Review Test")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@ActiveProfiles("test")
 public class ReviewTest {
 	@Autowired
 	ReviewRepository reviewRepository;

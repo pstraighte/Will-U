@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.user.dto.UserUpdateRequestDto;
 import com.beteam.willu.user.entity.User;
@@ -14,6 +15,7 @@ import com.beteam.willu.user.repository.UserRepository;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("UserRepository Test")
+@ActiveProfiles("test")
 public class UserRepositoryTest {
 	@Autowired
 	private UserRepository userRepository;

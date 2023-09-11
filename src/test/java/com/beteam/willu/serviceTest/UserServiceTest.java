@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.common.jwt.JwtUtil;
 import com.beteam.willu.common.redis.RedisUtil;
@@ -27,6 +28,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @DisplayName("USER SERVICE TEST")
 @ExtendWith(MockitoExtension.class)
+@ActiveProfiles("test")
 public class UserServiceTest {
 	@InjectMocks
 	private UserService userService;

@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
 
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.entity.Post;
@@ -27,6 +28,7 @@ import com.beteam.willu.user.repository.UserRepository;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("postRepository Test")
 @TestMethodOrder(value = MethodOrderer.OrderAnnotation.class)
+@ActiveProfiles("test")
 public class PostRepositoryTest {
 	@Autowired
 	private PostRepository postRepository;
