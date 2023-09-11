@@ -10,4 +10,4 @@ COPY build/libs/Will-U-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 
 # 컨테이너 실행 시 사용할 명령어
-CMD ["java -jar app.jar"]
+CMD java -jar app.jar
