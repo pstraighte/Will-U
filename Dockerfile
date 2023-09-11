@@ -1,7 +1,7 @@
 FROM azul/zulu-openjdk:17
 
 # 독커 작업 디렉토리 지정
-WORKDIR /app
+# WORKDIR /app
 
 # jar 파일을 파일 경로로 복사
 COPY build/libs/Will-U-0.0.1-SNAPSHOT.jar Will-U-0.0.1-SNAPSHOT.jar
