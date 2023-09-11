@@ -8,18 +8,16 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class UserResponseDto {
+	private Long id;
 	private String username;
 	private String nickname;
-	private String phoneNumber;
-	private String area;
 	private String picture;
 	private Double score;
 
 	public UserResponseDto(User user) {
+		this.id = user.getId();
 		this.username = user.getUsername();
 		this.nickname = user.getNickname();
-		this.phoneNumber = user.getPhoneNumber();
-		this.area = user.getUsername();
 		this.picture = user.getPicture();
 		this.score = user.getScore();
 	}

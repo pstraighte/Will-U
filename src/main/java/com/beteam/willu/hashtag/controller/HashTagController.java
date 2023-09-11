@@ -26,7 +26,7 @@ public class HashTagController {
 
     //태그 검색
     @Transactional
-    @GetMapping("/tag")
+    @GetMapping("/tag/search")
     public ResponseEntity<Page<PostResponseDto>> createTag(
             @RequestParam("content") String content,
             @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
@@ -44,7 +44,7 @@ public class HashTagController {
 
     //태그 중 top 5 선정
     @Transactional
-    @GetMapping("/tags")
+    @GetMapping("/tag")
     public List<TagTopResponseDto> getTags() {
         return hashTagService.getTags();
     }

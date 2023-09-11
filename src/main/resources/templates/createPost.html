@@ -125,7 +125,7 @@
             display: inline; /* 가로로 나타내기 */
             margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
         }
-      
+
         .place-name {
             font-weight: bold;
             font-size: 16px;
@@ -135,7 +135,7 @@
             font-size: 14px;
             color: #555;
         }
-      
+
     </style>
 
 </head>
@@ -165,7 +165,7 @@
 
         </ul>
         <button onclick="arrayAdd()">태그 작성</button>
-      
+
         <br><br>
         <label for="promiseArea">약속 장소</label>
         <input type="text" id="promiseArea" name="promiseArea" readonly>
@@ -182,7 +182,7 @@
                 <div id="modalLocationResults"></div>
             </div>
         </div>
-      
+
         <div class="buttons">
             <button onclick="createPost()">작성</button>
             <button type="button" id="back">취소</button>
@@ -201,7 +201,7 @@
         if (emptyArray.includes(tagName)) {
             alert("이미 입력한 태그입니다.")
             $("#tag").val('');
-        } else if (tagName.includes(' ')) {
+        } else if (tagName.includes(' ') || tagName === '') {
             alert("공백을 이용할 수 없습니다.")
         } else {
             emptyArray.push(tagName);

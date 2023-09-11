@@ -337,6 +337,7 @@
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+                console.log("responseresponseresponse :", response);
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
@@ -388,24 +389,11 @@
             error: function (xhr, status, error) {
                 alert("해당 채팅방 사용자가 아닙니다.")
                 console.log(xhr);
-                window.location.href = "/api/users/chatList"
+                window.location.href = "/"
             }
         });
 
     });
-
-    function openSidebar() {
-        var sidebar = document.getElementById("sidebar");
-        var content = document.getElementById("content");
-
-        if (sidebar.style.width === "250px") {
-            sidebar.style.width = "0";
-            content.style.marginLeft = "0";
-        } else {
-            sidebar.style.width = "250px";
-            content.style.marginLeft = "260px";
-        }
-    }
 
     // 쿼리스트링 값 불러오기
     urlSearch = new URLSearchParams(location.search);
@@ -438,8 +426,6 @@
         // 이 채팅룸을 클릭했을때 해당하는 roomNumber을 가지고 온다.
         // connect(header,연결 성공시 콜백,에러발생시 콜백)
         stompClient.connect({}, function () {
-                // 소켓을 연결 시키기 전에 채팅방의 활성화 필드가 true 인지 확인 후 false 라면 연결 x
-                // 활성화 필드가 true인 채팅방 리스트만 보여주긴 하지만 주소창의 url 로 접근시 적용
 
                 //subscribe(subscribe url,해당 url로 메시지를 받을때마다 실행할 함수)
                 sub = stompClient.subscribe('/topic/' + roomNumber, function (e) {
@@ -502,15 +488,14 @@
 
     //화면에 메시지를 표시하는 함수
     function showMessage(data) {
-
-        var formattedDateTime = makeDateFormat(data.date);
+        // var formattedDateTime = makeDateFormat(data.date);
 
         if (data.sender === userId) {
             $(`<div id="chatDivMe" class="chatDivMe">
                 <div id="chatUserMe" class="chatUserMe">${data.sender}</div>
 
                 <div id="chatContentDivMe" class="chatContentDivMe">
-                    <div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>
+                    <div id="chatContentTimeMe" class="chatContentTimeMe">${data.date}</div>
                     <div id="chatContentMe" class="chatContentMe">${data.contents}</div>
                 </div>
             </div>`).appendTo(`#chatting`);
@@ -522,41 +507,25 @@
 
                 <div id="chatContentDiv" class="chatContentDiv">
                     <div id="chatContent" class="chatContent">${data.contents}</div>
-                    <div id="chatContentTime" class="chatContentTime">${formattedDateTime}</div>
+                    <div id="chatContentTime" class="chatContentTime">${data.date}</div>
                 </div>
             </div>`).appendTo(`#chatting`);
         }
     }
 
     function makeDateFormat(dateTimeString) {
-        // LocalDateTime 형식의 문자열
-        var localDateTimeString = dateTimeString;
+        // Date 객체로 변환
+        let dateTime = new Date(dateTimeString);
 
-// LocalDateTime 문자열을 Date 객체로 변환
-        var parts = localDateTimeString.split('T'); // 날짜와 시간을 분리
-        var datePart = parts[0]; // 날짜 부분
-        var timePart = parts[1]; // 시간 부분
-
-        var dateParts = datePart.split('-');
-        var timeParts = timePart.split(':');
-
-        var year = parseInt(dateParts[0]);
-        var month = parseInt(dateParts[1]) - 1; // JavaScript의 월은 0부터 시작하므로 1을 빼줍니다.
-        var day = parseInt(dateParts[2]);
-        var hour = parseInt(timeParts[0]);
-        var minute = parseInt(timeParts[1]);
-        var second = parseInt(timeParts[2]);
-
-        var dateTime = new Date(year, month, day, hour, minute, second);
-
-        let years = dateTime.getFullYear();
-        let months = dateTime.getMonth();
-        let days = dateTime.getDate();
-        let hours = dateTime.getHours();
-        let minutes = dateTime.getMinutes();
+        // 원하는 형식으로 날짜와 시간을 가공
+        let year = dateTime.getFullYear();
+        let month = dateTime.getMonth() + 1;
+        let day = dateTime.getDate();
+        let hour = dateTime.getHours();
+        let minute = dateTime.getMinutes();
 
         // 날짜와 시간을 원하는 형식으로 조합
-        return years + "년 " + months + "월 " + days + "일 " + hours + "시 " + minutes + "분";
+        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
     }
 
     //메시지 브로커로 메시지 전송
@@ -590,6 +559,8 @@
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
+
+                console.log("사용자확인 : ", response);
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
@@ -607,7 +578,7 @@
                     'sender': userId,
                     'contents': $("#msg").val(),
                     'roomNumber': roomNumber,
-                    'date': koreanTime
+                    'date': makeDateFormat(currentDate)
                 };
 
                 // send(destination,헤더,페이로드)
@@ -918,7 +889,7 @@
             'sender': userId,
             'contents': `님이 나가셨습니다.`,
             'roomNumber': roomNumber,
-            'date': koreanTime
+            'date': makeDateFormat(currentDate)
         };
 
         stompClient.send("/app/chat/send", {}, JSON.stringify(data));
@@ -983,7 +954,7 @@
                     'kickOutUser': kickOutUser,
                     'contents': '님이 강퇴 당했습니다.',
                     'roomNumber': roomNumber,
-                    'date': koreanTime
+                    'date': makeDateFormat(currentDate)
                 };
 
                 stompClient.send("/app/chat/send", {}, JSON.stringify(allMsg));
