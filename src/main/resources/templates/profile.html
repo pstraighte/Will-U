@@ -101,6 +101,25 @@
             </div>
         </div>
     </div>
+    <!-- 추가 버튼 -->
+    <button type="button" id="add-interest-button" class="button add-button"
+            th:attr="data-user-id=${user.id}">관심 유저 추가
+    </button>
+
+    <!-- 해제 버튼 -->
+    <button type="button" id="remove-interest-button" class="button remove-button"
+            th:attr="data-user-id=${user.id}">관심 유저 해제
+    </button>
+
+    <!-- 추가 버튼 -->
+    <button type="button" id="add-blacklist-button" class="button add-button"
+            th:attr="data-user-id=${user.id}">블랙리스트 추가
+    </button>
+
+    <!-- 해제 버튼 -->
+    <button type="button" id="remove-blacklist-button" class="button remove-button"
+            th:attr="data-user-id=${user.id}">블랙리스트 해제
+    </button>
 </div>
 <script src="/js/sidebar.js"></script>
 <script>
@@ -212,6 +231,56 @@
         sendTab.addEventListener("click", function (e) {
             e.preventDefault(); // 기본 링크 동작을 막음
             $(this).tab('show'); // 해당 탭을 활성화
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 공통적으로 사용할 함수로 API 요청을 처리하는 함수를 정의합니다.
+        async function performApiRequest(userId, method, type, successMessage, failureMessage) {
+            try {
+                const response = await fetch(`/api/${type}/${userId}`, {
+                    method: method
+                });
+
+                if (response.ok) {
+                    // 성공적으로 요청을 처리한 경우의 처리
+                    // 예: 버튼 스타일 변경, 메시지 표시 등
+                    window.alert(successMessage);
+                } else {
+                    // 서버로부터 실패 응답을 받았을 때의 처리
+                    // 예: 에러 메시지 표시 등
+                    console.error("요청 실패");
+                    window.alert(failureMessage);
+                }
+            } catch (error) {
+                // API 요청 중에 발생한 오류 처리
+                console.error("API 요청 오류:", error);
+            }
+        }
+
+
+        // 추가 버튼 클릭 시
+        document.getElementById("add-interest-button").addEventListener("click", async () => {
+            const userId = document.getElementById("add-interest-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "POST", "interest", "관심 유저로 추가되었습니다.", "관심 유저 추가 실패");
+        });
+
+        // 해제 버튼 클릭 시
+        document.getElementById("remove-interest-button").addEventListener("click", async () => {
+            const userId = document.getElementById("remove-interest-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "DELETE", "interest", "관심 유저에서 제거되었습니다.", "관심 유저 해제 실패");
+        });
+
+        // 블랙리스트 추가 버튼 클릭 시
+        document.getElementById("add-blacklist-button").addEventListener("click", async () => {
+            const userId = document.getElementById("add-blacklist-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "POST", "blacklist", "블랙리스트에 추가되었습니다.", "블랙리스트 추가 실패");
+        });
+
+        // 블랙리스트 해제 버튼 클릭 시
+        document.getElementById("remove-blacklist-button").addEventListener("click", async () => {
+            const userId = document.getElementById("remove-blacklist-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "DELETE", "blacklist", "블랙리스트에서 제거되었습니다.", "블랙리스트 해제 실패");
         });
     });
 </script>
