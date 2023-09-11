@@ -31,6 +31,7 @@ import com.beteam.willu.review.dto.ReviewSetResponseDto;
 import com.beteam.willu.review.repository.ReviewRepository;
 import com.beteam.willu.stomp.service.ChatRoomService;
 import com.beteam.willu.user.entity.User;
+import com.beteam.willu.user.repository.UserRepository;
 import com.beteam.willu.user.service.UserService;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -53,6 +54,7 @@ public class ViewController {
 
 	@Value("${kakao.api.key}") // 프로퍼티에서 API 키 읽어옴
 	private String kakaomapApiKey;
+	private final UserRepository userRepository;
 
 	//인덱스 페이지 게시글 목록
 	@GetMapping("/")    //주소 입력값
@@ -81,8 +83,32 @@ public class ViewController {
 		PostResponseDto post = postService.getPost(postId);
 		model.addAttribute("post", post);
 
+		User user = userService.findUser(post.getUsername());
+		String nickname = user.getNickname();
+		String picture = user.getPicture();
+
+		model.addAttribute("nickname", nickname);
+		model.addAttribute("picture", picture);
+
 		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
 		model.addAttribute("currentNum", userCount);
+
+		Double score = user.getScore();
+
+		BigDecimal bd = new BigDecimal(score);
+
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
+
+		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+			// 소수 부분이 0일 경우 정수 부분만 사용
+			Integer userScore = bd.intValue();
+			model.addAttribute("userScore", userScore);
+		} else {
+			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+			Double userScore = bd.doubleValue();
+			model.addAttribute("userScore", userScore);
+		}
+
 		return "detailPost";
 	}
 
