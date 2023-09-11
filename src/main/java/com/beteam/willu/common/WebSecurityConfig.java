@@ -65,6 +65,7 @@ public class WebSecurityConfig {
 				.requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll() //update post view 허용되는 문제 있음
 				.requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
 				.requestMatchers(HttpMethod.GET, "/api/search/**").permitAll()
+				.requestMatchers("/profile/**").permitAll()
 				.anyRequest().authenticated()
 		);
 		// form 로그인 사용하지 않음

@@ -121,6 +121,9 @@
             th:attr="data-user-id=${user.id}">블랙리스트 해제
     </button>
 </div>
+<script th:inline="javascript">
+    var nickname = [[${ nick }]];
+</script>
 <script src="/js/sidebar.js"></script>
 <script>
     const editProfileButton = document.getElementById("edit-profile-button");
@@ -283,6 +286,42 @@
             await performApiRequest(userId, "DELETE", "blacklist", "블랙리스트에서 제거되었습니다.", "블랙리스트 해제 실패");
         });
     });
+
+    // 토큰에서 username 추출
+    if (token) {
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userName = payloads.sub;
+        checkWriterAndShowButtons(userName, nickname);
+    } else {
+        const userName = null;
+        checkWriterAndShowButtons(userName, nickname);
+    }
+
+    function checkWriterAndShowButtons(loginUserName, profileUserName) {
+        console.log("loginUserName:", loginUserName);
+        console.log("profileUserName:", profileUserName);
+        if (loginUserName !== null) { // 로그인한 경우에만 버튼을 표시
+            if (loginUserName === profileUserName) {
+                $("#edit-profile-button").css("display", "");
+                $("#add-interest-button").css("display", "none");
+                $("#remove-interest-button").css("display", "none");
+                $("#add-blacklist-button").css("display", "none");
+                $("#remove-blacklist-button").css("display", "none");
+            } else {
+                $("#edit-profile-button").css("display", "none");
+                $("#add-interest-button").css("display", "");
+                $("#remove-interest-button").css("display", "");
+                $("#add-blacklist-button").css("display", "");
+                $("#remove-blacklist-button").css("display", "");
+            }
+        } else { // 로그인하지 않은 경우 버튼을 숨김
+            $("#edit-profile-button").css("display", "none");
+            $("#add-interest-button").css("display", "none");
+            $("#remove-interest-button").css("display", "none");
+            $("#add-blacklist-button").css("display", "none");
+            $("#remove-blacklist-button").css("display", "none");
+        }
+    }
 </script>
 </body>
 </html>

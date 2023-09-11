@@ -150,10 +150,11 @@
             </div>
             <div class="profile-details">
                 <div class="nickname">
-                    <a href="#" class="navbar-brand" id="user-nickname">Nickname</a>
+                    <a href="#" onclick="goToUserProfile('${post.username}');" class="navbar-brand"
+                       th:text="${nickname}">작성자 : ${nickname}</a>
                 </div>
                 <div class="score">
-                    <span>점수: <span id="user-score"></span></span>
+                    <span>점수: ${userScore}</span>
                 </div>
             </div>
         </div>
@@ -185,6 +186,7 @@
     var nickname = [[${ nickname }]];
     var picture = [[${ picture }]]
     var userScore = [[${ userScore }]]
+    var userId = [[${ userId }]]
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
@@ -193,27 +195,39 @@
     createPostContent(post, formattedDateTime, status, currentNum, nickname, picture, userScore);
 
     //토큰에서 username 추출
-    const payloads = JSON.parse(atob(token.split(".")[1]));
-    const userName = payloads.sub;
-    //작성자인지 확인해서
-    checkWriterAndShowButtons(userName, post.username, status);
+    if (token) {
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userName = payloads.sub;
+        checkWriterAndShowButtons(userName, post.username, status);
+    } else {
+        const userName = null;
+        checkWriterAndShowButtons(userName, post.username, status);
 
+    }
+
+    //작성자인지 확인해서
     function checkWriterAndShowButtons(loginUserName, postUserName, status) {
 
-        if (loginUserName === postUserName) {
-            $("#join").css("display", "none");
-            $("#edit").css("display", "");
-            $("#delete").css("display", "");
-        } else {
-            if (status === "모집중") {
-                $("#join").css("display", "");
-                $("#edit").css("display", "none");
-                $("#delete").css("display", "none");
-            } else {
+        if (loginUserName !== null) { // 로그인한 경우에만 버튼을 표시
+            if (loginUserName === postUserName) {
                 $("#join").css("display", "none");
-                $("#edit").css("display", "none");
-                $("#delete").css("display", "none");
+                $("#edit").css("display", "");
+                $("#delete").css("display", "");
+            } else {
+                if (status === "모집중") {
+                    $("#join").css("display", "");
+                    $("#edit").css("display", "none");
+                    $("#delete").css("display", "none");
+                } else {
+                    $("#join").css("display", "none");
+                    $("#edit").css("display", "none");
+                    $("#delete").css("display", "none");
+                }
             }
+        } else { // 로그인하지 않은 경우 버튼을 숨김
+            $("#join").css("display", "none");
+            $("#edit").css("display", "none");
+            $("#delete").css("display", "none");
         }
     }
 
@@ -361,13 +375,13 @@
             <img src="${picture}" width="70" height="70">
         </div>
         <div class="profile-details">
-            <div class="nickname">
-                <a th:text="${nickname}" class="navbar-brand">작성자 : ${nickname}</a>
-            </div>
-            <div class="score">
-                <span>점수: ${userScore}</span>
-            </div>
-        </div>
+    <div class="nickname">
+        <a href="#" onclick="goToUserProfile('${userId}');" class="navbar-brand" th:text="${nickname}">작성자 : ${nickname}</a>
+    </div>
+    <div class="score">
+        <span>점수: ${userScore}</span>
+    </div>
+</div>
     </div>
                     <div id="moreInfo">
                         <h3>약속 시간</h3>
@@ -391,6 +405,10 @@
                  #${response.tagList[i].tag}
               </li>`).appendTo(`#tagBox`);
         }
+    }
+
+    function goToUserProfile(username) {
+        window.location.href = '/profile/' + username;
     }
 </script>
 

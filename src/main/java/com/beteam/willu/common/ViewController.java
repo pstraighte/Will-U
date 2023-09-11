@@ -70,50 +70,53 @@ public class ViewController {
         return "index"; //출력 html
     }
 
-    //게시글 작성
-    @GetMapping("/post/create")
-    public String createPost(Model model) {
-        // 카카오맵 API 키를 모델에 추가
-        model.addAttribute("apiKey", kakaomapApiKey);
+  	//게시글 작성
+	@GetMapping("/post/create")
+	public String createPost(Model model) {
+		// 카카오맵 API 키를 모델에 추가
+		model.addAttribute("apiKey", kakaomapApiKey);
 
-        return "createPost";
-    }
+		return "createPost";
+	}
+  
+    	//게시글 단건 조회
+  @Transactional
+	@GetMapping("/posts/{postId}")
+	public String detailPost(Model model, @PathVariable Long postId) {
+		PostResponseDto post = postService.getPost(postId);
+		model.addAttribute("post", post);
 
-    //게시글 단건 조회
-    @Transactional
-    @GetMapping("/posts/{postId}")
-    public String detailPost(Model model, @PathVariable Long postId) {
-        PostResponseDto post = postService.getPost(postId);
-        model.addAttribute("post", post);
+		User user = userService.findUser(post.getUsername());
+		String nickname = user.getNickname();
+		String picture = user.getPicture();
+		Long userId = user.getId();
 
-        User user = userService.findUser(post.getUsername());
-        String nickname = user.getNickname();
-        String picture = user.getPicture();
+		model.addAttribute("userId", userId);
 
-        model.addAttribute("nickname", nickname);
-        model.addAttribute("picture", picture);
+		model.addAttribute("nickname", nickname);
+		model.addAttribute("picture", picture);
 
-        int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
-        model.addAttribute("currentNum", userCount);
+		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
+		model.addAttribute("currentNum", userCount);
 
-        Double score = user.getScore();
+		Double score = user.getScore();
 
-        BigDecimal bd = new BigDecimal(score);
+		BigDecimal bd = new BigDecimal(score);
 
-        bd = bd.setScale(2, RoundingMode.HALF_UP);
+		bd = bd.setScale(2, RoundingMode.HALF_UP);
 
-        if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
-            // 소수 부분이 0일 경우 정수 부분만 사용
-            Integer userScore = bd.intValue();
-            model.addAttribute("userScore", userScore);
-        } else {
-            // 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
-            Double userScore = bd.doubleValue();
-            model.addAttribute("userScore", userScore);
-        }
+		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+			// 소수 부분이 0일 경우 정수 부분만 사용
+			Integer userScore = bd.intValue();
+			model.addAttribute("userScore", userScore);
+		} else {
+			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+			Double userScore = bd.doubleValue();
+			model.addAttribute("userScore", userScore);
+		}
 
-        return "detailPost";
-    }
+		return "detailPost";
+	}
 
     // 게시글 수정 페이지
     @GetMapping("/posts/update/{postId}")
@@ -164,8 +167,12 @@ public class ViewController {
     @GetMapping("/profile/{id}")
     public String Profile(Model model, @PathVariable Long id) {
 
-        User user = userService.findUser(id);
-        model.addAttribute("user", user);
+		User user = userService.findUser(id);
+		String nickname = user.getNickname();
+
+		model.addAttribute("nick", nickname);
+		model.addAttribute("user", user);
+
 
         Double score = user.getScore();
 
