@@ -32,10 +32,11 @@ jobs:
         run: chmod +x gradlew
 
 
-      # Gradle Build (test 제외)
+      # Gradle Build (test 제외)✨
       # gradlew 빌드
       - name: Build with Gradle
         run: ./gradlew clean build --exclude-task test
+        # ./ 쓰면 인식못함(cmd)
 
       # DockerHub 로그인
       - name: DockerHub Login
@@ -72,6 +73,6 @@ jobs:
             -e SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} \
             -e SPRING_DATASOURCE_USERNAME=admin \
             -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -d -it ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
   # -d가 백그라운드 실행시킴
   # Docker 이미지를 빌드하고 EC2 인스턴스에서 해당 이미지를 실행하는 단계가 이미 포함되어 있으므로 추가적인 deploy 파일이 필요하지 않습니다
