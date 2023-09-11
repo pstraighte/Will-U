@@ -10,6 +10,12 @@ on:
 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
+  Create-Application-Properties:
+    runs-on: ubuntu-latest
+    steps:
+      - run: touch ./src/main/resources/application.properties
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - run: cat ./src/main/resources/application.properties
   build:
     # VM의실행 환경 지정 => 우분투 최신 버전
     runs-on: ubuntu-latest
@@ -18,6 +24,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+
+  
 
       # zulu 17 설치
       - name: Set up Zulu OpenJDK 17
