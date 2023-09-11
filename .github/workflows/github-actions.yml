@@ -66,10 +66,11 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
-            sudo nohup docker run -p 8080:8080 \
+            docker run -p 8080:8080 \
             --name ${{ secrets.PROJECT_NAME }} \
             -e SPRING_DATASOURCE_URL=${{ secrets.DB_URL }} \
             -e SPRING_DATASOURCE_USERNAME=admin \
             -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DB_PASSWORD }} \
-            -d -it ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }} &
- 
+            -d -it ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+  # -d가 백그라운드 실행시킴
+  # Docker 이미지를 빌드하고 EC2 인스턴스에서 해당 이미지를 실행하는 단계가 이미 포함되어 있으므로 추가적인 deploy 파일이 필요하지 않습니다
