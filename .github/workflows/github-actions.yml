@@ -13,7 +13,9 @@ jobs:
   Create-Application-Properties:
     runs-on: ubuntu-latest
     steps:
-      - run: touch ./src/main/resources/application.properties
+      - run: mkdir -p ./src/main/resources
+      - run: cd ./src/main/resources
+      - run: touch ./application.properties
       - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
       - run: cat ./src/main/resources/application.properties
   build:
