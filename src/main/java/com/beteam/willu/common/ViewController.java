@@ -1,21 +1,6 @@
 package com.beteam.willu.common;
 
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import com.beteam.willu.blacklist.dto.BlacklistResponseDto;
 import com.beteam.willu.blacklist.entity.Blacklist;
 import com.beteam.willu.blacklist.repository.BlacklistRepository;
@@ -36,6 +21,7 @@ import com.beteam.willu.user.service.UserService;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -65,11 +51,11 @@ public class ViewController {
     private final ChatRoomService chatRoomService;
     private final JwtUtil jwtUtil;
     private final ReviewRepository reviewRepository;
-  
-    
-	@Value("${kakao.api.key}") // 프로퍼티에서 API 키 읽어옴
-	private String kakaomapApiKey;
-	private final UserRepository userRepository;
+
+
+    @Value("${kakao.api.key}") // 프로퍼티에서 API 키 읽어옴
+    private String kakaomapApiKey;
+    private final UserRepository userRepository;
 
 
     //인덱스 페이지 게시글 목록
@@ -83,61 +69,65 @@ public class ViewController {
         model.addAttribute("posts", posts);
         return "index"; //출력 html
     }
-  
-  	//게시글 작성
-	@GetMapping("/post/create")
-	public String createPost(Model model) {
-		// 카카오맵 API 키를 모델에 추가
-		model.addAttribute("apiKey", kakaomapApiKey);
 
-		return "createPost";
-	}
-  
-    	//게시글 단건 조회
-  @Transactional
-	@GetMapping("/posts/{postId}")
-	public String detailPost(Model model, @PathVariable Long postId) {
-		PostResponseDto post = postService.getPost(postId);
-		model.addAttribute("post", post);
+    //게시글 작성
+    @GetMapping("/post/create")
+    public String createPost(Model model) {
+        // 카카오맵 API 키를 모델에 추가
+        model.addAttribute("apiKey", kakaomapApiKey);
 
-		User user = userService.findUser(post.getUsername());
-		String nickname = user.getNickname();
-		String picture = user.getPicture();
+        return "createPost";
+    }
 
-		model.addAttribute("nickname", nickname);
-		model.addAttribute("picture", picture);
+    //게시글 단건 조회
+    @Transactional
+    @GetMapping("/posts/{postId}")
+    public String detailPost(Model model, @PathVariable Long postId) {
+        PostResponseDto post = postService.getPost(postId);
+        model.addAttribute("post", post);
 
-		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
-		model.addAttribute("currentNum", userCount);
+        User user = userService.findUser(post.getUsername());
+        String nickname = user.getNickname();
+        String picture = user.getPicture();
 
-		Double score = user.getScore();
+        model.addAttribute("nickname", nickname);
+        model.addAttribute("picture", picture);
 
-		BigDecimal bd = new BigDecimal(score);
+        int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
+        model.addAttribute("currentNum", userCount);
 
-		bd = bd.setScale(2, RoundingMode.HALF_UP);
+        Double score = user.getScore();
 
-		if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
-			// 소수 부분이 0일 경우 정수 부분만 사용
-			Integer userScore = bd.intValue();
-			model.addAttribute("userScore", userScore);
-		} else {
-			// 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
-			Double userScore = bd.doubleValue();
-			model.addAttribute("userScore", userScore);
-		}
+        BigDecimal bd = new BigDecimal(score);
 
-		return "detailPost";
-	}
+        bd = bd.setScale(2, RoundingMode.HALF_UP);
+
+        if (bd.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0) {
+            // 소수 부분이 0일 경우 정수 부분만 사용
+            Integer userScore = bd.intValue();
+            model.addAttribute("userScore", userScore);
+        } else {
+            // 소수 부분이 0이 아닌 경우 BigDecimal 값을 그대로 사용
+            Double userScore = bd.doubleValue();
+            model.addAttribute("userScore", userScore);
+        }
+
+        return "detailPost";
+    }
 
     // 게시글 수정 페이지
     @GetMapping("/posts/update/{postId}")
     public String updatePost(Model model, @PathVariable Long postId) {
+
         model.addAttribute("postId", postId);//2 값을 1에 담음 타임리프 가져올꺼면 이름 "postId" 로 가져오기
+        model.addAttribute("apiKey", kakaomapApiKey);
+
         return "updatePost";
     }
 
     // 마이 페이지
-    @GetMapping("/users/mypage")
+    @Transactional
+    @GetMapping("/mypage")
     public String myPage(Model model, @AuthenticationPrincipal UserDetailsImpl userDetails) {
         // userDetails 객체에서 현재 사용자의 정보를 가져와서 모델에 추가
         model.addAttribute("user", userDetails.getUser());
@@ -162,7 +152,7 @@ public class ViewController {
         }
         model.addAttribute("blacklists", blacklistResponseDtos);
 
-        List<PostResponseDto> postResponseDtos = postRepository.findByUser(userDetails.getUser())
+        List<PostResponseDto> postResponseDtos = postRepository.findByUserOrderByCreatedAtDesc(userDetails.getUser())
                 .stream()
                 .map(PostResponseDto::new)
                 .toList();

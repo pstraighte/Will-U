@@ -34,12 +34,10 @@ public class testTasklet implements Tasklet {
 
         // 생성된 job 데이터 삭제
         jobCleanupService.cleanupOldJobData();
-      
-	    	// 활성화 되어있는 게시글을 가져온다.
-	    	List<Post> truePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(true);
 
         // 활성화 되어있는 게시글을 가져온다.
-        List<Post> truePostList = postRepository.findAllByRecruitment(true);
+        List<Post> truePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(true);
+
 
         // 현재 시간 데이터를 생성
         LocalDateTime dateTime;
@@ -59,11 +57,9 @@ public class testTasklet implements Tasklet {
             }
         }
 
-    		// 비활성화 되어있는 게시글을 가져온다.
-	    	List<Post> falsePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(false);
-
         // 비활성화 되어있는 게시글을 가져온다.
-        List<Post> falsePostList = postRepository.findAllByRecruitment(false);
+        List<Post> falsePostList = postRepository.findAllByRecruitmentOrderByCreatedAtDesc(false);
+
 
         // false 로 설정된 게시글의 채팅방이 모집완료 후 1시간이 지났는지 확인
         for (Post falsePost : falsePostList) {

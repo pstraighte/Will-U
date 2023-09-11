@@ -253,7 +253,6 @@
     }
 
     function nodeCreate(totalPages, number) {
-        //clearHTML()
         if (number === 0) {
             // 첫페이지 일때
             $(`
@@ -422,7 +421,8 @@
         } else {
             chPost(i);
         }
-     
+    }
+
     // 게시글 태그별 조회
     function tagSearch(con) {
         var value;
@@ -441,7 +441,11 @@
                 content: value
             },
             success: function (response) {
-                clearHTML();
+                $('#page-item1').empty();
+                $('#page-item2').empty();
+                $('#page-item3').empty();
+                $('#page-item4').empty();
+                $('#pagination').find($(`li[id^='page-']`)).empty();
                 // 검색 결과를 화면에 표시
                 var tableBody = $('.table tbody');
                 tableBody.empty();

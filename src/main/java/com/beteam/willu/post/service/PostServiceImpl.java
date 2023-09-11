@@ -188,17 +188,22 @@ public class PostServiceImpl implements PostService {
         Page<Post> searchResultPage;
         if (recruitment) {
             searchResultPage = switch (criteria) {
-                case "username" -> postRepository.findByUser_UsernameContainingAndRecruitmentIsTrue(keyword, pageable);
-                case "content" -> postRepository.findByContentContainingAndRecruitmentIsTrue(keyword, pageable);
-//                case "category" -> postRepository.findByCategoryContainingAndRecruitmentIsTrue(keyword, pageable);
-                default -> postRepository.findByTitleContainingAndRecruitmentIsTrue(keyword, pageable);
+                case "username" ->
+                        postRepository.findByUser_UsernameContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword,
+                                pageable);
+                case "content" ->
+                        postRepository.findByContentContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
+//                case "category" ->
+////                        postRepository.findByCategoryContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
+                default ->
+                        postRepository.findByTitleContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
             };
         } else {
             searchResultPage = switch (criteria) {
-                case "username" -> postRepository.findByUser_UsernameContaining(keyword, pageable);
-                case "content" -> postRepository.findByContentContaining(keyword, pageable);
-//                case "category" -> postRepository.findByCategoryContaining(keyword, pageable);
-                default -> postRepository.findByTitleContaining(keyword, pageable);
+                case "username" -> postRepository.findByUser_UsernameContainingOrderByCreatedAtDesc(keyword, pageable);
+                case "content" -> postRepository.findByContentContainingOrderByCreatedAtDesc(keyword, pageable);
+//                case "category" -> postRepository.findByCategoryContainingOrderByCreatedAtDesc(keyword, pageable);
+                default -> postRepository.findByTitleContainingOrderByCreatedAtDesc(keyword, pageable);
             };
         }
 
