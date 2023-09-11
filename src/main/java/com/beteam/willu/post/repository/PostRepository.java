@@ -29,12 +29,6 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     // 내용으로 검색하고 모집 상태가 true인 게시글만 검색
     Page<Post> findByContentContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(String keyword, Pageable pageable);
 
-    // 관심사으로 검색하고 모집 상태가 true인 게시글만 검색
-//    Page<Post> findByCategoryContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(String keyword, Pageable pageable);
-//
-//    //관심사로 검색
-//    Page<Post> findByCategoryContainingOrderByCreatedAtDesc(String keyword, Pageable pageable);
-
     List<Post> findAllByRecruitmentOrderByCreatedAtDesc(boolean b);
 
     List<Post> findByUserOrderByCreatedAtDesc(User user);

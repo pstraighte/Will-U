@@ -4,7 +4,7 @@ function googleLogin() {
 
 
 function kakaoLogin() {
-    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=http://43.201.154.114:8080/api/users/kakao/callback&response_type=code'
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=http://localhost:8080/api/users/kakao/callback&response_type=code'
 }
 
 function naverLogin() {

@@ -434,7 +434,7 @@
         }
 
         $.ajax({
-            url: "/api/tag",
+            url: "/api/tag/search",
             type: "GET",
             async: false,
             data: {
@@ -466,7 +466,7 @@
 
     function getTags() {
         $.ajax({
-            url: "/api/tags",
+            url: "/api/tag",
             type: "GET",
             async: false,
             success: function (response) {

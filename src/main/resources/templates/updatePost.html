@@ -143,7 +143,7 @@
             display: inline; /* 가로로 나타내기 */
             margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
         }
-      
+
         /* 모달 스타일 */
         .modal {
             display: none;
@@ -300,6 +300,8 @@
                 emptyArray.push(response.tagList[i].tag);
             }
 
+            console.log("클라이언트 배열 확인 :", emptyArray);
+
 
             // status 변수의 값을 기반으로 체크박스의 상태를 설정합니다.
             toggle.prop("checked", status);
@@ -446,7 +448,7 @@
 
         }
     }
-    
+
 </script>
 <script type="text/javascript">
     var infowindow = new kakao.maps.InfoWindow({zIndex: 1});
