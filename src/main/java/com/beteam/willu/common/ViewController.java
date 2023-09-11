@@ -86,6 +86,9 @@ public class ViewController {
 		User user = userService.findUser(post.getUsername());
 		String nickname = user.getNickname();
 		String picture = user.getPicture();
+		Long userId = user.getId();
+
+		model.addAttribute("userId", userId);
 
 		model.addAttribute("nickname", nickname);
 		model.addAttribute("picture", picture);
@@ -159,6 +162,9 @@ public class ViewController {
 	public String Profile(Model model, @PathVariable Long id) {
 
 		User user = userService.findUser(id);
+		String nickname = user.getNickname();
+
+		model.addAttribute("nick", nickname);
 		model.addAttribute("user", user);
 
 		Double score = user.getScore();

@@ -140,10 +140,11 @@
             </div>
             <div class="profile-details">
                 <div class="nickname">
-                    <a href="#" class="navbar-brand" id="user-nickname">Nickname</a>
+                    <a href="#" onclick="goToUserProfile('${post.username}');" class="navbar-brand"
+                       th:text="${nickname}">작성자 : ${nickname}</a>
                 </div>
                 <div class="score">
-                    <span>점수: <span id="user-score"></span></span>
+                    <span>점수: ${userScore}</span>
                 </div>
             </div>
         </div>
@@ -177,6 +178,7 @@
     var nickname = [[${ nickname }]];
     var picture = [[${ picture }]]
     var userScore = [[${ userScore }]]
+    var userId = [[${ userId }]]
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
@@ -365,13 +367,13 @@
             <img src="${picture}" width="70" height="70">
         </div>
         <div class="profile-details">
-            <div class="nickname">
-                <a th:text="${nickname}" class="navbar-brand">작성자 : ${nickname}</a>
-            </div>
-            <div class="score">
-                <span>점수: ${userScore}</span>
-            </div>
-        </div>
+    <div class="nickname">
+        <a href="#" onclick="goToUserProfile('${userId}');" class="navbar-brand" th:text="${nickname}">작성자 : ${nickname}</a>
+    </div>
+    <div class="score">
+        <span>점수: ${userScore}</span>
+    </div>
+</div>
     </div>
                     <div id="moreInfo">
                         <h3>관심사</h3>
@@ -388,6 +390,10 @@
                     </div>
             `;
         postbox.append(postDiv);
+    }
+
+    function goToUserProfile(username) {
+        window.location.href = '/profile/' + username;
     }
 </script>
 
