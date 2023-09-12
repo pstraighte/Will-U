@@ -242,6 +242,11 @@
             margin-bottom: 10px;
         }
 
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
     </style>
 </head>
 
@@ -299,7 +304,6 @@
 
 </body>
 <script>
-
     $(document).ready(function () {
         let token1 = Cookies.get('Authorization');
         const payloads = JSON.parse(atob(token1.split(".")[1]));
@@ -337,7 +341,6 @@
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
-                console.log("responseresponseresponse :", response);
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
@@ -356,13 +359,14 @@
                     url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
                     method: 'GET', // 요청 메소드 (GET, POST 등)
                     success: function (response) {
+                        console.log("responseresponseresponseresponse", response);
                         for (var i = 0; i < response.chatContentList.length; i++) {
 
                             var formattedDateTime = makeDateFormat(response.chatContentList[i].createAt);
 
                             if (userAuth == response.chatContentList[i].userName) {
                                 $(`<div id="chatDivMe-${i}" class="chatDivMe"></div>`).appendTo(`#chatting`);
-                                $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userName}</div>`).appendTo(`#chatDivMe-${i}`);
+                                $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDivMe-${i}`);
 
                                 $(`<div id="chatContentDivMe-${i}" class="chatContentDivMe"></div>`).appendTo(`#chatDivMe-${i}`);
                                 $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>`).appendTo(`#chatContentDivMe-${i}`);
@@ -371,7 +375,7 @@
                             }
 
                             $(`<div id="chatDiv-${i}" class="chatDiv"></div>`).appendTo(`#chatting`);
-                            $(`<div id="chatUser" class="chatUser">${response.chatContentList[i].userName}</div>`).appendTo(`#chatDiv-${i}`);
+                            $(`<div id="chatUser" class="chatUser">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDiv-${i}`);
 
                             $(`<div id="chatContentDiv-${i}" class="chatContentDiv"></div>`).appendTo(`#chatDiv-${i}`);
                             $(`<div id="chatContent" class="chatContent">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDiv-${i}`);
@@ -397,10 +401,8 @@
 
     // 쿼리스트링 값 불러오기
     urlSearch = new URLSearchParams(location.search);
-
     // 채팅방 id
     roomNumber = urlSearch.get('number')
-
     // 쿠키값에서 유저 값 가져오기
     let token1 = Cookies.get('Authorization');
     const payloads = JSON.parse(atob(token1.split(".")[1]));
@@ -408,6 +410,13 @@
 
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth;
+
+    // 유저 확인 한번만 하기
+
+    //유저 닉네임
+    // var userNicName = userNickNameSearch();
+    //
+    // console.log("userNicName", userNicName);
 
     var socket = new SockJS("/chatting");
     stompClient = Stomp.over(socket);
@@ -479,6 +488,7 @@
 
     }
 
+    // 소켓 연결
     connect();
 
     //엔터 눌렀을때 전송
@@ -488,9 +498,8 @@
 
     //화면에 메시지를 표시하는 함수
     function showMessage(data) {
-        // var formattedDateTime = makeDateFormat(data.date);
 
-        if (data.sender === userId) {
+        if (data.userId === userId) {
             $(`<div id="chatDivMe" class="chatDivMe">
                 <div id="chatUserMe" class="chatUserMe">${data.sender}</div>
 
@@ -511,21 +520,6 @@
                 </div>
             </div>`).appendTo(`#chatting`);
         }
-    }
-
-    function makeDateFormat(dateTimeString) {
-        // Date 객체로 변환
-        let dateTime = new Date(dateTimeString);
-
-        // 원하는 형식으로 날짜와 시간을 가공
-        let year = dateTime.getFullYear();
-        let month = dateTime.getMonth() + 1;
-        let day = dateTime.getDate();
-        let hour = dateTime.getHours();
-        let minute = dateTime.getMinutes();
-
-        // 날짜와 시간을 원하는 형식으로 조합
-        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
     }
 
     //메시지 브로커로 메시지 전송
@@ -560,12 +554,13 @@
             success: function (response) {
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
 
-                console.log("사용자확인 : ", response);
                 var chackUser;
+                var chatUserNick; // 보내진 채팅에 유저닉 표시
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
-                        // 해당 채팅방에 속한 사용자
+                        // 해당 채팅방에 속한 사용자 (이때의 유저 닉)
                         chackUser = true;
+                        chatUserNick = response.chatRoomList[i].userNick;
                     }
                 }
                 if (!chackUser == true) {
@@ -575,14 +570,12 @@
 
                 data = {
                     'type': 'chat',
-                    'sender': userId,
+                    'userId': userId,
+                    'sender': chatUserNick,
                     'contents': $("#msg").val(),
                     'roomNumber': roomNumber,
                     'date': makeDateFormat(currentDate)
                 };
-
-                // send(destination,헤더,페이로드)
-                // stompClient.send("/app/chat/send", {}, JSON.stringify(data));
 
                 //보낼때 채팅 저장
                 $.ajax({
@@ -624,6 +617,7 @@
             url: `/api/chat/chatRooms/${roomNumber}/users`,
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
+                console.log("response", response);
                 var chackUser;
                 // 해당 사용자가 ADMIN인지 판단
                 for (var j = 0; j < response.chatRoomList.length; j++) {
@@ -641,7 +635,7 @@
                     if (userId == response.chatRoomList[i].userName) {
                         $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">
                             <div id="chatRoomUserPro" class="chatRoomUserPro"></div>
-                            <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userName}</div>
+                            <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userNick}</div>
                         </div>`).appendTo(`#userBox`);
                         continue;
                     }
@@ -650,7 +644,7 @@
                     $(`<div id="chatRoomUser-${response.chatRoomList[i].userId}" class="chatRoomUser" onclick="">
                        <div id="chatRoomUserPro" class="chatRoomUserPro"></div>
 
-                       <div id="chatRoomUserName" class="chatRoomUserName">${response.chatRoomList[i].userName}</div>
+                       <div id="chatRoomUserName" class="chatRoomUserName"><a href="/profile/${response.chatRoomList[i].userId}">${response.chatRoomList[i].userNick}</a></div>
 
                        <div id="reviewBtnBox" class="reviewBtnBox">
                          <button class="btn btn-light" onclick="review(${response.chatRoomList[i].userId},'${response.chatRoomList[i].userName}')">후 기</button>
@@ -710,6 +704,7 @@
                 var reviewCheck = false;
                 var reviewContent = "";
                 var reviewScore = "";
+                var receiverNickname = "";
                 // 해당 유저에게 리뷰를 이미 남겼는지 확인
                 for (var i = 0; i < response.reviews.length; i++) {
                     // 해당 유저에게 리뷰를 이미 남겼는지 확인
@@ -719,14 +714,14 @@
                         reviewCheck = true;
                         reviewContent = response.reviews[i].content;
                         reviewScore = response.reviews[i].score;
-                        senderNickname = response.reviews[i].senderNickname;
+                        receiverNickname = response.reviews[i].receiverNickname;
                     }
                 }
 
                 if (reviewCheck) {
                     // 리뷰 수정창 띄우기
                     $("#reviewModalOverlay").fadeIn();
-                    $(".modal-content").find($(`p[id^='userImpor']`)).text(user);
+                    $(".modal-content").find($(`p[id^='userImpor']`)).text(receiverNickname);
 
                     //후기 입력 노드
                     $(`<input type="text" id="reviewContent" class="form-control"  value="${reviewContent}" />
@@ -735,13 +730,13 @@
 
                     $(` <div id="reviewBtn" >
                             <button id="reviewUpdateInsert" class="btn btn-light" onclick="reviewUpdate(${id})">확인</button>
-                            <button id="reviewDelete" class="btn btn-light" onclick="reviewDelete(${id})">리뷰삭제</button>
+                            <button id="reviewDelete" class="btn btn-light" onclick="reviewDelete(${id})">후기삭제</button>
                             <button id="reviewUpdateCancle" class="btn btn-light" onclick="reviewCancle()">닫기</button>
                         </div>
                     `).appendTo(`.modal-buttons`);
                 } else {
                     $("#reviewModalOverlay").fadeIn();
-                    $(".modal-content").find($(`p[id^='userImpor']`)).text(user);
+                    $(".modal-content").find($(`p[id^='userImpor']`)).text(receiverNickname);
 
                     //후기 입력 노드
                     $(`<input type="text" id="reviewContent" class="form-control" placeholder="후기를 입력하세요" />
@@ -823,7 +818,7 @@
             contentType: "application/json",
             data: JSON.stringify({content: $("#reviewContent").val(), score: intValue}), // 점수를 intValue로 설정
             success: function (response) {
-                alert("리뷰가 수정되었습니다");
+                alert("후기가 수정되었습니다");
                 // 수정 노드 삭제
                 $("#reviewUpdateInsert").remove();
                 $("#reviewUpdateCancle").remove();
@@ -837,7 +832,7 @@
                 $("#reviewModalOverlay").fadeOut();
             },
             error: function (xhr, status, error) {
-                alert("리뷰 수정 실패");
+                alert("후기 수정 실패");
                 console.log(xhr);
             }
         });
@@ -849,7 +844,7 @@
             url: `/api/review/users/${id}/chatRooms/${roomNumber}`,
             method: 'DELETE', // 요청 메소드 (GET, POST 등)
             success: function (response) {
-                alert("리뷰가 삭제되었습니다.");
+                alert("후기가 삭제되었습니다.");
                 // 수정 노드 삭제
                 $("#reviewUpdateInsert").remove();
                 $("#reviewUpdateCancle").remove();
@@ -863,15 +858,10 @@
                 $("#reviewModalOverlay").fadeOut();
             },
             error: function (xhr, status, error) {
-                alert("리뷰삭제 실패")
+                alert("후기삭제 실패")
                 console.log(xhr);
             }
         });
-    }
-
-    // 소켓 끊기
-    function disconnect() {
-        stompClient.disconnect();
     }
 
     // 채팅방 나가기
@@ -992,14 +982,6 @@
 
     }
 
-    // 사용자가 뒤로 가기시 동작
-    window.addEventListener("popstate", (event) => {
-        alert("뒤로간다!")
-        disconnect();
-        // 여기에 뒤로가기 시 실행할 작업을 추가하세요.
-        // 예: 경고창 표시, 원하는 동작 수행 등
-    });
-
     // 특정 유저에게 메세지 (강퇴)
     function kickOutMsg(kickOutUser) {
         data = {
@@ -1009,6 +991,26 @@
         };
 
         stompClient.send(`/app/sendToUser/` + kickOutUser, {}, JSON.stringify(data));
+    }
+
+    function makeDateFormat(dateTimeString) {
+        // Date 객체로 변환
+        let dateTime = new Date(dateTimeString);
+
+        // 원하는 형식으로 날짜와 시간을 가공
+        let year = dateTime.getFullYear();
+        let month = dateTime.getMonth() + 1;
+        let day = dateTime.getDate();
+        let hour = dateTime.getHours();
+        let minute = dateTime.getMinutes();
+
+        // 날짜와 시간을 원하는 형식으로 조합
+        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
+    }
+
+    // 소켓 끊기
+    function disconnect() {
+        stompClient.disconnect();
     }
 
 </script>

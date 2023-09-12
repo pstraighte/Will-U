@@ -271,8 +271,6 @@
 
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-
-    <script src="/js/login.js"></script>
 </head>
 
 <body>
@@ -298,220 +296,68 @@
         <div class="form-content">
             <div class="login-form">
                 <div class="title">Login</div>
-                <form action="#">
-                    <div class="input-boxes">
-                        <div class="input-box">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="idInput" placeholder="Enter your id" required>
-                        </div>
-                        <div class="input-box">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="passInput" placeholder="Enter your password" required>
-                        </div>
-                        <!--                        <div class="text"><a href="#">Forgot password?</a></div>-->
-                        <div class="button input-box">
-                            <input type="button" onclick="login()" value="로그인">
-                        </div>
-                        <button id="login-kakao-btn"
-                                onclick="kakaoLogin()">
-                            카카오로 로그인하기
-                        </button>
-                        <button id="login-google-btn"
-                                onclick="googleLogin()">
-                            구글 로그인하기
-                        </button>
-                        <button id="login-naver-btn"
-                                onclick="naverLogin()">
-                            네이버 로그인하기
-                        </button>
-                        <div class="text sign-up-text">계정이 없으신가요? <label for="flip">지금 바로 회원가입</label>
-                        </div>
+                <div id="idDiv" class="input-boxes">
+                    <div class="input-box">
+                        <i class="fas fa-user"></i>
+                        <input id="idInput" type="text" placeholder="Enter your id" required>
                     </div>
-                </form>
+                    <div class="input-box">
+                        <i class="fas fa-lock"></i>
+                        <input id="passInput" type="password" placeholder="Enter your password" required>
+                    </div>
+                    <!--                        <div class="text"><a href="#">Forgot password?</a></div>-->
+                    <div class="button input-box">
+                        <input type="submit" onclick="login()" value="로그인">
+                    </div>
+                </div>
+                <button id="login-kakao-btn"
+                        onclick="kakaoLogin()">
+                    카카오로 로그인하기
+                </button>
+                <button id="login-google-btn"
+                        onclick="googleLogin()">
+                    구글 로그인하기
+                </button>
+                <button id="login-naver-btn"
+                        onclick="naverLogin()">
+                    네이버 로그인하기
+                </button>
+                <div class="text sign-up-text">계정이 없으신가요? <label for="flip">지금 바로 회원가입</label>
+                </div>
             </div>
             <div class="signup-form">
                 <div class="title">Signup</div>
-                <form action="#">
-                    <div class="input-boxes">
-                        <div class="input-box">
-                            <i class="fas fa-user"></i>
-                            <input type="text" id="username" placeholder="Enter your id" required>
-                        </div>
-                        <div class="input-box">
-                            <i class="fas fa-id-card"></i>
-                            <input type="text" id="nickname" placeholder="Enter your nickname" required>
-                        </div>
-                        <div class="input-box">
-                            <i class="fas fa-envelope"></i>
-                            <input type="text" id="email" placeholder="Enter your email" required>
-                        </div>
-                        <div class="input-box">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="password" placeholder="Enter your password" required>
-                        </div>
-                        <div class="input-box">
-                            <i class="fas fa-lock"></i>
-                            <input type="password" id="password-confirm" placeholder="Enter your password" required>
-                        </div>
-                        <div class="button input-box">
-                            <input type="submit" onclick="signup()" value="회원가입">
-                        </div>
-                        <div class="text sign-up-text">이미 계정이 있으신가요? <label for="flip">로그인하러 가기</label>
-                        </div>
+                <div id="sinupDiv" class="input-boxes">
+                    <div class="input-box">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="username" placeholder="Enter your id" required>
                     </div>
-                </form>
+                    <div class="input-box">
+                        <i class="fas fa-id-card"></i>
+                        <input type="text" id="nickname" placeholder="Enter your nickname" required>
+                    </div>
+                    <div class="input-box">
+                        <i class="fas fa-envelope"></i>
+                        <input type="text" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-box">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="input-box">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="password-confirm" placeholder="Enter your password" required>
+                    </div>
+                    <div class="button input-box">
+                        <input type="button" onclick="signup()" value="회원가입">
+                    </div>
+                    <div class="text sign-up-text">이미 계정이 있으신가요? <label for="flip">로그인하러 가기</label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 </body>
-<script>
-    $(document).ready(function () {
-        // 토큰 삭제
-        Cookies.remove('Authorization', {path: '/'});
-        Cookies.remove('RT', {path: '/'});
-    });
-
-    function login() {
-        let username = document.getElementById("idInput").value;
-        let password = document.getElementById("passInput").value;
-        if (username === '' || password === '') {
-            alert("정보를 모두 입력해주세요");
-            return;
-        }
-        $.ajax({
-            url: `/api/users/login`, // 요청을 보낼 서버의 URL
-            method: 'POST', // 요청 메소드 (GET, POST 등)
-            contentType: "application/json",
-            data: JSON.stringify({username: username, password: password}),
-
-            success: function (response) {
-                console.log(response.message);
-                if (response.message === "로그인 성공") {
-                    const Toast = Swal.mixin({
-                        toast: true,
-                        position: 'center',
-                        showConfirmButton: false,
-                        timer: 1000,
-                        timerProgressBar: true,
-                        didOpen: (toast) => {
-                            toast.addEventListener('mouseenter', Swal.stopTimer)
-                            toast.addEventListener('mouseleave', Swal.resumeTimer)
-                        }
-                    })
-
-                    Toast.fire({
-                        icon: 'success',
-                        title: '로그인 성공'
-                    }).then(() => {
-                        window.location.href = "/";
-                    });
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: '로그인 실패',
-                        text: response,
-                    });
-                }
-            },
-            error: function (xhr) {
-                Swal.fire({
-                    icon: 'error',
-                    title: '로그인 실패',
-                    text: "아이디 혹은 비밀번호를 확인하세요",
-                });
-            }
-        });
-    }
-
-    function signup() {
-        let username = document.getElementById("username").value;
-        let nickname = document.getElementById("nickname").value;
-        let email = document.getElementById("email").value;
-        let password = document.getElementById("password").value;
-        let confirmPassword = document.getElementById("password-confirm").value;
-
-        if (username === '' || password === '' || nickname === '' || email === '' || confirmPassword === '') {
-            Swal.fire({
-                icon: 'warning',
-                title: '회원가입 실패',
-                text: "회원 정보를 모두 입력해주세요"
-            });
-        }
-
-        let email_format = '^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+)$';
-
-        if (!email.match(email_format)) {
-            Swal.fire({
-                icon: 'warning',
-                title: '회원가입 실패',
-                text: "아이디가 이메일 형식에 부합하지 않습니다."
-            });
-            document.getElementById("email").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
-            return;
-        }
-
-        if (password !== confirmPassword) {
-            Swal.fire({
-                icon: 'warning',
-                title: '회원가입 실패',
-                text: "비밀번호가 일치하지 않습니다"
-            });
-            document.getElementById("password-confirm").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
-            return;
-        }
-
-        $.ajax({
-            type: "POST",
-            url: "/api/users/signup",
-            data: JSON.stringify({
-                username: username,
-                nickname: nickname,
-                email: email,
-                password: password
-            }),
-            contentType: "application/json",
-
-            success: function (response) {
-                const Toast = Swal.mixin({
-                    toast: true,
-                    position: 'center-center',
-                    showConfirmButton: false,
-                    timer: 800,
-                    timerProgressBar: true,
-                    didOpen: (toast) => {
-                        toast.addEventListener('mouseenter', Swal.stopTimer)
-                        toast.addEventListener('mouseleave', Swal.resumeTimer)
-                    }
-                })
-
-                Toast.fire({
-                    icon: 'success',
-                    title: '회원가입 성공'
-                }).then(() => {
-                    window.location.href = "/login";
-                });
-
-            },
-            error: function (xhr) {
-                if (xhr.responseText) {
-                    try {
-                        const responseJson = JSON.parse(xhr.responseText);
-                        const errorMessage = responseJson.message;
-                        Swal.fire({
-                            icon: 'error',
-                            title: '회원가입 실패',
-                            text: errorMessage,
-                        });
-                    } catch (e) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: '회원가입 실패'
-                        });
-                    }
-                }
-            }
-        })
-    }
-</script>
+<script src="/js/login.js"></script>
 </html>

@@ -259,9 +259,6 @@ public class ChatRoomService {
         if (chatRoom.isEmpty()) {
             throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
         }
-        // 해당 채팅방의 id 를 가진 유저들을 조회
-
-        //		List<UserChatRoom> chatRoomUsers = userChatRoomsRepository.findAllByChatRoomsId(id);
 
         for (UserChatRoom userChatRoom : chatRoom) {
             System.out.println("userChatRoom = " + userChatRoom.getUser().getUsername());

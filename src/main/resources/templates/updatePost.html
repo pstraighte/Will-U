@@ -379,9 +379,8 @@
         let promiseTime = $("#promiseTime").val();
         let promiseArea = $("#promiseArea").val();
         let maxnum = $("#maxnum").val();
-        let tags = emptyArray;
 
-        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '' || tags.length === 0) {
+        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '') {
             Swal.fire({
                 icon: 'warning',
                 title: '게시글 수정 실패',
@@ -436,6 +435,8 @@
             $("#tag").val('');
         } else if (tagName.includes(' ') || tagName === '') {
             alert("공백을 이용할 수 없습니다.")
+        } else if (tagName.length < 2) {
+            alert("두글자 이상 입력하세요.")
         } else {
             emptyArray.push(tagName);
 
@@ -445,7 +446,6 @@
             <button class="btn-close" onclick="delTag('${tagName}')"></button>
             </li>`).appendTo(`#tagList`);
             $("#tag").val('');
-
         }
     }
 

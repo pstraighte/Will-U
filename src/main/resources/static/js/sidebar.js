@@ -62,9 +62,10 @@ eventSource.onmessage = e => {
 
         if (jsonData.notificationType == "APPROVE_REQUEST") {
             $('.accordion-content').empty();
-            showChatRoom(jsonData.receiver.nickname);
+            getChatRooms(jsonData.receiver.username);
         }
     }
+
 
 }
 eventSource.onerror = error => {

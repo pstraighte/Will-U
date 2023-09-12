@@ -54,33 +54,21 @@ public class HashTagService {
     // 태그중 탐 5
     @Transactional
     public List<TagTopResponseDto> getTags() {
-        List<Object[]> testData = boardTagMapRepository.countTagsByTagIdDescLimit5();
+        List<Object[]> testData = boardTagMapRepository.countTagsByTagIdDesc();
 
         List<TagTopResponseDto> results = new ArrayList<>();
         for (Object[] objects : testData) {
             Long tagId = (Long) objects[0]; // 첫 번째 요소는 Tag_id
             Optional<Tag> tag = hashTagRepository.findById(tagId);
+
             Long count = (Long) objects[1]; // 두 번째 요소는 개수
-            System.out.println("Tag_id: " + tag.get().getContent() + ", Count: " + count);
+            
             results.add(new TagTopResponseDto(tag.get().getContent(), count));
         }
 
         return results;
     }
 
-    // 태그 삭제 (중간테이블)
-//    public void deleteTag(Long id) {
-//        // 태그가 존재하는지 확인.
-//        BoardTagMap boardTagMap = findTag(id);
-//
-//        boardTagMapRepository.delete(boardTagMap);
-//
-//    }
-
-    // 태그 찾기
-//    public BoardTagMap findTag(Long id) {
-//        return boardTagMapRepository.findById(id).orElseThrow(EntityNotFoundException::new);
-//    }
 }
 
 class PostListComparator implements Comparator<Post> {
