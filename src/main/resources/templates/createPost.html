@@ -157,7 +157,7 @@
         <label for="maxnum">모임 인원</label>
         <input type="number" id="maxnum" name="maxnum" min="2">
 
-
+        <br>
         <label for="tag">태그</label>
         <input type="text" id="tag" name="tag">
 
@@ -203,6 +203,8 @@
             $("#tag").val('');
         } else if (tagName.includes(' ') || tagName === '') {
             alert("공백을 이용할 수 없습니다.")
+        } else if (tagName.length < 2) {
+            alert("두글자 이상 입력하세요.")
         } else {
             emptyArray.push(tagName);
 
