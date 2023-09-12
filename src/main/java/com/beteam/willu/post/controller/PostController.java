@@ -74,6 +74,7 @@ public class PostController {
     @PutMapping("/posts/{id}")
     public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @Valid @RequestBody PostRequestDto postRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
+	postService.deleteOldTagMap(id);
         PostResponseDto result = postService.updatePost(id, postRequestDto, userDetails.getUsername());
         return ResponseEntity.status((HttpStatus.OK)).body(result);
     }
