@@ -29,9 +29,4 @@ public class UserChatRoom extends Timestamped {
     @Column(name = "role")
     private String role;
 
-//    // 채팅방유저 삭제시 후기도 삭제
-//    @OneToMany(mappedBy = "chatRooms", cascade = CascadeType.REMOVE)
-//    @Builder.Default
-//    private List<UserChatRoom> userChatRoomList = new ArrayList<>();
-
 }

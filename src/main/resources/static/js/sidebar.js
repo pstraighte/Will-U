@@ -62,9 +62,10 @@ eventSource.onmessage = e => {
 
         if (jsonData.notificationType == "APPROVE_REQUEST") {
             $('.accordion-content').empty();
-            showChatRoom(jsonData.receiver.nickname);
+            getChatRooms(jsonData.receiver.username);
         }
     }
+
 
 }
 eventSource.onerror = error => {
@@ -176,7 +177,7 @@ function goProfile() {
 }
 
 function goMypage() {
-    window.location.href = `/users/mypage`;
+    window.location.href = `/mypage`;
 }
 
 function chatRoom(id) {
@@ -286,12 +287,15 @@ function sendReject(ntId, postId, publisherId) {
         contentType: "application/json",
         data: JSON.stringify(data),
         success: function (response) {
-            alert("전송 완료");
+            // alert("전송 완료");
+            console.log("전송 완료");
+            console.log(response);
 
         },
         error: function (xhr, status, error) {
-            alert("전송 실패")
+            // alert("전송 실패")
             console.log(xhr);
+            console.log(error)
         }
     });
 }
@@ -303,6 +307,7 @@ function sendApprove(ntId, postId, publisherId) {
         "userId": publisherId,
         "notificationId": ntId
     };
+    console.log(data);
     //승인 알림 전송
     $.ajax({
         url: `/api/chatRoom/join`, // 요청을 보낼 서버의 URL

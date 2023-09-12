@@ -18,7 +18,7 @@
             <a th:text="${user.nickname}" class="navbar-brand">Nickname</a>
         </div>
         <div class="score">
-            <span>점수: <span th:text="${userScore}"></span></span>
+            <span>점수: <span th:text="${user.score}"></span></span>
         </div>
     </div>
     <div class="edit-button">
@@ -101,7 +101,29 @@
             </div>
         </div>
     </div>
+    <!-- 추가 버튼 -->
+    <button type="button" id="add-interest-button" class="button add-button"
+            th:attr="data-user-id=${user.id}">관심 유저 추가
+    </button>
+
+    <!-- 해제 버튼 -->
+    <button type="button" id="remove-interest-button" class="button remove-button"
+            th:attr="data-user-id=${user.id}">관심 유저 해제
+    </button>
+
+    <!-- 추가 버튼 -->
+    <button type="button" id="add-blacklist-button" class="button add-button"
+            th:attr="data-user-id=${user.id}">블랙리스트 추가
+    </button>
+
+    <!-- 해제 버튼 -->
+    <button type="button" id="remove-blacklist-button" class="button remove-button"
+            th:attr="data-user-id=${user.id}">블랙리스트 해제
+    </button>
 </div>
+<script th:inline="javascript">
+    var user = [[${ user }]];
+</script>
 <script src="/js/sidebar.js"></script>
 <script>
     const editProfileButton = document.getElementById("edit-profile-button");
@@ -214,6 +236,92 @@
             $(this).tab('show'); // 해당 탭을 활성화
         });
     });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // 공통적으로 사용할 함수로 API 요청을 처리하는 함수를 정의합니다.
+        async function performApiRequest(userId, method, type, successMessage, failureMessage) {
+            try {
+                const response = await fetch(`/api/${type}/${userId}`, {
+                    method: method
+                });
+
+                if (response.ok) {
+                    // 성공적으로 요청을 처리한 경우의 처리
+                    // 예: 버튼 스타일 변경, 메시지 표시 등
+                    window.alert(successMessage);
+                } else {
+                    // 서버로부터 실패 응답을 받았을 때의 처리
+                    // 예: 에러 메시지 표시 등
+                    console.error("요청 실패");
+                    window.alert(failureMessage);
+                }
+            } catch (error) {
+                // API 요청 중에 발생한 오류 처리
+                console.error("API 요청 오류:", error);
+            }
+        }
+
+
+        // 추가 버튼 클릭 시
+        document.getElementById("add-interest-button").addEventListener("click", async () => {
+            const userId = document.getElementById("add-interest-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "POST", "interest", "관심 유저로 추가되었습니다.", "관심 유저 추가 실패");
+        });
+
+        // 해제 버튼 클릭 시
+        document.getElementById("remove-interest-button").addEventListener("click", async () => {
+            const userId = document.getElementById("remove-interest-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "DELETE", "interest", "관심 유저에서 제거되었습니다.", "관심 유저 해제 실패");
+        });
+
+        // 블랙리스트 추가 버튼 클릭 시
+        document.getElementById("add-blacklist-button").addEventListener("click", async () => {
+            const userId = document.getElementById("add-blacklist-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "POST", "blacklist", "블랙리스트에 추가되었습니다.", "블랙리스트 추가 실패");
+        });
+
+        // 블랙리스트 해제 버튼 클릭 시
+        document.getElementById("remove-blacklist-button").addEventListener("click", async () => {
+            const userId = document.getElementById("remove-blacklist-button").getAttribute("data-user-id");
+            await performApiRequest(userId, "DELETE", "blacklist", "블랙리스트에서 제거되었습니다.", "블랙리스트 해제 실패");
+        });
+    });
+
+    // 토큰에서 username 추출
+    if (token) {
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userName = payloads.sub;
+        checkWriterAndShowButtons(userName, user.username);
+    } else {
+        const userName = null;
+        checkWriterAndShowButtons(userName, user.username);
+    }
+
+    function checkWriterAndShowButtons(loginUserName, profileUserName) {
+        console.log("loginUserName:", loginUserName);
+        console.log("profileUserName:", profileUserName);
+        if (loginUserName !== null) { // 로그인한 경우에만 버튼을 표시
+            if (loginUserName === profileUserName) {
+                $("#edit-profile-button").css("display", "");
+                $("#add-interest-button").css("display", "none");
+                $("#remove-interest-button").css("display", "none");
+                $("#add-blacklist-button").css("display", "none");
+                $("#remove-blacklist-button").css("display", "none");
+            } else {
+                $("#edit-profile-button").css("display", "none");
+                $("#add-interest-button").css("display", "");
+                $("#remove-interest-button").css("display", "");
+                $("#add-blacklist-button").css("display", "");
+                $("#remove-blacklist-button").css("display", "");
+            }
+        } else { // 로그인하지 않은 경우 버튼을 숨김
+            $("#edit-profile-button").css("display", "none");
+            $("#add-interest-button").css("display", "none");
+            $("#remove-interest-button").css("display", "none");
+            $("#add-blacklist-button").css("display", "none");
+            $("#remove-blacklist-button").css("display", "none");
+        }
+    }
 </script>
 </body>
 </html>

@@ -10,6 +10,7 @@ public class ChatRoomSetResponseDto {
     private String role; // 해당 유저가 ADMIN인지 판단.
     private String chatName;
     private String userName;
+    private String userNick;
 
     // 해당 dto 를 채팅방 불러오기랑 채팅방 유저 불러오기 둘다 사용중이라
     // 채팅방 id 와 사용자 id를 두개 불러온다.
@@ -19,5 +20,6 @@ public class ChatRoomSetResponseDto {
         this.role = chatRoom.getRole();
         this.chatName = chatRoom.getChatRooms().getChatTitle();
         this.userName = chatRoom.getUser().getUsername();
+        this.userNick = chatRoom.getUser().getNickname();
     }
 }
