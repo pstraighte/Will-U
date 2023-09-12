@@ -96,6 +96,7 @@
                     <th scope="col">제목</th>
                     <th scope="col">모집인원</th>
                     <th scope="col">모집여부</th>
+                    <th scope="col">작성자</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -347,17 +348,19 @@
     }
 
     function createPostHTML(post) {
+        console.log(post.username);
         var tableBody = $('.table tbody');
         var newRow = $('<tr>'); // 새로운 행 생성
         var idCell = $('<th scope="row">').text(post.id);
         var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
         let content = getChatRoomUserInfo(post);
         var maxnumCell = $('<td>').text(content);
+        var writerCell = $('<td>').text(post.username);
         var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
         var recruitmentCell = $('<td>').text(recruitmentText);
 
         // 행에 셀들을 추가
-        newRow.append(idCell, titleCell, maxnumCell, recruitmentCell);
+        newRow.append(idCell, titleCell, maxnumCell, recruitmentCell, writerCell);
         tableBody.append(newRow);
     }
 
