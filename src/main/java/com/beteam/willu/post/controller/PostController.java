@@ -22,7 +22,7 @@ import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
-import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.post.service.PostServiceImpl;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class PostController {
 
-	private final PostService postService;
+	private final PostServiceImpl postService;
 
 	// 게시글 작성
 	@PostMapping("/post")
