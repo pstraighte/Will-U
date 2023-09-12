@@ -90,7 +90,6 @@ public class ChatRoomService {
 
     // 특정 채팅룸 불러오기 (채팅방의 활성화 확인)
     public ChatRoomNameResponseDto getRoom(Long id, UserDetailsImpl userDetails) {
-
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(id);
 
         if (!chatRoom.isPresent()) {

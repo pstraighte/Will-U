@@ -317,7 +317,7 @@
 
         // 해당 채팅방이 활성화 상태인지 - 사용자가 url로 채팅방 이동시 막기
         $.ajax({
-            url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL
+            url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL   // 해당 룸번호는 불러옴. (api가 동작하는지 봐야함)
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
                 if (!response.activated) {
@@ -328,7 +328,7 @@
                 $('#title_room').text(response.roomName);
             },
             error: function (xhr, status, error) {
-                alert("채팅방 활성화 체크 오류")
+                alert("채팅방에 다시 입장해 주세요.")
                 window.location.href = "/";
                 console.log(xhr);
             }
@@ -351,6 +351,7 @@
 
                 // 해당 채팅방에 속한 사용자가 아닐때 이동
                 if (!chackUser == true) {
+                    alert("해당 채팅방 사용자가 아닙니다.")
                     window.location.href = "/"
                 }
 
@@ -385,13 +386,13 @@
                         $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
                     },
                     error: function (xhr, status, error) {
-                        alert("채팅 내용 불러오기 실패")
+                        alert("이전 채팅내용을 불러오지 못했습니다.")
                         console.log(xhr);
                     }
                 });
             },
             error: function (xhr, status, error) {
-                alert("해당 채팅방 사용자가 아닙니다.")
+                alert("채팅방에 다시 입장해 주세요.")
                 console.log(xhr);
                 window.location.href = "/"
             }
@@ -411,12 +412,6 @@
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth;
 
-    // 유저 확인 한번만 하기
-
-    //유저 닉네임
-    // var userNicName = userNickNameSearch();
-    //
-    // console.log("userNicName", userNicName);
 
     var socket = new SockJS("/chatting");
     stompClient = Stomp.over(socket);
@@ -873,7 +868,6 @@
         // 한국 시간대에 시차를 적용
         var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
 
-
         data = {
             'type': 'disconnect',
             'sender': userId,
@@ -951,8 +945,6 @@
 
                 kickOutMsg(kickOutUser);
 
-                // 기능 업그레이드는 개별 메세지를 보내고 개별 메세지를 받은 사용자가
-                // 확인버튼을 누르면 바로 채팅방이 나가지는 (리다이렉트)
                 //보낼때 채팅 저장
                 $.ajax({
                     url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL
