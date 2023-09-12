@@ -5,7 +5,7 @@ import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
-import com.beteam.willu.post.service.PostService;
+import com.beteam.willu.post.service.PostServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class PostController {
 
-    private final PostService postService;
+    private final PostServiceImpl postService;
 
     // 게시글 작성
     @Operation(summary = "게시글 생성", description = "정해진 파라미터를 받은 후 게시글 데이터를 생성합니다.")
