@@ -1,6 +1,6 @@
 # Workflow 이름
 name: Spring Boot & Gradle CI/CD
-
+# 
 # 어떤 이벤트가 발생하면 workflow 실행할 지 명시
 on:
   # main 브랜치에 push나 pull request 발생 시
