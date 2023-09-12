@@ -233,9 +233,8 @@
         let promiseTime = $("#promiseTime").val();
         let promiseArea = $("#promiseArea").val();
         let maxnum = $("#maxnum").val();
-        let tags = emptyArray;
 
-        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '' || tags.length === 0) {
+        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '') {
             Swal.fire({
                 icon: 'warning',
                 title: '게시글 등록 실패',

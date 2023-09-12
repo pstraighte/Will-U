@@ -299,7 +299,6 @@
 
 </body>
 <script>
-
     $(document).ready(function () {
         let token1 = Cookies.get('Authorization');
         const payloads = JSON.parse(atob(token1.split(".")[1]));
@@ -337,7 +336,6 @@
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
                 // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
-                console.log("responseresponseresponse :", response);
                 var chackUser;
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
@@ -397,10 +395,8 @@
 
     // 쿼리스트링 값 불러오기
     urlSearch = new URLSearchParams(location.search);
-
     // 채팅방 id
     roomNumber = urlSearch.get('number')
-
     // 쿠키값에서 유저 값 가져오기
     let token1 = Cookies.get('Authorization');
     const payloads = JSON.parse(atob(token1.split(".")[1]));
@@ -408,6 +404,14 @@
 
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth;
+
+    // 유저 확인 한번만 하기
+
+
+    //유저 닉네임
+    // var userNicName = userNickNameSearch();
+    //
+    // console.log("userNicName", userNicName);
 
     var socket = new SockJS("/chatting");
     stompClient = Stomp.over(socket);
@@ -479,6 +483,7 @@
 
     }
 
+    // 소켓 연결
     connect();
 
     //엔터 눌렀을때 전송
@@ -488,7 +493,6 @@
 
     //화면에 메시지를 표시하는 함수
     function showMessage(data) {
-        // var formattedDateTime = makeDateFormat(data.date);
 
         if (data.sender === userId) {
             $(`<div id="chatDivMe" class="chatDivMe">
@@ -511,21 +515,6 @@
                 </div>
             </div>`).appendTo(`#chatting`);
         }
-    }
-
-    function makeDateFormat(dateTimeString) {
-        // Date 객체로 변환
-        let dateTime = new Date(dateTimeString);
-
-        // 원하는 형식으로 날짜와 시간을 가공
-        let year = dateTime.getFullYear();
-        let month = dateTime.getMonth() + 1;
-        let day = dateTime.getDate();
-        let hour = dateTime.getHours();
-        let minute = dateTime.getMinutes();
-
-        // 날짜와 시간을 원하는 형식으로 조합
-        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
     }
 
     //메시지 브로커로 메시지 전송
@@ -562,10 +551,12 @@
 
                 console.log("사용자확인 : ", response);
                 var chackUser;
+                var chatUserNick; // 보내진 채팅에 유저닉 표시
                 for (var i = 0; i < response.chatRoomList.length; i++) {
                     if (userAuth == response.chatRoomList[i].userName) {
-                        // 해당 채팅방에 속한 사용자
+                        // 해당 채팅방에 속한 사용자 (이때의 유저 닉)
                         chackUser = true;
+                        chatUserNick = response.chatRoomList[i].userNick;
                     }
                 }
                 if (!chackUser == true) {
@@ -575,14 +566,11 @@
 
                 data = {
                     'type': 'chat',
-                    'sender': userId,
+                    'sender': chatUserNick, // 여긴데
                     'contents': $("#msg").val(),
                     'roomNumber': roomNumber,
                     'date': makeDateFormat(currentDate)
                 };
-
-                // send(destination,헤더,페이로드)
-                // stompClient.send("/app/chat/send", {}, JSON.stringify(data));
 
                 //보낼때 채팅 저장
                 $.ajax({
@@ -869,11 +857,6 @@
         });
     }
 
-    // 소켓 끊기
-    function disconnect() {
-        stompClient.disconnect();
-    }
-
     // 채팅방 나가기
     // 채팅방에서 방장이 나갔을 경우 (미구현)
     function disconnectChatRoom() {
@@ -992,14 +975,6 @@
 
     }
 
-    // 사용자가 뒤로 가기시 동작
-    window.addEventListener("popstate", (event) => {
-        alert("뒤로간다!")
-        disconnect();
-        // 여기에 뒤로가기 시 실행할 작업을 추가하세요.
-        // 예: 경고창 표시, 원하는 동작 수행 등
-    });
-
     // 특정 유저에게 메세지 (강퇴)
     function kickOutMsg(kickOutUser) {
         data = {
@@ -1011,5 +986,25 @@
         stompClient.send(`/app/sendToUser/` + kickOutUser, {}, JSON.stringify(data));
     }
 
+    function makeDateFormat(dateTimeString) {
+        // Date 객체로 변환
+        let dateTime = new Date(dateTimeString);
+
+        // 원하는 형식으로 날짜와 시간을 가공
+        let year = dateTime.getFullYear();
+        let month = dateTime.getMonth() + 1;
+        let day = dateTime.getDate();
+        let hour = dateTime.getHours();
+        let minute = dateTime.getMinutes();
+
+        // 날짜와 시간을 원하는 형식으로 조합
+        return year + "년 " + month + "월 " + day + "일 " + hour + "시 " + minute + "분";
+    }
+
+    // 소켓 끊기
+    function disconnect() {
+        stompClient.disconnect();
+    }
+    
 </script>
 </html>

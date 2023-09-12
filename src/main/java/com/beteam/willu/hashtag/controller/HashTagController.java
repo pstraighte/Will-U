@@ -49,10 +49,4 @@ public class HashTagController {
         return hashTagService.getTags();
     }
 
-
-    // 태그삭제
-//    @DeleteMapping("/tags/{id}")
-//    public void deleteTag(@PathVariable Long id) {
-//        hashTagService.deleteTag(id);
-//    }
 }
