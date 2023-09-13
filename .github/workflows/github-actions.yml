@@ -7,7 +7,7 @@ on:
   push:
     branches: [ "CICD_test" ]
 
-
+# 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
   addProperties:
