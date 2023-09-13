@@ -61,11 +61,11 @@ jobs:
 
       # Docker 이미지 빌드
       - name: Docker Image Build
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ PROJECT_NAME }}
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
 
       # DockerHub Push
       - name: DockerHub Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ PROJECT_NAME }}
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
 
       # EC2 인스턴스 접속 및 애플리케이션 실행
       - name: Application Run
@@ -77,14 +77,14 @@ jobs:
 
           script: |
             cd /home/ubuntu/
-            sudo docker kill ${{ PROJECT_NAME }}
-            sudo docker rm -f ${{ PROJECT_NAME }}
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ PROJECT_NAME }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ PROJECT_NAME }}
+            sudo docker kill ${{ secrets.PROJECT_NAME }}
+            sudo docker rm -f ${{ secrets.PROJECT_NAME }}
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
             docker run -p -d 8080:8080 \
             --name ${{ PROJECT_NAME }}
             # -e SPRING_DATASOURCE_URL=${{ secrets.DEV_DB_URL }} \
             # -e SPRING_DATASOURCE_USERNAME=admin \
             # -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ PROJECT_NAME }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
