@@ -44,12 +44,13 @@ public class JwtUtil {
 	public static final long REFRESH_TOKEN_EXPIRE_TIME = 7 * 24 * 60 * 60 * 1000L; // 3일
 
 	private Key key;
+	@Value("${jwt.secret.key}") String secret;
 	private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 	private final RedisUtil redisUtil;
 	// 로그 설정
 	public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
-	public JwtUtil(@Value("${jwt.secret.key}") String secret, RedisUtil redisUtil) {
+	public JwtUtil(RedisUtil redisUtil) {
 		byte[] keyBytes = Decoders.BASE64.decode(secret);
 		this.key = Keys.hmacShaKeyFor(keyBytes);
 		this.redisUtil = redisUtil;
