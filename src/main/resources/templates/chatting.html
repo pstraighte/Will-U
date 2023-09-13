@@ -320,6 +320,7 @@
             url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL
             method: 'GET', // 요청 메소드 (GET, POST 등)
             success: function (response) {
+                // 여기까지 못오고 퇴출
                 if (!response.activated) {
                     alert("활성화된 채팅방이 아닙니다.")
                     window.location.href = "/";
@@ -351,6 +352,7 @@
 
                 // 해당 채팅방에 속한 사용자가 아닐때 이동
                 if (!chackUser == true) {
+                    alert("해당 채팅방 사용자가 아닙니다.")
                     window.location.href = "/"
                 }
 
@@ -391,7 +393,7 @@
                 });
             },
             error: function (xhr, status, error) {
-                alert("해당 채팅방 사용자가 아닙니다.")
+                alert("채팅방오류 다시 입장하세요")
                 console.log(xhr);
                 window.location.href = "/"
             }
