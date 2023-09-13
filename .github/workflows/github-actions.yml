@@ -11,7 +11,6 @@ permissions:
   contents: read
   
 env:
-  DOCKERHUB_USERNAME: pstraighte
   PROJECT_NAME: willu
     
 # 
@@ -58,16 +57,16 @@ jobs:
       - name: DockerHub Login
         uses: docker/login-action@v2
         with:
-          username: $DOCKERHUB_USERNAME
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       # Docker 이미지 빌드
       - name: Docker Image Build
-        run: docker build -t $DOCKERHUB_USERNAME/$PROJECT_NAME .
+        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/$PROJECT_NAME .
 
       # DockerHub Push
       - name: DockerHub Push
-        run: docker push $DOCKERHUB_USERNAME/$PROJECT_NAME
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/$PROJECT_NAME
 
       # EC2 인스턴스 접속 및 애플리케이션 실행
       - name: Application Run
@@ -81,14 +80,14 @@ jobs:
             cd /home/ubuntu/
             sudo docker kill $PROJECT_NAME
             sudo docker rm -f $PROJECT_NAME
-            sudo docker rmi $DOCKERHUB_USERNAME/$PROJECT_NAME
-            sudo docker pull $DOCKERHUB_USERNAME/$PROJECT_NAME
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/$PROJECT_NAME
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/$PROJECT_NAME
             
             docker run -p 8080:8080 \
             --name $PROJECT_NAME \
             # -e SPRING_DATASOURCE_URL=${{ secrets.DEV_DB_URL }} \
             # -e SPRING_DATASOURCE_USERNAME=admin \
             # -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
-            -d $DOCKERHUB_USERNAME/$PROJECT_NAME
+            -d ${{ secrets.DOCKERHUB_USERNAME }}/$PROJECT_NAME
   # -d가 백그라운드 실행시킴
   # Docker 이미지를 빌드하고 EC2 인스턴스에서 해당 이미지를 실행하는 단계가 이미 포함되어 있으므로 추가적인 deploy 파일이 필요하지 않습니다
