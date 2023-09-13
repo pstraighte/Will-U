@@ -10,7 +10,7 @@ on:
 permissions:
   contents: read
   
-env:
+# env:
   # PROJECT_NAME: willu
     
 # 
