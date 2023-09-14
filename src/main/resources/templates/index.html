@@ -14,8 +14,18 @@
             cursor: pointer; /* 커서 스타일을 포인터로 변경하여 클릭 가능하도록 함 */
             margin-left: 20px;
             border-radius: 5px;
+            width: 20%;
         }
 
+        .nav {
+            align-content: center;
+            width: 70%;
+            min-height: 40px;
+            float: right;
+            height: fit-content;
+
+
+        }
 
         .postbox {
             display: flex; /* 요소들을 가로로 배치하기 위한 설정 */
@@ -60,7 +70,12 @@
             flex-direction: row; /* 가로로 배치 (기본값은 row이므로 생략 가능) */
             justify-content: space-between; /* 요소들을 좌우로 분산 배치 */
             align-items: center; /* 요소들을 수직 가운데 정렬 */
-            margin-top: 40px;
+            margin: 40px auto;
+            align-content: center;
+            width: 70%;
+            float: right;
+            height: fit-content;
+
         }
 
         .table a {
@@ -111,21 +126,23 @@
         </div>
 
         <!--        추가한 내용-->
-        <nav aria-label="Page navigation example">
-            <ul class="pagination" id="pagination">
-                <li class="page-item" id="page-item1">
-                </li>
-                <li class="page-item" id="page-item2">
-                </li>
+        <div class="nav">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination" id="pagination">
+                    <li class="page-item" id="page-item1">
+                    </li>
+                    <li class="page-item" id="page-item2">
+                    </li>
 
-                <!--                노드 들어갈곳-->
+                    <!--                노드 들어갈곳-->
 
-                <li class="page-item" id="page-item3">
-                </li>
-                <li class="page-item" id="page-item4">
-                </li>
-            </ul>
-        </nav>
+                    <li class="page-item" id="page-item3">
+                    </li>
+                    <li class="page-item" id="page-item4">
+                    </li>
+                </ul>
+            </nav>
+        </div>
 
         <div class="nav-list">
             <form id="searchForm">
