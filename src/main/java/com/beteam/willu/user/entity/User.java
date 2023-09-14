@@ -45,14 +45,6 @@ public class User extends Timestamped {
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
-	// 번호
-	@Column(name = "phoneNumber")
-	private String phoneNumber;
-
-	// 지역
-	@Column(name = "area")
-	private String area;
-
 	// 프로필 사진 url
 	@Column(name = "picture")
 	private String picture;
@@ -78,8 +70,6 @@ public class User extends Timestamped {
 	@Transactional
 	public void profileUpdate(UserUpdateRequestDto updateRequestDto) {
 		this.nickname = updateRequestDto.getNickname();
-		this.phoneNumber = updateRequestDto.getPhoneNumber();
-		this.area = updateRequestDto.getArea();
 	}
 
 	// 카카오 id 를 업데이트

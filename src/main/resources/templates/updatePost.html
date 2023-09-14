@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <th:block th:replace="~{fragments/sidebar::common-header}"></th:block>
+    <script type="text/javascript"
+            th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${apiKey} + '&libraries=services'"></script>
+
+
     <title>게시글 수정</title>
     <style>
         .post-form {
@@ -128,6 +132,78 @@
         .slider.round:before {
             border-radius: 50%;
         }
+
+
+        #tagList {
+            list-style-type: none; /* 리스트 마커(점) 제거 */
+            padding: 0; /* 내부 여백 제거 */
+        }
+
+        #tagList > li {
+            display: inline; /* 가로로 나타내기 */
+            margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
+        }
+
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            width: 50%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .close-modal:hover {
+            color: red;
+        }
+
+        /* 검색 결과 목록 스타일링 */
+        .location-result {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f5f5f5;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .location-result:hover {
+            background-color: #e0e0e0;
+        }
+
+        .place-name {
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .address-name {
+            font-size: 14px;
+            color: #555;
+        }
+
     </style>
 </head>
 <body>
@@ -142,24 +218,8 @@
         <label for="content">내용</label>
         <textarea id="content" name="content" required></textarea>
 
-        <label for="category">관심분야</label>
-        <select id="category" name="category">
-            <option value="">카테고리 선택</option>
-            <option value="운동">운동</option>
-            <option value="커뮤니케이션">커뮤니케이션</option>
-            <option value="게임">게임</option>
-            <option value="문화생활">문화생활</option>
-            <option value="자기개발">자기개발</option>
-            <option value="동물">동물</option>
-            <option value="맛집투어">맛집투어</option>
-            <option value="기타">기타</option>
-        </select><br>
-
         <label for="promiseTime">약속 시간</label>
         <input type="datetime-local" id="promiseTime" name="promiseTime">
-
-        <label for="promiseArea">약속 장소</label>
-        <input type="text" id="promiseArea" name="promiseArea">
 
         <label for="maxnum">모임 인원</label>
         <input type="number" id="maxnum" name="maxnum" min="2">
@@ -171,6 +231,31 @@
         <p id="off-text">OFF</p>
         <p id="on-text" style="display:none;">ON</p>
 
+        <label for="tag">태그</label>
+        <input type="text" id="tag" name="tag">
+
+        <ul id="tagList">
+
+        </ul>
+        <button onclick="arrayAdd()">태그 입력</button>
+
+        <br><br>
+        <label for="promiseArea">약속 장소</label>
+        <input type="text" id="promiseArea" name="promiseArea" readonly>
+        <div id="map" style="width: 100%; height: 400px;"></div>
+        <button id="chooseLocation">약속 장소 수정</button>
+        <div id="locationModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <h2>장소 선택</h2>
+                <label for="modalKeyword"></label><input type="text" id="modalKeyword" placeholder="장소 검색 키워드">
+                <div id="infoWindowContent"></div>
+                <div id="addressInfo"></div>
+                <button id="modalSearchLocation">검색</button>
+                <div id="modalLocationResults"></div>
+            </div>
+        </div>
+
         <div class="buttons">
             <button type="button" onclick="updatePost()">수정</button>
             <button type="button" id="back">취소</button>
@@ -180,15 +265,22 @@
 </body>
 
 <script th:inline="javascript">
+
     var postId = [[${postId}]];
     console.log(postId);
     let status;
     let toggle = $("#recruit-status");
+
+    // 태그 배열
+    const emptyArray = [];
+
     // ========== 게시글 정보 불러오기 ==========
     $.ajax({
         url: `/api/posts/${postId}`,
         method: 'GET',
         success: function (response) {
+            console.log("responseresponseresponse : ", response);
+
             $("#title").val(response.title);
             $("#content").val(response.content);
             $("#category").val(response.category);
@@ -198,11 +290,31 @@
             status = response.recruitment;
             console.log("status", status);
 
+            // 태그
+            for (var i = 0; i < response.tagList.length; i++) {
+                $(`<li id="${response.tagList[i].tag}">
+                  #${response.tagList[i].tag}
+                  <button class="btn-close" onclick="delTag('${response.tagList[i].tag}')"></button>
+                </li>`).appendTo(`#tagList`);
+
+                emptyArray.push(response.tagList[i].tag);
+            }
+
+            console.log("클라이언트 배열 확인 :", emptyArray);
+
+
             // status 변수의 값을 기반으로 체크박스의 상태를 설정합니다.
             toggle.prop("checked", status);
             if (status) {
                 $("#off-text").hide();
                 $("#on-text").show();
+            }
+            let area = response.promiseArea;
+            if (area) {
+                if (area.includes("_")) {
+                    area = area.split("_")[1];
+                }
+                getCoordinatesFromAddress(area)
             }
         },
         error: function (xhr, status, error) {
@@ -262,32 +374,290 @@
 
     // ========== 게시글 수정 ==========
     function updatePost() {
-        $.ajax({
-            url: `/api/posts/${postId}`,
-            method: 'PUT',
-            contentType: "application/json",
-            data: JSON.stringify({
-                title: $("#title").val(),
-                content: $("#content").val(),
-                category: $("#category").val(),
-                promiseTime: $("#promiseTime").val(),
-                promiseArea: $("#promiseArea").val(),
-                maxnum: $("#maxnum").val()
-            }),
-            success: function (response) {
-                window.location.href = "/posts/" + postId;
-            },
-            error: function (xhr, status, error) {
-                alert("글 수정 실패");
-                console.log(xhr);
-            }
-        });
+        let title = $("#title").val();
+        let content = $("#content").val();
+        let promiseTime = $("#promiseTime").val();
+        let promiseArea = $("#promiseArea").val();
+        let maxnum = $("#maxnum").val();
+
+        if (title === '' || content === '' || promiseTime === '' || promiseArea === '' || maxnum === '') {
+            Swal.fire({
+                icon: 'warning',
+                title: '게시글 수정 실패',
+                text: "게시글 정보를 모두 입력해주세요"
+            });
+        } else {
+            $.ajax({
+                url: `/api/posts/${postId}`,
+                method: 'PUT',
+                contentType: "application/json",
+                data: JSON.stringify({
+                    title: $("#title").val(),
+                    content: $("#content").val(),
+                    category: $("#category").val(),
+                    promiseTime: $("#promiseTime").val(),
+                    promiseArea: $("#promiseArea").val(),
+                    maxnum: $("#maxnum").val(),
+                    tags: emptyArray
+                }),
+                success: function (response) {
+                    window.location.href = "/posts/" + postId;
+                },
+                error: function (xhr, status, error) {
+                    alert("글 수정 실패");
+                    console.log(xhr);
+                }
+            });
+        }
     }
 
     document.getElementById("back").addEventListener("click", function () {
         window.location.href = "/posts/" + postId; // 뒤로가기 (상세페이지로)
     });
 
+    function delTag(tagName) {
+        const index = emptyArray.indexOf(`${tagName}`);
+        if (index !== -1) {
+            emptyArray.splice(index, 1);
+        }
 
+        $(`#${tagName}`).remove();
+        console.log("삭제시 : ", emptyArray);
+    }
+
+    function arrayAdd() {
+        console.log("배열 상황 ", emptyArray);
+
+        var tagName = $("#tag").val()
+        // 이미 배열에 있는 값인지
+        if (emptyArray.includes(tagName)) {
+            alert("이미 입력한 태그입니다.")
+            $("#tag").val('');
+        } else if (tagName.includes(' ') || tagName === '') {
+            alert("공백을 이용할 수 없습니다.")
+        } else if (tagName.length < 2) {
+            alert("두글자 이상 입력하세요.")
+        } else {
+            emptyArray.push(tagName);
+
+            console.log("넣은 상황", emptyArray);
+            $(`<li id="${tagName}">
+            ${tagName}
+            <button class="btn-close" onclick="delTag('${tagName}')"></button>
+            </li>`).appendTo(`#tagList`);
+            $("#tag").val('');
+        }
+    }
+
+</script>
+<script type="text/javascript">
+    var infowindow = new kakao.maps.InfoWindow({zIndex: 1});
+    var currentMarker = null; // 현재 마커를 저장하기 위한 변수
+
+    var container = document.getElementById('map');
+    var options = {
+        center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 중심 좌표 설정
+        level: 3 // 초기 확대 레벨 설정
+    };
+    var map = new kakao.maps.Map(container, options);
+
+    var ps = new kakao.maps.services.Places();
+
+    function searchLocation(keyword) {
+
+        ps.keywordSearch(keyword, placesSearchCB);
+
+    }
+
+    function placesSearchCB(data, status, pagination) {
+        console.log(data);
+        if (status === kakao.maps.services.Status.OK) {
+            // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+            // LatLngBounds 객체에 좌표를 추가합니다
+            var bounds = new kakao.maps.LatLngBounds();
+
+            for (var i = 0; i < data.length; i++) {
+                bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+            }
+
+            // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+            map.setBounds(bounds);
+
+            // 검색 결과를 모달 창에 표시
+            var resultsDiv = document.getElementById('modalLocationResults');
+            resultsDiv.innerHTML = ''; // 이전 검색 결과 초기화
+
+            if (data.length === 0) {
+                resultsDiv.innerText = '검색 결과가 없습니다.';
+                return;
+            }
+
+            // 검색 결과를 목록으로 표시
+            data.forEach(function (place) {
+                var placeDiv = document.createElement('div');
+                placeDiv.className = 'location-result';
+
+                var leftDiv = document.createElement('div');
+                leftDiv.className = 'place-name';
+                leftDiv.innerText = place.place_name;
+
+                var rightDiv = document.createElement('div');
+                rightDiv.className = 'address-name';
+                rightDiv.innerText = place.address_name;
+
+                // 목록 클릭 시 해당 장소 정보를 입력 필드에 표시
+                placeDiv.addEventListener('click', function () {
+                    // 표시할 마커의 위치 좌표
+                    var markerPosition = new kakao.maps.LatLng(place.y, place.x);
+
+                    // 기존 마커 제거
+                    if (currentMarker) {
+                        currentMarker.setMap(null);
+                    }
+
+                    // 새로운 마커 생성
+                    currentMarker = new kakao.maps.Marker({
+                        position: markerPosition,
+                        map: map
+                    });
+
+                    // 새로운 마커로 지도 이동
+                    map.panTo(markerPosition);
+
+                    // 선택한 장소 정보를 입력 필드에 표시
+                    document.getElementById('promiseArea').value = place.place_name;
+                    closeModal(); // 모달 창 닫기
+
+                    // 클릭한 마커의 정보를 InfoWindow에 표시
+                    var content = '<div style="padding:5px;font-size:12px;">' + place.place_name + '<br>' + place.address_name + '<br>' + '</div>';
+                    infowindow.setContent(content);
+                    infowindow.open(map, currentMarker);
+                });
+
+                // 왼쪽과 오른쪽 엘리먼트를 부모에 추가
+                placeDiv.appendChild(leftDiv);
+                placeDiv.appendChild(rightDiv);
+
+                resultsDiv.appendChild(placeDiv);
+            });
+
+            // 지도 클릭 이벤트
+            kakao.maps.event.addListener(map, 'click', function (mouseEvent) {
+                // 클릭한 위치 좌표
+                var clickedLatLng = mouseEvent.latLng;
+
+                // 기존 마커 제거
+                if (currentMarker) {
+                    currentMarker.setMap(null);
+                }
+
+                // 좌표를 주소로 변환
+                var geocoder = new kakao.maps.services.Geocoder();
+                geocoder.coord2Address(clickedLatLng.getLng(), clickedLatLng.getLat(), function (result, status) {
+                    if (status === kakao.maps.services.Status.OK) {
+                        // 클릭한 위치의 주소 정보
+                        var address = result[0].address.address_name;
+
+                        // 선택한 장소 정보를 입력 필드에 표시
+                        document.getElementById('promiseArea').value = address;
+
+                        // 새로운 마커 생성
+                        currentMarker = new kakao.maps.Marker({
+                            position: clickedLatLng,
+                            map: map
+                        });
+
+                        // 클릭한 마커의 정보를 InfoWindow에 표시
+                        var content = '<div style="padding:5px;font-size:12px;">' + address + '</div>';
+                        infowindow.setContent(content);
+                        infowindow.open(map, currentMarker);
+                    } else {
+                        alert('주소 변환 실패');
+                    }
+                });
+            });
+
+        }
+    }
+
+    // 모달 열기
+    function openModal() {
+        var modal = document.getElementById('locationModal');
+        modal.style.display = 'block';
+    }
+
+    // 모달 닫기
+    function closeModal() {
+        var modal = document.getElementById('locationModal');
+        modal.style.display = 'none';
+    }
+
+    // 검색 버튼 클릭 시 모달 열기
+    document.getElementById('chooseLocation').addEventListener('click', function () {
+        openModal();
+    });
+
+    // 모달 닫기 버튼 클릭 시 모달 닫기
+    document.getElementsByClassName('close-modal')[0].addEventListener('click', function () {
+        closeModal();
+    });
+
+    // 검색 버튼 클릭 시 검색 결과 표시
+    document.getElementById('modalSearchLocation').addEventListener('click', function () {
+        var keyword = document.getElementById('modalKeyword').value;
+        searchLocation(keyword);
+    });
+
+    function getCoordinatesFromAddress(address) {
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        // 주소를 좌표로 변환
+        geocoder.addressSearch(address, function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var latitude = result[0].y; // 위도
+                var longitude = result[0].x; // 경도
+
+                // 얻어진 좌표로 마커를 표시하거나 다른 작업을 수행할 수 있습니다.
+                var place = {
+                    place_name: address,
+                    y: latitude,
+                    x: longitude
+                };
+
+                displayMarker(place);
+            } else {
+                console.log('주소를 좌표로 변환할 수 없습니다.');
+            }
+        });
+    }
+
+    function displayMarker(place) {
+        console.log("좌표: " + place.y)
+        console.log("좌표: " + place.x)
+
+        var markerPosition2 = new kakao.maps.LatLng(place.y, place.x);
+
+        // 마커를 생성하고 지도에 표시합니다
+        currentMarker = new kakao.maps.Marker({
+            position: markerPosition2,
+            map: map
+        });
+
+        // 새로운 마커로 지도 이동
+        map.panTo(markerPosition2);
+
+        // 선택한 장소 정보를 입력 필드에 표시
+        document.getElementById('promiseArea').value = place.place_name;
+        console.log("좌표: " + place.y)
+        console.log("좌표: " + place.x)
+
+        // 마커에 클릭 이벤트를 등록합니다
+        kakao.maps.event.addListener(currentMarker, 'click', function () {
+            // 클릭한 마커의 정보를 InfoWindow에 표시
+            var content = '<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>';
+            infowindow.setContent(content);
+            infowindow.open(map, currentMarker);
+        });
+    }
 </script>
 </html>

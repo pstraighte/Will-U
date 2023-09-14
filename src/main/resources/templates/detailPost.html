@@ -117,6 +117,16 @@
                 opacity: 0;
             }
         }
+
+        #tagBox {
+            list-style-type: none; /* 리스트 마커(점) 제거 */
+            padding: 0; /* 내부 여백 제거 */
+        }
+
+        #tagBox > li {
+            display: inline; /* 가로로 나타내기 */
+            margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
+        }
     </style>
 </head>
 
@@ -134,9 +144,21 @@
                 <h1 style="float: right">${status}</h1>
             </div>
         </div>
+        <div class="profile-container">
+            <div class="profile-image">
+                <img src="" alt="Profile Image" width="70" height="70" id="profile-image">
+            </div>
+            <div class="profile-details">
+                <div class="nickname">
+                    <a href="#" onclick="goToUserProfile('${post.username}');" class="navbar-brand"
+                       th:text="${nickname}">작성자 : ${nickname}</a>
+                </div>
+                <div class="score">
+                    <span>점수: ${userScore}</span>
+                </div>
+            </div>
+        </div>
         <div id="moreInfo">
-            <h3>관심사</h3>
-            <h4 class="attr"> ${response.category}</h4>
             <h3>약속 시간</h3>
             <h4 class="attr">${response.promiseTime}</h4>
             <h3>약속 장소</h3>
@@ -159,36 +181,48 @@
 </body>
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
-    // console.log(post);
+    var user = [[${ user }]];
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
     let currentNum = [[${ currentNum }]];
 
-    createPostContent(post, formattedDateTime, status, currentNum);
+    createPostContent(post, formattedDateTime, status, currentNum, user);
 
     //토큰에서 username 추출
-    const payloads = JSON.parse(atob(token.split(".")[1]));
-    const userName = payloads.sub;
-    //작성자인지 확인해서
-    checkWriterAndShowButtons(userName, post.username, status);
+    if (token) {
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        const userName = payloads.sub;
+        checkWriterAndShowButtons(userName, post.username, status);
+    } else {
+        const userName = null;
+        checkWriterAndShowButtons(userName, post.username, status);
 
+    }
+
+    //작성자인지 확인해서
     function checkWriterAndShowButtons(loginUserName, postUserName, status) {
 
-        if (loginUserName === postUserName) {
-            $("#join").css("display", "none");
-            $("#edit").css("display", "");
-            $("#delete").css("display", "");
-        } else {
-            if (status === "모집중") {
-                $("#join").css("display", "");
-                $("#edit").css("display", "none");
-                $("#delete").css("display", "none");
-            } else {
+        if (loginUserName !== null) { // 로그인한 경우에만 버튼을 표시
+            if (loginUserName === postUserName) {
                 $("#join").css("display", "none");
-                $("#edit").css("display", "none");
-                $("#delete").css("display", "none");
+                $("#edit").css("display", "");
+                $("#delete").css("display", "");
+            } else {
+                if (status === "모집중") {
+                    $("#join").css("display", "");
+                    $("#edit").css("display", "none");
+                    $("#delete").css("display", "none");
+                } else {
+                    $("#join").css("display", "none");
+                    $("#edit").css("display", "none");
+                    $("#delete").css("display", "none");
+                }
             }
+        } else { // 로그인하지 않은 경우 버튼을 숨김
+            $("#join").css("display", "none");
+            $("#edit").css("display", "none");
+            $("#delete").css("display", "none");
         }
     }
 
@@ -198,7 +232,7 @@
 
         // 원하는 형식으로 날짜와 시간을 가공
         let year = dateTime.getFullYear();
-        let month = dateTime.getMonth();
+        let month = dateTime.getMonth() + 1;
         let day = dateTime.getDate();
         let hour = dateTime.getHours();
         let minute = dateTime.getMinutes();
@@ -292,7 +326,7 @@
                     contentType: "application/json",
                     data: JSON.stringify({postId: `${post.id}`, receiverId: response, type: "JOIN_REQUEST"}),
                     success: function (response) {
-                        alert('신청 성공');
+                        console.log("신청 성공", response);
                     },
                     error: function (xhr, status, error) {
                         console.log(error);
@@ -314,7 +348,7 @@
         window.location.href = "/"; // 뒤로가기 기능 실행
     });
 
-    function createPostContent(response, formattedDateTime, status, currentNum) {
+    function createPostContent(response, formattedDateTime, status, currentNum, user) {
         var postbox = $('#postbox');
         postbox.empty();
         var postDiv = `
@@ -331,9 +365,20 @@
         postDiv += `
                         </div>
                     </div>
+    <div class="profile-container" style="display:flex">
+        <div class="profile-image">
+            <img src="${user.picture}" width="70" height="70">
+        </div>
+        <div class="profile-details">
+             <div class="nickname">
+                <a href="#" onclick="goToUserProfile('${user.id}');" class="navbar-brand">작성자 : ${user.nickname}</a>
+            </div>
+            <div class="score">
+                <span>점수: ${user.score.toFixed(2)}</span>
+            </div>
+        </div>
+    </div>
                     <div id="moreInfo">
-                        <h3>관심사</h3>
-                        <h4 class="attr"> ${response.category}</h4>
                         <h3>약속 시간</h3>
                         <h4 class="attr">${formattedDateTime}</h4>
                         <h3>약속 장소</h3>
@@ -344,8 +389,21 @@
                     <div id="contentBox">
                         <p>${response.content}</p>
                     </div>
+                    <ul id="tagBox">
+                    </ul>
             `;
         postbox.append(postDiv);
+
+
+        for (var i = 0; i < response.tagList.length; i++) {
+            $(`<li>
+                 #${response.tagList[i].tag}
+              </li>`).appendTo(`#tagBox`);
+        }
+    }
+
+    function goToUserProfile(username) {
+        window.location.href = '/profile/' + username;
     }
 </script>
 

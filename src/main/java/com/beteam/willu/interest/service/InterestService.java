@@ -27,6 +27,8 @@ public class InterestService {
 
 		if (interestRepository.existsByReceiverIdAndSenderId(receiver.getId(), user.getId())) {
 			throw new DuplicateRequestException("이미 관심등록 된 유저 입니다.");
+		} else if (receiver.getId().equals(user.getId())) {
+			throw new IllegalArgumentException("자신에게 관심등록을 할 수 없습니다.");
 		} else {
 			Interest interest = new Interest(receiver, user);
 			interestRepository.save(interest);
