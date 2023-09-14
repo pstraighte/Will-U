@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-
+  
 	private final PostRepository postRepository;
 	private final ChatRoomRepository chatRoomRepository;
 	private final UserChatRoomsRepository userChatRoomsRepository;
@@ -194,36 +194,9 @@ public class PostServiceImpl implements PostService {
 		return postPage.map(PostResponseDto::new);
 	}
 
-	// @Override
-	// @Transactional(readOnly = true)
-	// public Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment,
-	//                                          Pageable pageable) {
-	//     Page<Post> searchResultPage;
-	//     if (recruitment) {
-	//         searchResultPage = switch (criteria) {
-	//             case "username" ->
-	//                     postRepository.findByUser_UsernameContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword,
-	//                             pageable);
-	//             case "content" ->
-	//                     postRepository.findByContentContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
-	//             default ->
-	//                     postRepository.findByTitleContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
-	//         };
-	//     } else {
-	//         searchResultPage = switch (criteria) {
-	//             case "username" -> postRepository.findByUser_UsernameContainingOrderByCreatedAtDesc(keyword, pageable);
-	//             case "content" -> postRepository.findByContentContainingOrderByCreatedAtDesc(keyword, pageable);
-	//             default -> postRepository.findByTitleContainingOrderByCreatedAtDesc(keyword, pageable);
-	//         };
-	//     }
-	//
-	//     return searchResultPage.map(PostResponseDto::new);
-	// }
-
 	// 게시글 찾기
 	@Override
 	public Post findPost(Long id) {
 		return postRepository.findById(id).orElseThrow(EntityNotFoundException::new);
 	}
-
 }

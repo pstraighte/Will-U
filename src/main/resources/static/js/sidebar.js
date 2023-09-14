@@ -64,15 +64,24 @@ eventSource.onmessage = e => {
             $('.accordion-content').empty();
             getChatRooms(jsonData.receiver.username);
         }
+        //사이드바 열기
+        var offcanvasTarget = $('#offcanvasWithBothOptions');
+        if (!offcanvasTarget.hasClass('show')) {
+            // 열려있는 경우 닫기
+            offcanvasTarget.offcanvas('show');
+        }
+        if (!$(".accordion-header2").hasClass("active")) {
+            $(".accordion-header2").click();
+        }
     }
-
-
 }
 eventSource.onerror = error => {
     console.log("에러 발생");
-    //eventSource.close();
-};
 
+};
+window.onunload = function () {
+    eventSource.close();
+};
 //알림 허용 체크
 notifyMe();
 
@@ -188,19 +197,6 @@ function chatRoom(id) {
 
 //알림 기능
 
-function read(ntId) {
-    $.ajax({
-        url: `/api/notification/${ntId}`, // 요청을 보낼 서버의 URL
-        method: 'PATCH', // 요청 메소드 (GET, POST 등)
-        contentType: "application/json",
-        success: function (response) {
-            removeNotificationHTML(ntId);
-        },
-        error: function (xhr, status, error) {
-            console.log("읽기 처리 실패");
-        }
-    });
-}
 
 function reject(ntId, postId, publisherId) {
     if (confirm("참가 요청을 거부하시겠습니까?")) {

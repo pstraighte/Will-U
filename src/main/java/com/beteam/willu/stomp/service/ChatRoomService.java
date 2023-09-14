@@ -91,12 +91,14 @@ public class ChatRoomService {
     // 특정 채팅룸 불러오기 (채팅방의 활성화 확인)
     public ChatRoomNameResponseDto getRoom(Long id, UserDetailsImpl userDetails) {
 
+        // 쿼리스트링의 id를 가져와서 해당하는 채팅방을 조회
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(id);
 
         if (!chatRoom.isPresent()) {
             throw new IllegalArgumentException("해당 채팅방이 존재하지 않습니다.");
         }
 
+        // ChatRoomNameResponseDto 는 채팅방 제목과 활성화 상태를 반환
         return new ChatRoomNameResponseDto(chatRoom.get());
     }
 
@@ -253,11 +255,11 @@ public class ChatRoomService {
     // 채팅방 사용자들 조회
     // 채팅방 id를 사용해서 조회
     public ChatRoomsResponseDto getChatRoomUsers(Long id) {
-        // 해당 채팅방이 있는지 확인
+        // id 에 속한 유저 조회
         List<UserChatRoom> chatRoom = userChatRoomsRepository.findAllByChatRoomsId(id);
 
         if (chatRoom.isEmpty()) {
-            throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
+            throw new IllegalArgumentException("해당방의 유저가 존재하지 않습니다");
         }
 
         for (UserChatRoom userChatRoom : chatRoom) {
@@ -280,5 +282,10 @@ public class ChatRoomService {
         ChatRoom chatRoom = chatRoomRepository.findByPostId(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
         return chatRoom.getUserChatRoomList().size();
+    }
+
+    public long findChatRoomByPostId(Long postId) {
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
+        return chatRoom.getId();
     }
 }

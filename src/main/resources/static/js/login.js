@@ -1,14 +1,14 @@
 function googleLogin() {
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-rr40njqgkvh758r32q783es0oflajmh2.apps.googleusercontent.com&redirect_uri=http://52.79.83.234:8080/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-rr40njqgkvh758r32q783es0oflajmh2.apps.googleusercontent.com&redirect_uri=https://willuapp.com/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
 }
 
 
 function kakaoLogin() {
-    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=http://52.79.83.234:8080/api/users/kakao/callback&response_type=code'
+    window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=https://willuapp.com/api/users/kakao/callback&response_type=code'
 }
 
 function naverLogin() {
-    window.location.href = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=http://52.79.83.234:8080/api/users/naver/callback&response_type=code;'
+    window.location.href = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=https://willuapp.com/api/users/naver/callback&response_type=code;'
 }
 
 $(document).ready(function () {
@@ -84,18 +84,17 @@ function signup() {
         });
     }
 
-    let nickname_format = '^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$';
+    let nickname_format = '^[ㄱ-ㅎ가-힣A-Za-z0-9-_]{2,10}$';
 
     if (!nickname.match(nickname_format)) {
         Swal.fire({
             icon: 'warning',
             title: '회원가입 실패',
-            text: "닉네임은 특수문자 없이 두글자 이상 입력해 주세요"
+            text: "닉네임은 특수문자 없이 2~10까지만 입력해 주세요"
         });
         document.getElementById("nickname").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
         return;
     }
-
 
     let email_format = '^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+)$';
 
@@ -109,13 +108,11 @@ function signup() {
         return;
     }
 
-    let password_format = '(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{6,16}'
-
-    if (!password.match(password_format)) {
+    if (password === '') {
         Swal.fire({
             icon: 'warning',
             title: '회원가입 실패',
-            text: "비밀번호는 영어대소문자 와 특수문자를 포함해 주세요."
+            text: "비밀번호를 입력하세요."
         });
         document.getElementById("password").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
         return;

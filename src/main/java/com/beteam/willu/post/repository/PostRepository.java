@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
+
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.user.entity.User;
 import com.querydsl.core.types.Predicate;
