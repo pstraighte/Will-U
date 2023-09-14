@@ -326,6 +326,7 @@
                     contentType: "application/json",
                     data: JSON.stringify({postId: `${post.id}`, receiverId: response, type: "JOIN_REQUEST"}),
                     success: function (response) {
+                        alert('신청 성공하셨습니다.')
                         console.log("신청 성공", response);
                     },
                     error: function (xhr, status, error) {
