@@ -283,4 +283,9 @@ public class ChatRoomService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
         return chatRoom.getUserChatRoomList().size();
     }
+
+    public long findChatRoomByPostId(Long postId) {
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
+        return chatRoom.getId();
+    }
 }

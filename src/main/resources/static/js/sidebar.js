@@ -77,9 +77,11 @@ eventSource.onmessage = e => {
 }
 eventSource.onerror = error => {
     console.log("에러 발생");
-    //eventSource.close();
-};
 
+};
+window.onunload = function () {
+    eventSource.close();
+};
 //알림 허용 체크
 notifyMe();
 

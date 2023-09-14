@@ -127,6 +127,10 @@
             display: inline; /* 가로로 나타내기 */
             margin-right: 10px; /* 항목 간 간격 설정 (원하는 간격으로 조정) */
         }
+
+        #moveToChatRoom {
+            display: none;
+        }
     </style>
 </head>
 
@@ -172,6 +176,7 @@
     </div>
     <div class="buttons">
         <button id="join" onclick="joinRequest()">신청하기</button>
+        <button id="moveToChatRoom" onclick="goChatRoom()">채팅방 이동</button>
         <button id="edit" onclick="updatePost()">수정하기</button>
         <button id="delete" onclick="confirmAndDelete()">삭제하기</button>
         <button id="back">돌아가기</button>
@@ -182,6 +187,11 @@
 <script th:inline="javascript">
     var post = [[${ post }]];//타임리프-post.id에 사용
     var user = [[${ user }]];
+    var chatRoomId = [[${chatRoomId}]];
+    var userId = user.id;
+
+    console.log(chatRoomId);
+    console.log(userId);
 
     let formattedDateTime = makeDateFormat(post.promiseTime);
     let status = post.recruitment ? "모집중" : "모집 종료";
@@ -212,6 +222,7 @@
                 $("#join").css("display", "none");
                 $("#edit").css("display", "");
                 $("#delete").css("display", "");
+                $("#moveToChatRoom").css("display", "");
             } else {
                 if (status === "모집중") {
                     $("#join").css("display", "");
@@ -222,11 +233,19 @@
                     $("#edit").css("display", "none");
                     $("#delete").css("display", "none");
                 }
+                //TODO 채팅방에 참가해있는지 userchatroom findbyuseridandchatroomid
+                // if ("채팅방 참가 - 채팅방유저인지 확인 필요") {
+                //     $("#moveToChatRoom").css("display", "");
+                // } else {
+                //     $("#moveToChatRoom").css("display", "none");
+                // }
+                $("#moveToChatRoom").css("display", "");
             }
         } else { // 로그인하지 않은 경우 버튼을 숨김
             $("#join").css("display", "none");
             $("#edit").css("display", "none");
             $("#delete").css("display", "none");
+            $("#moveToChatRoom").css("display", "none");
         }
     }
 
@@ -409,6 +428,12 @@
 
     function goToUserProfile(username) {
         window.location.href = '/profile/' + username;
+    }
+
+    function goChatRoom() {
+
+        window.location.href = `/users/chat?numbers=${chatRoomId}`;
+
     }
 </script>
 
