@@ -170,7 +170,14 @@
     });
 
     document.getElementById("createPostButton").addEventListener("click", function () {
-        window.location.href = "/post/create";
+        //쿠키 있으면 이동 없으면 로그인 페이지로
+        let authorizationToken = getAuthorizationCookie();
+        if (authorizationToken === null) {
+            window.location.href = "/login";
+        } else {
+            window.location.href = "/post/create";
+        }
+
     });
 
     function nodeCreateAll(totalPages, number) {
