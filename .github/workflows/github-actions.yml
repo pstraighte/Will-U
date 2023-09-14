@@ -6,7 +6,10 @@ on:
   # main 브랜치에 push나 pull request 발생 시
   push:
     branches: [ "CICD_test" ]
-
+    
+permissions:
+  contents: read
+  
 # 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
@@ -63,7 +66,7 @@ jobs:
 
       # EC2 인스턴스 접속 및 애플리케이션 실행
       - name: Application Run
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -71,7 +74,7 @@ jobs:
 
           script: |
             cd /home/ubuntu/
-            sudo docker kill ${{ secrets.PROJECT_NAME }}
+            sudo docker stop ${{ secrets.PROJECT_NAME }}
             sudo docker rm -f ${{ secrets.PROJECT_NAME }}
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
