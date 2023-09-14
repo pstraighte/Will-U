@@ -76,12 +76,4 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
-            sudo docker run --name ${{ secrets.PROJECT_NAME }} \
-            -d -p 8081:8080 \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
-
-
-
-            # -e SPRING_DATASOURCE_URL=${{ secrets.DEV_DB_URL }} \
-            # -e SPRING_DATASOURCE_USERNAME=admin \
-            # -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
+            sudo docker-compose up -d
