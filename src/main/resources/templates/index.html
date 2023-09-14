@@ -354,7 +354,7 @@
         var titleCell = $('<td>').append($('<a>').attr('href', '/posts/' + post.id).text(post.title));
         let content = getChatRoomUserInfo(post);
         var maxnumCell = $('<td>').text(content);
-        var writerCell = $('<td>').text(post.username);
+        var writerCell = $('<td>').text(post.nickname);
         var recruitmentText = post.recruitment ? "모집중" : "모집완료🎉";
         var recruitmentCell = $('<td>').text(recruitmentText);
 
