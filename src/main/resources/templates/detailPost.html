@@ -190,15 +190,19 @@
     createPostContent(post, formattedDateTime, status, currentNum, user);
 
     //토큰에서 username 추출
+    let userName;
     if (token) {
-        const payloads = JSON.parse(atob(token.split(".")[1]));
-        const userName = payloads.sub;
-        checkWriterAndShowButtons(userName, post.username, status);
-    } else {
-        const userName = null;
-        checkWriterAndShowButtons(userName, post.username, status);
 
+        const payloads = JSON.parse(atob(token.split(".")[1]));
+        userName = payloads.sub;
+        console.log(userName)
+
+    } else {
+        userName = null;
+        console.log(userName)
     }
+    console.log(userName)
+    checkWriterAndShowButtons(userName, post.username, status);
 
     //작성자인지 확인해서
     function checkWriterAndShowButtons(loginUserName, postUserName, status) {
@@ -326,6 +330,7 @@
                     contentType: "application/json",
                     data: JSON.stringify({postId: `${post.id}`, receiverId: response, type: "JOIN_REQUEST"}),
                     success: function (response) {
+                        alert('신청 성공하셨습니다.')
                         console.log("신청 성공", response);
                     },
                     error: function (xhr, status, error) {

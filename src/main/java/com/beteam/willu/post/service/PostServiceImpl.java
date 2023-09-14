@@ -189,7 +189,7 @@ public class PostServiceImpl implements PostService {
         if (recruitment) {
             searchResultPage = switch (criteria) {
                 case "username" ->
-                        postRepository.findByUser_UsernameContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword,
+                        postRepository.findByUser_NicknameContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword,
                                 pageable);
                 case "content" ->
                         postRepository.findByContentContainingAndRecruitmentIsTrueOrderByCreatedAtDesc(keyword, pageable);
@@ -198,7 +198,7 @@ public class PostServiceImpl implements PostService {
             };
         } else {
             searchResultPage = switch (criteria) {
-                case "username" -> postRepository.findByUser_UsernameContainingOrderByCreatedAtDesc(keyword, pageable);
+                case "username" -> postRepository.findByUser_NicknameContainingOrderByCreatedAtDesc(keyword, pageable);
                 case "content" -> postRepository.findByContentContainingOrderByCreatedAtDesc(keyword, pageable);
                 default -> postRepository.findByTitleContainingOrderByCreatedAtDesc(keyword, pageable);
             };
