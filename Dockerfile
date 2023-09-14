@@ -10,4 +10,4 @@ COPY build/libs/Will-U-0.0.1-SNAPSHOT.jar Will-U-0.0.1-SNAPSHOT.jar
 EXPOSE 8080
 
 # 컨테이너 실행 시 사용할 명령어
-ENTRYPOINT ["java", "-jar", "Will-U-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "Will-U-0.0.1-SNAPSHOT.jar"]
