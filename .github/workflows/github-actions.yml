@@ -56,6 +56,7 @@ jobs:
       # Docker 이미지 빌드
       - name: Docker Image Build
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }} . 
+        needs: Build with Gradle
 
       # DockerHub Push
       - name: DockerHub Push
@@ -71,7 +72,7 @@ jobs:
 
           script: |
             cd /home/ubuntu/
-            sudo docker kill ${{ secrets.PROJECT_NAME }}
+            sudo docker stop ${{ secrets.PROJECT_NAME }}
             sudo docker rm -f ${{ secrets.PROJECT_NAME }}
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
