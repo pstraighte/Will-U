@@ -79,9 +79,9 @@ jobs:
             sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
-            docker run -p -d 8080:8080 \
+            docker run -p 8080:8080 \
             --name ${{ secrets.PROJECT_NAME }}
             # -e SPRING_DATASOURCE_URL=${{ secrets.DEV_DB_URL }} \
             # -e SPRING_DATASOURCE_USERNAME=admin \
             # -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DEV_DB_PASSWORD }} \
-            ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            -d ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
