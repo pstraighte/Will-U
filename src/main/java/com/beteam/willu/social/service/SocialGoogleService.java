@@ -182,6 +182,7 @@ public class SocialGoogleService {
                         .password(encodedPassword)
                         .email(email)
                         .googleId(googleId)
+                        .picture("https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg?w=826")
                         .build();
             }
 
