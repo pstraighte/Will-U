@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
-  
+
 	private final PostRepository postRepository;
 	private final ChatRoomRepository chatRoomRepository;
 	private final UserChatRoomsRepository userChatRoomsRepository;
@@ -188,7 +188,7 @@ public class PostServiceImpl implements PostService {
 	@Transactional(readOnly = true)
 	public Page<PostResponseDto> searchPosts(String keyword, String criteria, boolean recruitment, Pageable pageable) {
 		Predicate predicate = PostExpressions.createBooleanExpression(keyword, criteria, recruitment);
-		Page<Post> postPage = postRepository.findAllByOrderByIdDesc(predicate, pageable);
+		Page<Post> postPage = postRepository.findAll(predicate, pageable);
 
 		// Page<Post>를 Page<PostResponseDto>로 변환
 		return postPage.map(PostResponseDto::new);
