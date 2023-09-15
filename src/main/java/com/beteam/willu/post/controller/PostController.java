@@ -3,6 +3,7 @@ package com.beteam.willu.post.controller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -139,19 +140,18 @@ public class PostController {
 	// 게시글 검색
 	// TODO 파라매터 받아오는 방법 프론트엔드와 연결 시 확정 가능할 듯
 	// size를 선택할 수 있는 기능이 필요한가? ex) 10개, 20개, 30개
-	@Operation(summary = "게시글 검색", description = "정해진 파라미터를 받은 후 파라미터의 데이터에 맞는 게시글의 정보를 조회한다.")
-	@Parameter(name = "keyword", schema = @Schema(type = "String"), description = "검색 키워드")
-	@Parameter(name = "criteria", schema = @Schema(type = "String"), description = "검색 조건(제목, 사용자이름, 게시글 내용)")
-	@Parameter(name = "recruitment", schema = @Schema(type = "boolean"), description = "게시글의 모집중 상태")
 	@GetMapping("/search/posts")
 	public ResponseEntity<Page<PostResponseDto>> searchPosts(
-		@RequestParam("keyword") String keyword, // 검색 키워드 파라미터
-		@RequestParam("criteria") String criteria, // 검색 조건 파라미터 (title, nickname, content 중 하나)
-		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
-		@RequestParam(value = "size", defaultValue = "10") int size, // 페이지당 항목 수 파라미터 (기본값: 10)
-		@RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment // 모집중인 게시글만 검색할 것인가?
+		@RequestParam("keyword") String keyword,
+		@RequestParam("criteria") String criteria,
+		@RequestParam(value = "page", defaultValue = "0") int page,
+		@RequestParam(value = "size", defaultValue = "10") int size,
+		@RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment
 	) {
-		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		// 정렬 방식 지정 (id 필드를 내림차순으로 정렬)
+		Sort sort = Sort.by(Sort.Order.desc("id"));
+
+		Pageable pageable = PageRequest.of(page, size, sort); // 페이지와 항목 수를 기반으로 페이징 정보 생성
 		if (keyword.length() < 2) {
 			// 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
 			if (keyword.isEmpty()) {
