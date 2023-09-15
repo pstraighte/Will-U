@@ -9,9 +9,15 @@
             <maxFileSize>10MB</maxFileSize>
             <maxHistory>2</maxHistory>
         </rollingPolicy>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
     </appender>
 
     <root level="info">
         <appender-ref ref="file"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
