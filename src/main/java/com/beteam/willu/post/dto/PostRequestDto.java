@@ -19,7 +19,6 @@ public class PostRequestDto {
 
     private LocalDateTime promiseTime;
 
-    @NotBlank(message = "지역을 입력해 주세요")
     private String promiseArea;
 
     @Min(2) //최소 2명

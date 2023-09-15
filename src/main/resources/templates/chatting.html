@@ -304,102 +304,6 @@
 
 </body>
 <script>
-    $(document).ready(function () {
-        let token1 = Cookies.get('Authorization');
-        const payloads = JSON.parse(atob(token1.split(".")[1]));
-        const userAuth = payloads.sub;
-
-        // 쿼리스트링 값 불러오기
-        urlSearch = new URLSearchParams(location.search);
-
-        // 채팅방 id
-        roomNumber = urlSearch.get('number')
-
-        // 해당 채팅방이 활성화 상태인지 - 사용자가 url로 채팅방 이동시 막기
-        $.ajax({
-            url: `/api/chat/chatRooms/${roomNumber}`, // 요청을 보낼 서버의 URL   // 해당 룸번호는 불러옴. (api가 동작하는지 봐야함)
-            method: 'GET', // 요청 메소드 (GET, POST 등)
-            success: function (response) {
-                if (!response.activated) {
-                    alert("활성화된 채팅방이 아닙니다.")
-                    window.location.href = "/";
-                }
-
-                $('#title_room').text(response.roomName);
-            },
-            error: function (xhr, status, error) {
-                alert("채팅방에 다시 입장해 주세요.")
-                window.location.href = "/";
-                console.log(xhr);
-            }
-        });
-
-
-        // 채팅방에 속한 사용자 인지 확인
-        $.ajax({
-            url: `/api/chat/chatRooms/${roomNumber}/users`, // 요청을 보낼 서버의 URL
-            method: 'GET', // 요청 메소드 (GET, POST 등)
-            success: function (response) {
-                // 채팅방에 속한 사용자인지 판단 (api에 이기능을 넣을지 여기서 정할지 정하기)
-                var chackUser;
-                for (var i = 0; i < response.chatRoomList.length; i++) {
-                    if (userAuth == response.chatRoomList[i].userName) {
-                        // 해당 채팅방에 속한 사용자
-                        chackUser = true;
-                    }
-                }
-
-                // 해당 채팅방에 속한 사용자가 아닐때 이동
-                if (!chackUser == true) {
-                    alert("해당 채팅방 사용자가 아닙니다.")
-                    window.location.href = "/"
-                }
-
-                // 채팅방에 저장된 채팅내용 조회
-                $.ajax({
-                    url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
-                    method: 'GET', // 요청 메소드 (GET, POST 등)
-                    success: function (response) {
-                        console.log("responseresponseresponseresponse", response);
-                        for (var i = 0; i < response.chatContentList.length; i++) {
-
-                            var formattedDateTime = makeDateFormat(response.chatContentList[i].createAt);
-
-                            if (userAuth == response.chatContentList[i].userName) {
-                                $(`<div id="chatDivMe-${i}" class="chatDivMe"></div>`).appendTo(`#chatting`);
-                                $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDivMe-${i}`);
-
-                                $(`<div id="chatContentDivMe-${i}" class="chatContentDivMe"></div>`).appendTo(`#chatDivMe-${i}`);
-                                $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>`).appendTo(`#chatContentDivMe-${i}`);
-                                $(`<div id="chatContentMe" class="chatContentMe">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDivMe-${i}`);
-                                continue;
-                            }
-
-                            $(`<div id="chatDiv-${i}" class="chatDiv"></div>`).appendTo(`#chatting`);
-                            $(`<div id="chatUser" class="chatUser">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDiv-${i}`);
-
-                            $(`<div id="chatContentDiv-${i}" class="chatContentDiv"></div>`).appendTo(`#chatDiv-${i}`);
-                            $(`<div id="chatContent" class="chatContent">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDiv-${i}`);
-                            $(`<div id="chatContentTime" class="chatContentTime">${formattedDateTime}</div>`).appendTo(`#chatContentDiv-${i}`);
-                        }
-
-                        $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
-                    },
-                    error: function (xhr, status, error) {
-                        alert("이전 채팅내용을 불러오지 못했습니다.")
-                        console.log(xhr);
-                    }
-                });
-            },
-            error: function (xhr, status, error) {
-                alert("채팅방에 다시 입장해 주세요.")
-                console.log(xhr);
-                window.location.href = "/"
-            }
-        });
-
-    });
-
     // 쿼리스트링 값 불러오기
     urlSearch = new URLSearchParams(location.search);
     // 채팅방 id
@@ -411,6 +315,42 @@
 
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth;
+
+    // 채팅방에 저장된 채팅내용 조회
+    $.ajax({
+        url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
+        method: 'GET', // 요청 메소드 (GET, POST 등)
+        success: function (response) {
+            console.log("responseresponseresponseresponse", response);
+            for (var i = 0; i < response.chatContentList.length; i++) {
+
+                var formattedDateTime = makeDateFormat(response.chatContentList[i].createAt);
+
+                if (userAuth == response.chatContentList[i].userName) {
+                    $(`<div id="chatDivMe-${i}" class="chatDivMe"></div>`).appendTo(`#chatting`);
+                    $(`<div id="chatUserMe" class="chatUserMe">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDivMe-${i}`);
+
+                    $(`<div id="chatContentDivMe-${i}" class="chatContentDivMe"></div>`).appendTo(`#chatDivMe-${i}`);
+                    $(`<div id="chatContentTimeMe" class="chatContentTimeMe">${formattedDateTime}</div>`).appendTo(`#chatContentDivMe-${i}`);
+                    $(`<div id="chatContentMe" class="chatContentMe">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDivMe-${i}`);
+                    continue;
+                }
+
+                $(`<div id="chatDiv-${i}" class="chatDiv"></div>`).appendTo(`#chatting`);
+                $(`<div id="chatUser" class="chatUser">${response.chatContentList[i].userNick}</div>`).appendTo(`#chatDiv-${i}`);
+
+                $(`<div id="chatContentDiv-${i}" class="chatContentDiv"></div>`).appendTo(`#chatDiv-${i}`);
+                $(`<div id="chatContent" class="chatContent">${response.chatContentList[i].chatContent}</div>`).appendTo(`#chatContentDiv-${i}`);
+                $(`<div id="chatContentTime" class="chatContentTime">${formattedDateTime}</div>`).appendTo(`#chatContentDiv-${i}`);
+            }
+
+            $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
+        },
+        error: function (xhr, status, error) {
+            alert("채팅 내용 불러오기 실패")
+            console.log(xhr);
+        }
+    });
 
 
     var socket = new SockJS("/chatting");
@@ -867,6 +807,7 @@
 
         // 한국 시간대에 시차를 적용
         var koreanTime = new Date(currentDate.getTime() + koreanOffsetMinutes * 60 * 1000);
+
 
         data = {
             'type': 'disconnect',

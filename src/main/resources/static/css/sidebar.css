@@ -140,3 +140,8 @@ body {
     width: 100%;
     height: 110px;
 }
+
+#openSidebar {
+    width: 80px;
+    height: 80px;
+}
