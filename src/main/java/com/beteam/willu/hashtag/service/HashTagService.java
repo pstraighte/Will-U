@@ -38,9 +38,10 @@ public class HashTagService {
         for (BoardTagMap boardTagMap : boardTagMapList) {
             System.out.println("boardTagMap1" + boardTagMap.getPost().getId());
             // 모집중인 것만
-            if (boardTagMap.getPost().getRecruitment()) {
-                postList.add(boardTagMap.getPost());
-            }
+//            if (boardTagMap.getPost().getRecruitment()) {
+//                postList.add(boardTagMap.getPost());
+//            }
+            postList.add(boardTagMap.getPost());
         }
 
         // 시간순 정렬
@@ -62,7 +63,7 @@ public class HashTagService {
             Optional<Tag> tag = hashTagRepository.findById(tagId);
 
             Long count = (Long) objects[1]; // 두 번째 요소는 개수
-            
+
             results.add(new TagTopResponseDto(tag.get().getContent(), count));
         }
 

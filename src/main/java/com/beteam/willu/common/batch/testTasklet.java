@@ -66,7 +66,7 @@ public class testTasklet implements Tasklet {
             ChatRoom chatRoom = falsePost.getChatRoom();
             // 비활성화 된 게시글의 모집완료 시간의 1시간 후 데이터 생성
             LocalDateTime falsePostTime = falsePost.getPromiseTime();
-            LocalDateTime falsePostTimeAfter = falsePostTime.plus(2, ChronoUnit.MINUTES);
+            LocalDateTime falsePostTimeAfter = falsePostTime.plus(1, ChronoUnit.HOURS);
 
             // 1. false 로 설정된 게시글의 id와 같은 채팅방
             // 2. 채팅방 생성 기준으로 1시간이 지난 채팅방 (테스트 2분)
