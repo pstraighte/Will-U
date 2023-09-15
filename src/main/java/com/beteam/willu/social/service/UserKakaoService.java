@@ -172,7 +172,7 @@ public class UserKakaoService {
                         .password(encodedPassword)
                         .email(email)
                         .kakaoId(kakaoId)
-                        .picture("https://img.freepik.com/premium-vector/avatar-profile-icon_188544-4755.jpg?w=826")
+                        .picture("https://willu-bucket.s3.ap-northeast-2.amazonaws.com/profile-images/1a1fe197-72ab-4d81-9f11-974ae1552b0a_heart_0914-14.png")
                         .build();
             }
             userRepository.save(kakaoUser);
