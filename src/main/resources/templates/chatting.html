@@ -315,7 +315,7 @@
 
     // 쿠키값에서 유저이름 가져오기
     var userId = userAuth;
-    
+
     // 채팅방에 저장된 채팅내용 조회
     $.ajax({
         url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
@@ -886,8 +886,6 @@
 
                 kickOutMsg(kickOutUser);
 
-                // 기능 업그레이드는 개별 메세지를 보내고 개별 메세지를 받은 사용자가
-                // 확인버튼을 누르면 바로 채팅방이 나가지는 (리다이렉트)
                 //보낼때 채팅 저장
                 $.ajax({
                     url: `/api/chat/chatRooms`, // 요청을 보낼 서버의 URL

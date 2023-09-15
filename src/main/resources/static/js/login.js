@@ -84,17 +84,18 @@ function signup() {
         });
     }
 
-    let nickname_format = '^[ㄱ-ㅎ가-힣A-Za-z0-9-_]{2,10}$';
+    let nickname_format = '^[ㄱ-ㅎ가-힣a-z0-9-_]{2,10}$';
 
     if (!nickname.match(nickname_format)) {
         Swal.fire({
             icon: 'warning',
             title: '회원가입 실패',
-            text: "닉네임은 특수문자 없이 2~10까지만 입력해 주세요"
+            text: "닉네임은 특수문자 없이 두글자 이상 입력해 주세요"
         });
         document.getElementById("nickname").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
         return;
     }
+
 
     let email_format = '^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\\.[0-9a-zA-Z_-]+)$';
 
@@ -108,11 +109,13 @@ function signup() {
         return;
     }
 
-    if (password === '') {
+    let password_format = '(?=.*[0-9])(?=.*[a-zA-Z])(?=.*\\W)(?=\\S+$).{6,16}'
+
+    if (!password.match(password_format)) {
         Swal.fire({
             icon: 'warning',
             title: '회원가입 실패',
-            text: "비밀번호를 입력하세요."
+            text: "비밀번호는 영어대소문자 와 특수문자를 포함해 주세요."
         });
         document.getElementById("password").style.color = "red"; // 일치하지 않을 경우 글씨 색을 빨간색으로 변경
         return;
