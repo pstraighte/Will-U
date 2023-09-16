@@ -135,7 +135,6 @@ public class ChatRoomService {
         for (Chat chat : chatList) {
             if (chekTime.isBefore(chat.getCreatedAt())) {
                 // 초대 된 시간보다 큰것들 (자신의 들어온 후의 채팅)
-                System.out.println("chat.getChatContent() = " + chat.getChatContent());
                 showChatList.add(chat);
             }
         }
