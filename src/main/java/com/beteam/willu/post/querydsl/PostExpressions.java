@@ -12,12 +12,16 @@ public class PostExpressions {
 			builder.and(post.recruitment.isTrue());
 		}
 
-		if ("nickname".equals(criteria)) {
-			builder.and(post.user.nickname.containsIgnoreCase(keyword));
-		} else if ("content".equals(criteria)) {
-			builder.and(post.content.containsIgnoreCase(keyword));
+		if (keyword != null) {
+			if ("nickname".equals(criteria)) {
+				builder.and(post.user.nickname.containsIgnoreCase(keyword));
+			} else if ("content".equals(criteria)) {
+				builder.and(post.content.containsIgnoreCase(keyword));
+			} else {
+				builder.and(post.title.containsIgnoreCase(keyword));
+			}
 		} else {
-			builder.and(post.title.containsIgnoreCase(keyword));
+			builder.and(post.recruitment.isTrue());
 		}
 
 		return builder;
