@@ -179,6 +179,7 @@
         //게시글 전체 조회
         chPost(0);
     });
+
     // 게시글 필터 조회
     $("#searchForm").submit(function (event) {
         event.preventDefault(); // 폼 제출 기본 동작 방지
@@ -409,44 +410,55 @@
         var keyword = $("#keyword").val();
         var criteria = $("#criteria").val();
         var recruitment = $("#recruitment").is(":checked");
-        console.log(keyword, criteria, recruitment);
-        if (keyword !== null || recruitment === true) {
-            $.ajax({
-                url: "/api/search/posts",
-                type: "GET",
-                async: false,
-                data: {
-                    keyword: keyword,
-                    criteria: criteria,
-                    recruitment: recruitment,
-                    page: i,
-                    size: 10
-                },
-                success: function (response) {
-                    $('#page-item1').empty();
-                    $('#page-item2').empty();
-                    $('#page-item3').empty();
-                    $('#page-item4').empty();
-                    $('#pagination').find($(`li[id^='page-']`)).empty();
 
-                    //검색용 페이지 버튼이 필요
-                    nodeCreate(response.totalPages, response.number);
-                    //nodeCreateAll(response.totalPages, response.number);
-                    // 검색 결과를 화면에 표시
-                    var tableBody = $('.table tbody');
-                    tableBody.empty();
-
-                    response.content.forEach(function (post) {
-                        createPostHTML(post);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.log("검색실패");
-                }
-            });
-        } else {
-            chPost(i);
+        // 검색어가 비어있고 모집 상태가 true인 경우
+        if (!keyword && recruitment) {
+            keyword = ""; // 검색어를 빈 문자열로 설정
+            criteria = ""; // 기준을 빈 문자열로 설정
         }
+
+        performSearch(keyword, criteria, recruitment, i);
+    }
+
+    function performSearch(keyword, criteria, recruitment, page) {
+        $.ajax({
+            url: "/api/search/posts",
+            type: "GET",
+            async: false,
+            data: {
+                keyword: keyword,
+                criteria: criteria,
+                recruitment: recruitment,
+                page: page,
+                size: 10
+            },
+            success: function (response) {
+                // 페이지 및 결과 표시를 담당하는 함수 호출
+                displayResults(response, page);
+            },
+            error: function (xhr, status, error) {
+                console.log("검색 실패");
+            }
+        });
+    }
+
+    function displayResults(response, page) {
+        $('#page-item1').empty();
+        $('#page-item2').empty();
+        $('#page-item3').empty();
+        $('#page-item4').empty();
+        $('#pagination').find($(`li[id^='page-']`)).empty();
+
+        // 검색용 페이지 버튼이 필요
+        nodeCreate(response.totalPages, response.number);
+
+        // 검색 결과를 화면에 표시
+        var tableBody = $('.table tbody');
+        tableBody.empty();
+
+        response.content.forEach(function (post) {
+            createPostHTML(post);
+        });
     }
 
     // 게시글 태그별 조회
@@ -507,6 +519,53 @@
             }
         });
     }
+
+    // $(document).ready(function () {
+    //
+    //     // 체크박스 상태 감지
+    //     $("#recruitment").change(function () {
+    //         // 체크된 경우 모집 중인 게시글만 표시
+    //         if ($(this).is(":checked")) {
+    //             $.ajax({
+    //                 url: "/api/search/posts",
+    //                 type: "GET",
+    //                 async: false,
+    //                 data: {
+    //                     keyword: keyword,
+    //                     criteria: criteria,
+    //                     recruitment: recruitment,
+    //                     page: i,
+    //                     size: 10
+    //                 },
+    //                 success: function (response) {
+    //                     $('#page-item1').empty();
+    //                     $('#page-item2').empty();
+    //                     $('#page-item3').empty();
+    //                     $('#page-item4').empty();
+    //                     $('#pagination').find($(`li[id^='page-']`)).empty();
+    //
+    //                     //검색용 페이지 버튼이 필요
+    //                     nodeCreate(response.totalPages, response.number);
+    //                     //nodeCreateAll(response.totalPages, response.number);
+    //                     // 검색 결과를 화면에 표시
+    //                     var tableBody = $('.table tbody');
+    //                     tableBody.empty();
+    //
+    //                     response.content.forEach(function (post) {
+    //                         createPostHTML(post);
+    //                     });
+    //                 },
+    //                 error: function (xhr, status, error) {
+    //                     console.log("검색실패");
+    //                 }
+    //             });
+    //         } else {
+    //             // 체크가 해제된 경우 모든 게시글 표시
+    //             $(".table tbody tr").show();
+    //         }
+    //     });
+    // });
+
 
 </script>
 </html>
