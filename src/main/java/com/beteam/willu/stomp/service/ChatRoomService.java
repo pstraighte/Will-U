@@ -295,4 +295,5 @@ public class ChatRoomService {
 			.orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
 		return chatRoom.getId();
 	}
+  
 }
