@@ -66,6 +66,7 @@ public class ChatRoomService {
     // 사용자가 속한 채팅방(모두) 불러오기 (확인 완료)
     // 채팅방 비활성화 (채팅방 저장 테이터중 활성화 필드가 true인 값만 가져온다.)
     // 활성화 필드가 false 인 채팅방의 경우 - 게시글에서 모집완료 된 경우 / 시간을 정한다면 정해진 시간이 다된 경우
+    @Transactional(readOnly = true)
     public ChatRoomsResponseDto getRooms(Long id) {
         List<UserChatRoom> userChatRooms = userChatRoomsRepository.findAllByUserId(id);
 
@@ -119,6 +120,7 @@ public class ChatRoomService {
     }
 
     // 특정 채팅방 채팅 조회 (확인 완료)
+    @Transactional(readOnly = true)
     public ChatsResponseDto getChat(Long id, UserDetailsImpl userDetails) {
         // 로그인한 유저 id
         Long userId = userDetails.getUser().getId();
@@ -254,6 +256,7 @@ public class ChatRoomService {
 
     // 채팅방 사용자들 조회
     // 채팅방 id를 사용해서 조회
+    @Transactional(readOnly = true)
     public ChatRoomsResponseDto getChatRoomUsers(Long id) {
         // id 에 속한 유저 조회
         List<UserChatRoom> chatRoom = userChatRoomsRepository.findAllByChatRoomsId(id);
@@ -277,13 +280,14 @@ public class ChatRoomService {
         return chatRoomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public int findChatRoomByPostIdAndGetCount(Long postId) {
         ChatRoom chatRoom = chatRoomRepository.findByPostId(postId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
         return chatRoom.getUserChatRoomList().size();
     }
 
+    @Transactional(readOnly = true)
     public long findChatRoomByPostId(Long postId) {
         ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
         return chatRoom.getId();
