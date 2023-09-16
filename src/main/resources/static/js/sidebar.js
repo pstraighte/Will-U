@@ -251,9 +251,7 @@ function addNotificationHTML(content, nt, title, ntId, publisherId, receiverId, 
     let newElement =
         `<div class="unread-notification-${ntId}">
                     <h4>${title}</h4>
-                    <p>${content}</p>
-                    <p>${nt}</p>
-                `;
+                    <p>${content}</p>`;
     if (nt === "JOIN_REQUEST") {
         newElement += `<input type="button" class="btn btn-primary" onclick="approve(${ntId},${postId},${publisherId})" value="승인"  style="background-color:#1746A2">
                                 <input type="button" class="btn btn-primary" onclick="reject(${ntId},${postId},${publisherId})" value="거부" style="background-color:#1746A2">`
