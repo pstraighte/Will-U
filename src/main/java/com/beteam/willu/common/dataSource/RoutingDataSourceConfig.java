@@ -33,8 +33,8 @@ import java.util.Properties;
 public class RoutingDataSourceConfig {
 
     private final String ROUTING_DATA_SOURCE = "routingDataSource";
-    private final String MASTER_DATA_SOURCE = "masterDataSource";
-    private final String SLAVE_DATA_SOURCE = "slaveDataSource";
+    private final String MAIN_DATA_SOURCE = "mainDataSource";
+    private final String REPLICA_DATA_SOURCE = "replicaDataSource";
     private final String DATA_SOURCE = "dataSource";
 
 
@@ -47,17 +47,17 @@ public class RoutingDataSourceConfig {
 
     @Bean(ROUTING_DATA_SOURCE)
     public DataSource routingDataSource(
-            @Qualifier(MASTER_DATA_SOURCE) final DataSource masterDataSource,
-            @Qualifier(SLAVE_DATA_SOURCE) final DataSource slaveDataSource) {
+            @Qualifier(MAIN_DATA_SOURCE) final DataSource mainDataSource,
+            @Qualifier(REPLICA_DATA_SOURCE) final DataSource replicaDataSource) {
 
         RoutingDataSource routingDataSource = new RoutingDataSource();
 
         Map<Object, Object> dataSourceMap = new HashMap<>();
-        dataSourceMap.put(DataSourceType.MASTER, masterDataSource);
-        dataSourceMap.put(DataSourceType.SLAVE, slaveDataSource);
+        dataSourceMap.put(DataSourceType.MAIN, mainDataSource);
+        dataSourceMap.put(DataSourceType.REPLICA, replicaDataSource);
 
         routingDataSource.setTargetDataSources(dataSourceMap);
-        routingDataSource.setDefaultTargetDataSource(masterDataSource);
+        routingDataSource.setDefaultTargetDataSource(mainDataSource);
 
         return routingDataSource;
     }

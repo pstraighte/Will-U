@@ -13,23 +13,21 @@ import javax.sql.DataSource;
 @Configuration
 public class DataSourceConfig {
 
-    private final String MASTER_DATA_SOURCE = "masterDataSource";
-    private final String SLAVE_DATA_SOURCE = "slaveDataSource";
+    private final String MAIN_DATA_SOURCE = "mainDataSource";
+    private final String REPLICA_DATA_SOURCE = "replicaDataSource";
 
     @Primary
-    @Bean(MASTER_DATA_SOURCE)
+    @Bean(MAIN_DATA_SOURCE)
     @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource masterDataSource() {
-        System.out.println("MASTER_DATA_SOURCE 연결 WRITE 작업");
+    public DataSource mainDataSource() {
         return DataSourceBuilder
                 .create()
                 .build();
     }
 
-    @Bean(SLAVE_DATA_SOURCE)
+    @Bean(REPLICA_DATA_SOURCE)
     @ConfigurationProperties(prefix = "replica")
-    public DataSource slaveDataSource() {
-        System.out.println("SLAVE_DATA_SOURCE 연결 READ 작업");
+    public DataSource replicaDataSource() {
         return DataSourceBuilder
                 .create()
                 .build();
