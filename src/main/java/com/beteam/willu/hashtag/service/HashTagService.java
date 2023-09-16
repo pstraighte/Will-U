@@ -26,7 +26,7 @@ public class HashTagService {
 
     //태그 검색
     @Transactional
-    public Page<PostResponseDto> createTag(String requestDto, Pageable pageable) {
+    public Page<PostResponseDto> createTag(String requestDto, boolean recruitmentTag, Pageable pageable) {
 
         // 태그 테이블을 이용해 사용자가 검색한 내용의 태그의 id를 가져와야함
         Tag tags = hashTagRepository.findByContent(requestDto);
@@ -36,12 +36,14 @@ public class HashTagService {
 
         List<Post> postList = new ArrayList<>();
         for (BoardTagMap boardTagMap : boardTagMapList) {
-            System.out.println("boardTagMap1" + boardTagMap.getPost().getId());
-            // 모집중인 것만
-//            if (boardTagMap.getPost().getRecruitment()) {
-//                postList.add(boardTagMap.getPost());
-//            }
-            postList.add(boardTagMap.getPost());
+
+            if (!recruitmentTag) {
+                if (boardTagMap.getPost().getRecruitment()) {
+                    postList.add(boardTagMap.getPost());
+                }
+            } else {
+                postList.add(boardTagMap.getPost());
+            }
         }
 
         // 시간순 정렬

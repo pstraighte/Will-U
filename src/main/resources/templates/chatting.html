@@ -305,9 +305,9 @@
 </body>
 <script>
     // 쿼리스트링 값 불러오기
-    urlSearch = new URLSearchParams(location.search);
+    let urlSearch = new URLSearchParams(location.search);
     // 채팅방 id
-    roomNumber = urlSearch.get('number')
+    const roomNumber = urlSearch.get('number')
     // 쿠키값에서 유저 값 가져오기
     let token1 = Cookies.get('Authorization');
     const payloads = JSON.parse(atob(token1.split(".")[1]));
