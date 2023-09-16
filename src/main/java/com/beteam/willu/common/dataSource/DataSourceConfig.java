@@ -1,6 +1,5 @@
 package com.beteam.willu.common.dataSource;
 
-import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -19,20 +18,20 @@ public class DataSourceConfig {
 
     @Primary
     @Bean(MASTER_DATA_SOURCE)
-    @ConfigurationProperties(prefix = "spring.datasource.master.hikari")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource masterDataSource() {
+        System.out.println("MASTER_DATA_SOURCE 연결 WRITE 작업");
         return DataSourceBuilder
                 .create()
-                .type(HikariDataSource.class)
                 .build();
     }
 
     @Bean(SLAVE_DATA_SOURCE)
-    @ConfigurationProperties(prefix = "spring.datasource.slave.hikari")
+    @ConfigurationProperties(prefix = "replica")
     public DataSource slaveDataSource() {
+        System.out.println("SLAVE_DATA_SOURCE 연결 READ 작업");
         return DataSourceBuilder
                 .create()
-                .type(HikariDataSource.class)
                 .build();
     }
 }
