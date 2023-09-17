@@ -5,7 +5,7 @@ name: Spring Boot & Gradle CI/CD
 on:
   # main 브랜치에 push나 pull request 발생 시
   push:
-    branches: [ "CICD_test" ]
+    branches: [ "CICD_test_compose" ]
 
 # 
 # 위 이벤트 발생 시 실행될 작업들
@@ -71,9 +71,6 @@ jobs:
 
           script: |
             cd /home/ubuntu/
-            sudo docker kill ${{ secrets.PROJECT_NAME }}
-            sudo docker rm -f ${{ secrets.PROJECT_NAME }}
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
-            
-            sudo docker-compose up -d
+
+            sudo docker-compose down
+            sudo docker-compose up --build -d
