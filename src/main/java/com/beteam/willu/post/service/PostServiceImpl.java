@@ -1,9 +1,11 @@
 package com.beteam.willu.post.service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,9 +15,11 @@ import com.beteam.willu.hashtag.entity.BoardTagMap;
 import com.beteam.willu.hashtag.entity.Tag;
 import com.beteam.willu.hashtag.repository.BoardTagMapRepository;
 import com.beteam.willu.hashtag.repository.HashTagRepository;
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.entity.Post;
+import com.beteam.willu.post.entity.QPost;
 import com.beteam.willu.post.querydsl.PostExpressions;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.stomp.entity.ChatRoom;
@@ -24,6 +28,8 @@ import com.beteam.willu.stomp.repository.ChatRoomRepository;
 import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +43,9 @@ public class PostServiceImpl implements PostService {
 	private final UserChatRoomsRepository userChatRoomsRepository;
 	private final HashTagRepository hashTagRepository;
 	private final BoardTagMapRepository boardTagMapRepository;
+
+	private final JPAQueryFactory queryFactory;
+	private final QPost qPost = QPost.post; // QPost 클래스 사용
 
 	// 게시글 작성
 	@Override
@@ -84,9 +93,26 @@ public class PostServiceImpl implements PostService {
 	// 게시글 전체 조회
 	@Override
 	@Transactional(readOnly = true)
-	public Page<PostResponseDto> getPosts(Pageable pageable) {
-		Page<Post> posts = postRepository.findAllByOrderByCreatedAtDesc(pageable);
-		return posts.map(PostResponseDto::new);
+	public Page<MinimalPostResponseDto> getPosts(Pageable pageable) {
+		// 패치 조인 쿼리 작성
+		List<MinimalPostResponseDto> postResponseDtos = queryFactory
+			.selectDistinct(Projections.constructor(
+				MinimalPostResponseDto.class,
+				QPost.post
+			))
+			.from(qPost)
+			.leftJoin(qPost.user).fetchJoin()
+			.leftJoin(qPost.chatRoom).fetchJoin()
+			// .leftJoin(qPost.boardTagMapList).fetchJoin()
+			.orderBy(qPost.createdAt.desc())
+			.fetch();
+
+		// 결과를 Page로 변환
+		int start = (int)pageable.getOffset();
+		int end = Math.min((start + pageable.getPageSize()), postResponseDtos.size());
+		List<MinimalPostResponseDto> sublist = postResponseDtos.subList(start, end);
+
+		return new PageImpl<>(sublist, pageable, postResponseDtos.size());
 	}
 
 	// 게시글 상세 조회

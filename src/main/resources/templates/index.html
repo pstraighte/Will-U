@@ -519,53 +519,5 @@
             }
         });
     }
-
-    // $(document).ready(function () {
-    //
-    //     // 체크박스 상태 감지
-    //     $("#recruitment").change(function () {
-    //         // 체크된 경우 모집 중인 게시글만 표시
-    //         if ($(this).is(":checked")) {
-    //             $.ajax({
-    //                 url: "/api/search/posts",
-    //                 type: "GET",
-    //                 async: false,
-    //                 data: {
-    //                     keyword: keyword,
-    //                     criteria: criteria,
-    //                     recruitment: recruitment,
-    //                     page: i,
-    //                     size: 10
-    //                 },
-    //                 success: function (response) {
-    //                     $('#page-item1').empty();
-    //                     $('#page-item2').empty();
-    //                     $('#page-item3').empty();
-    //                     $('#page-item4').empty();
-    //                     $('#pagination').find($(`li[id^='page-']`)).empty();
-    //
-    //                     //검색용 페이지 버튼이 필요
-    //                     nodeCreate(response.totalPages, response.number);
-    //                     //nodeCreateAll(response.totalPages, response.number);
-    //                     // 검색 결과를 화면에 표시
-    //                     var tableBody = $('.table tbody');
-    //                     tableBody.empty();
-    //
-    //                     response.content.forEach(function (post) {
-    //                         createPostHTML(post);
-    //                     });
-    //                 },
-    //                 error: function (xhr, status, error) {
-    //                     console.log("검색실패");
-    //                 }
-    //             });
-    //         } else {
-    //             // 체크가 해제된 경우 모든 게시글 표시
-    //             $(".table tbody tr").show();
-    //         }
-    //     });
-    // });
-
-
 </script>
 </html>

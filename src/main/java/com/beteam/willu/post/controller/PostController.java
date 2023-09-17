@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.common.security.UserDetailsImpl;
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.service.PostServiceImpl;
@@ -58,12 +59,12 @@ public class PostController {
 
 	@Operation(summary = "게시글 전체 조회", description = "게시글의 목록을 페이징에 관련된 정보와 함께 조회 합니다.")
 	@GetMapping("/posts")
-	public ResponseEntity<Page<PostResponseDto>> getPosts(
+	public ResponseEntity<Page<MinimalPostResponseDto>> getPosts(
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
 		@RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
 	) {
 		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-		Page<PostResponseDto> posts = postService.getPosts(pageable);
+		Page<MinimalPostResponseDto> posts = postService.getPosts(pageable);
 		return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
 	}
 

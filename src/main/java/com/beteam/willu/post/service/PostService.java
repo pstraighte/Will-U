@@ -3,6 +3,7 @@ package com.beteam.willu.post.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.entity.Post;
@@ -44,7 +45,7 @@ public interface PostService {
 	//     */
 	//    Page<PostResponseDto> getPosts(Pageable pageable);
 	// List<PostResponseDto> getPosts();
-	Page<PostResponseDto> getPosts(Pageable pageable);
+	Page<MinimalPostResponseDto> getPosts(Pageable pageable);
 
 	/**
 	 * @param keyword     검색 내용
