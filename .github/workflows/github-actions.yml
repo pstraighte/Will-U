@@ -80,8 +80,8 @@ jobs:
             cd /home/ubuntu/
             sudo docker stop willu
             sudo docker rm -f willu
-            sudo docker rmi sim3412/willu
-            sudo docker pull sim3412/willu
+            sudo docker rmi sim3412/willu:1.0
+            sudo docker pull sim3412/willu:1.0
             
             docker run -p 8080:8080 \
             --name willu \
