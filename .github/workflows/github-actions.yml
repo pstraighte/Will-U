@@ -80,9 +80,9 @@ jobs:
             cd /home/ubuntu/
             sudo docker stop ${{ secrets.PROJECT_NAME }}
             sudo docker rm -f ${{ secrets.PROJECT_NAME }}
-            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:1.0
-            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:1.0
+            sudo docker rmi ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}
             
             docker run -p 8080:8080 \
             --name willu \
-            -d -it sim3412/willu
+            -d ${{ secrets.DOCKERHUB_USERNAME }/${{ secrets.PROJECT_NAME }}
