@@ -1,16 +1,5 @@
 package com.beteam.willu.post.controller;
 
-import com.beteam.willu.common.ApiResponseDto;
-import com.beteam.willu.common.security.UserDetailsImpl;
-import com.beteam.willu.post.dto.PostRequestDto;
-import com.beteam.willu.post.dto.PostResponseDto;
-import com.beteam.willu.post.service.PostServiceImpl;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +7,31 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.beteam.willu.common.ApiResponseDto;
+import com.beteam.willu.common.exception.RecruitmentStatusException;
+import com.beteam.willu.common.security.UserDetailsImpl;
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
+import com.beteam.willu.post.dto.PostRequestDto;
+import com.beteam.willu.post.dto.PostResponseDto;
+import com.beteam.willu.post.service.PostServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @Tag(name = "Post API", description = "게시글 제어 관련 API")
 @RestController
@@ -26,40 +39,40 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class PostController {
 
-    private final PostServiceImpl postService;
+	private final PostServiceImpl postService;
 
-    // 게시글 작성
-    @Operation(summary = "게시글 생성", description = "정해진 파라미터를 받은 후 게시글 데이터를 생성합니다.")
-    @Parameter(name = "title", required = true, schema = @Schema(type = "String"), description = "게시글 제목")
-    @Parameter(name = "content", required = true, schema = @Schema(type = "String"), description = "게시글 내용")
-    @Parameter(name = "promiseTime", required = true, schema = @Schema(type = "LocalDateTime", format = "date"), description = "약속 시간 - 게시글의 활성화 필드를 제어 할 정보")
-    @Parameter(name = "promiseArea", required = true, schema = @Schema(type = "String"), description = "지역")
-    @Parameter(name = "maxnum", required = true, schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
-    @Parameter(name = "category", required = true, schema = @Schema(type = "string"), description = "게시글 분류")
-    @PostMapping("/post")
-    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto postRequestDto,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        PostResponseDto post = postService.createPost(postRequestDto, userDetails.getUser());
-        return ResponseEntity.status(201).body(post);
-    }
+	// 게시글 작성
+	@Operation(summary = "게시글 생성", description = "정해진 파라미터를 받은 후 게시글 데이터를 생성합니다.")
+	@Parameter(name = "title", required = true, schema = @Schema(type = "String"), description = "게시글 제목")
+	@Parameter(name = "content", required = true, schema = @Schema(type = "String"), description = "게시글 내용")
+	@Parameter(name = "promiseTime", required = true, schema = @Schema(type = "LocalDateTime", format = "date"), description = "약속 시간 - 게시글의 활성화 필드를 제어 할 정보")
+	@Parameter(name = "promiseArea", required = true, schema = @Schema(type = "String"), description = "지역")
+	@Parameter(name = "maxnum", required = true, schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
+	@Parameter(name = "category", required = true, schema = @Schema(type = "string"), description = "게시글 분류")
+	@PostMapping("/post")
+	public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto postRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		PostResponseDto post = postService.createPost(postRequestDto, userDetails.getUser());
+		return ResponseEntity.status(201).body(post);
+	}
 
-    @Operation(summary = "게시글 전체 조회", description = "게시글의 목록을 페이징에 관련된 정보와 함께 조회 합니다.")
-    @GetMapping("/posts")
-    public ResponseEntity<Page<PostResponseDto>> getPosts(
-            @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
-            @RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
-    ) {
-        Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-        Page<PostResponseDto> posts = postService.getPosts(pageable);
-        return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
-    }
+	@Operation(summary = "게시글 전체 조회", description = "게시글의 목록을 페이징에 관련된 정보와 함께 조회 합니다.")
+	@GetMapping("/posts")
+	public ResponseEntity<Page<MinimalPostResponseDto>> getPosts(
+		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
+		@RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
+	) {
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		Page<MinimalPostResponseDto> posts = postService.getPosts(pageable);
+		return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
+	}
 
-    // 게시글 상세 조회
-    @Operation(summary = "게시글 개별 조회", description = "PathVariable 형태의 id 값을 이용해 id에 해당하는 게시글의 데이터를 조회한다.")
-    @GetMapping("/posts/{id}")
-    public PostResponseDto getPost(@PathVariable Long id) {
-        return postService.getPost(id);
-    }
+	// 게시글 상세 조회
+	@Operation(summary = "게시글 개별 조회", description = "PathVariable 형태의 id 값을 이용해 id에 해당하는 게시글의 데이터를 조회한다.")
+	@GetMapping("/posts/{id}")
+	public PostResponseDto getPost(@PathVariable Long id) {
+		return postService.getPost(id);
+	}
 
     //
     //게시글 수정
@@ -129,6 +142,5 @@ public class PostController {
                 pageable); // 서비스를 통해 검색 실행
         return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
     }
-
 
 }
