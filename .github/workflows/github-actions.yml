@@ -16,14 +16,11 @@ jobs:
   addProperties:
     runs-on: ubuntu-latest
     steps:
-    - name: Properties 생성
-      # shell: bash
-      run: |
-        mkdir -p ./src/main/resources
-        cd ./src/main/resources
-        touch ./application.properties
-        echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
-        cat ./src/main/resources/application.properties
+      - run: mkdir -p ./src/main/resources
+      - run: cd ./src/main/resources
+      - run: touch ./application.properties
+      - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
+      - run: cat ./src/main/resources/application.properties
        
   build:
     needs: addProperties
