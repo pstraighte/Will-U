@@ -6,7 +6,10 @@ on:
   # main 브랜치에 push나 pull request 발생 시
   push:
     branches: [ "CICD_test_compose" ]
-
+    
+permissions:
+  contents: read
+  
 # 
 # 위 이벤트 발생 시 실행될 작업들
 jobs:
@@ -18,6 +21,7 @@ jobs:
       - run: touch ./application.properties
       - run: echo "${{ secrets.APPLICATION }}" > ./src/main/resources/application.properties
       - run: cat ./src/main/resources/application.properties
+       
   build:
     needs: addProperties
     # VM의실행 환경 지정 => 우분투 최신 버전
@@ -45,7 +49,6 @@ jobs:
       # gradlew 빌드
       - name: Build with Gradle
         run: ./gradlew clean build --exclude-task test
-
       # DockerHub 로그아웃
       - name: DockerHub Logout
         run: docker logout
@@ -63,19 +66,24 @@ jobs:
 
       # DockerHub Push
       - name: DockerHub Push
-        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.PROJECT_NAME }}:1.0
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/willu:1.0
 
       # EC2 인스턴스 접속 및 애플리케이션 실행
       - name: Application Run
-        uses: appleboy/ssh-action@v0.1.6
+        uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.EC2_HOST }}
+          host: ${{ secrets.DEV_EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
           port: 22
-          
+
           script: |
             cd /home/ubuntu/
-
-            sudo docker-compose down
-            sudo docker-compose up --build -d
+            sudo docker stop willu
+            sudo docker rm -f willu
+            sudo docker rmi sim3412/willu:1.0
+            sudo docker pull sim3412/willu:1.0
+            
+            docker run -p 8080:8080 \
+            --name willu \
+            -d sim3412/willu:1.0
