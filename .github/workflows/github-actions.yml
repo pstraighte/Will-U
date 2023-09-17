@@ -72,6 +72,9 @@ jobs:
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
 
+          docker username: ${{ secrets.DOCKERHUB_USERNAME }}
+          docker password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
           script: |
             cd /home/ubuntu/
             sudo docker stop ${{ secrets.PROJECT_NAME }}
