@@ -85,4 +85,4 @@ jobs:
             
             docker run -p 8080:8080 \
             --name willu \
-            -d sim3412/willu
+            -d sim3412/willu:1.0
