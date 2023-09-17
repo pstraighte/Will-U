@@ -6,11 +6,7 @@ import com.beteam.willu.notification.dto.NotificationEvent;
 import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
-import com.beteam.willu.stomp.dto.ChatRoomNameResponseDto;
-import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
-import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
-import com.beteam.willu.stomp.dto.ChatroomJoinRequestDto;
-import com.beteam.willu.stomp.dto.ChatsResponseDto;
+import com.beteam.willu.stomp.dto.*;
 import com.beteam.willu.stomp.entity.Chat;
 import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.stomp.entity.UserChatRoom;
@@ -25,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -291,7 +288,7 @@ public class ChatRoomService {
     }
 
     public long findChatRoomByPostId(Long postId) {
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_Id(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
         return chatRoom.getId();
     }
 }
