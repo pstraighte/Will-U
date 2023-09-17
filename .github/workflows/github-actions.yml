@@ -16,8 +16,6 @@ jobs:
   addProperties:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
     - name: Properties 생성
       # shell: bash
       run: |
