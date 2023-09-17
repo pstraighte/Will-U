@@ -6,10 +6,12 @@ import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.context.annotation.Profile;
 
 import javax.sql.DataSource;
 
 @Slf4j
+@Profile("production")
 @Configuration
 public class DataSourceConfig {
 
@@ -25,6 +27,7 @@ public class DataSourceConfig {
                 .build();
     }
 
+    @Profile("production")
     @Bean(REPLICA_DATA_SOURCE)
     @ConfigurationProperties(prefix = "replica")
     public DataSource replicaDataSource() {

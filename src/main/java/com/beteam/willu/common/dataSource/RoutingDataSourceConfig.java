@@ -17,18 +17,16 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+@Profile("production")
 @Slf4j
 @EnableJpaRepositories(
-        basePackages = "com.beteam.willu",
-        entityManagerFactoryRef = "entityManagerFactory",
-        transactionManagerRef = "transactionManager"
+        basePackages = "com.beteam.willu"
 )
-@Profile("prod2")
+
 @Configuration
 public class RoutingDataSourceConfig {
 
@@ -36,7 +34,7 @@ public class RoutingDataSourceConfig {
     private final String MAIN_DATA_SOURCE = "mainDataSource";
     private final String REPLICA_DATA_SOURCE = "replicaDataSource";
     private final String DATA_SOURCE = "dataSource";
-
+    private final String NOROUTE_DATA_SOURCE = "norouteDataSource";
 
     @Value("${spring.jpa.properties.hibernate.format_sql}")
     String formatSQL;
@@ -45,6 +43,7 @@ public class RoutingDataSourceConfig {
     @Value("${spring.jpa.hibernate.ddl-auto}")
     String ddl;
 
+    @Profile("production")
     @Bean(ROUTING_DATA_SOURCE)
     public DataSource routingDataSource(
             @Qualifier(MAIN_DATA_SOURCE) final DataSource mainDataSource,
@@ -62,9 +61,17 @@ public class RoutingDataSourceConfig {
         return routingDataSource;
     }
 
+    @Profile("dev")
+    @Bean("dataSource")
+    public DataSource noroutingDataSource(
+            @Qualifier(MAIN_DATA_SOURCE) final DataSource devDataSource) {
+        return devDataSource;
+    }
+
+    @Profile("production")
     @Bean(DATA_SOURCE)
     public DataSource dataSource(
-            @Qualifier(ROUTING_DATA_SOURCE) DataSource routingDataSource) throws SQLException {
+            @Qualifier(ROUTING_DATA_SOURCE) DataSource routingDataSource) {
         return new LazyConnectionDataSourceProxy(routingDataSource);
     }
 
@@ -85,7 +92,6 @@ public class RoutingDataSourceConfig {
         HibernateJpaVendorAdapter hibernateJpaVendorAdapter = new HibernateJpaVendorAdapter();
         hibernateJpaVendorAdapter.setGenerateDdl(false);
         hibernateJpaVendorAdapter.setShowSql(false);
-
         hibernateJpaVendorAdapter.setDatabasePlatform("org.hibernate.dialect.MySQLDialect");
         return hibernateJpaVendorAdapter;
     }
