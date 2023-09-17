@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.RejectedExecutionException;
 
 @Slf4j(topic = "userService")
 @Service
@@ -116,7 +117,7 @@ public class UserService {
     @Transactional
     public void deleteUser(Long id, User user) {
         if (!id.equals(user.getId())) {
-            throw new IllegalArgumentException("본인이 아닙니다. 탈퇴할 수 없습니다.");
+            throw new RejectedExecutionException("본인이 아닙니다. 탈퇴할 수 없습니다.");
         }
         userRepository.delete(user);
     }
@@ -133,11 +134,11 @@ public class UserService {
 
     public User findUser(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
     public User findUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+        return userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
 }
