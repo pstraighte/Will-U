@@ -29,6 +29,7 @@ public class HashTagController {
     @GetMapping("/tag/search")
     public ResponseEntity<Page<PostResponseDto>> createTag(
             @RequestParam("content") String content,
+            @RequestParam("recruitmentTag") boolean recruitmentTag,
             @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
             @RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
     ) {
@@ -38,7 +39,7 @@ public class HashTagController {
         }
 
         Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-        Page<PostResponseDto> searchResultPage = hashTagService.createTag(content, pageable);
+        Page<PostResponseDto> searchResultPage = hashTagService.createTag(content, recruitmentTag, pageable);
         return ResponseEntity.ok().body(searchResultPage);// 서비스를 통해 검색 실행
     }
 

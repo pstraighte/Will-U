@@ -165,6 +165,7 @@
         <div>
             <input type="text" id="tagInput" placeholder="태그로 검색하세요">
             <button type="submit" onclick="tagSearch()">태그 검색</button>
+            <input type="checkbox" id="recruitmentTag"> 모집완료글 포함
         </div>
         <ul class="large">
 
@@ -175,10 +176,12 @@
 </body>
 <script>
     $(document).ready(function () {
-        getTags();
         //게시글 전체 조회
         chPost(0);
+        // 태그 리스트
+        getTags();
     });
+
     // 게시글 필터 조회
     $("#searchForm").submit(function (event) {
         event.preventDefault(); // 폼 제출 기본 동작 방지
@@ -409,46 +412,56 @@
         var keyword = $("#keyword").val();
         var criteria = $("#criteria").val();
         var recruitment = $("#recruitment").is(":checked");
-        console.log(keyword, criteria, recruitment);
-        if (keyword !== null || recruitment === true) {
-            $.ajax({
-                url: "/api/search/posts",
-                type: "GET",
-                async: false,
-                data: {
-                    keyword: keyword,
-                    criteria: criteria,
-                    recruitment: recruitment,
-                    page: i,
-                    size: 10
-                },
-                success: function (response) {
-                    $('#page-item1').empty();
-                    $('#page-item2').empty();
-                    $('#page-item3').empty();
-                    $('#page-item4').empty();
-                    $('#pagination').find($(`li[id^='page-']`)).empty();
 
-                    //검색용 페이지 버튼이 필요
-                    nodeCreate(response.totalPages, response.number);
-                    //nodeCreateAll(response.totalPages, response.number);
-                    // 검색 결과를 화면에 표시
-                    var tableBody = $('.table tbody');
-                    tableBody.empty();
-
-                    response.content.forEach(function (post) {
-                        createPostHTML(post);
-                    });
-                },
-                error: function (xhr, status, error) {
-                    console.log("검색실패");
-                }
-            });
-        } else {
-            chPost(i);
+        // 검색어가 비어있고 모집 상태가 true인 경우
+        if (!keyword && recruitment) {
+            keyword = ""; // 검색어를 빈 문자열로 설정
+            criteria = ""; // 기준을 빈 문자열로 설정
         }
+
+        performSearch(keyword, criteria, recruitment, i);
     }
 
+    function performSearch(keyword, criteria, recruitment, page) {
+        $.ajax({
+            url: "/api/search/posts",
+            type: "GET",
+            async: false,
+            data: {
+                keyword: keyword,
+                criteria: criteria,
+                recruitment: recruitment,
+                page: page,
+                size: 10
+            },
+            success: function (response) {
+                // 페이지 및 결과 표시를 담당하는 함수 호출
+                displayResults(response, page);
+            },
+            error: function (xhr, status, error) {
+                console.log("검색 실패");
+            }
+        });
+    }
+
+    function displayResults(response, page) {
+        $('#page-item1').empty();
+        $('#page-item2').empty();
+        $('#page-item3').empty();
+        $('#page-item4').empty();
+        $('#pagination').find($(`li[id^='page-']`)).empty();
+
+        // 검색용 페이지 버튼이 필요
+        nodeCreate(response.totalPages, response.number);
+
+        // 검색 결과를 화면에 표시
+        var tableBody = $('.table tbody');
+        tableBody.empty();
+
+        response.content.forEach(function (post) {
+            createPostHTML(post);
+        });
+    }
     // 게시글 태그별 조회
     function tagSearch(con) {
         var value;
@@ -458,13 +471,16 @@
         } else {
             value = con
         }
+        //태그 모집완료 체크
+        var recruitmentTag = $('#recruitmentTag').is(":checked");
 
         $.ajax({
             url: "/api/tag/search",
             type: "GET",
             async: false,
             data: {
-                content: value
+                content: value,
+                recruitmentTag: recruitmentTag
             },
             success: function (response) {
                 $('#page-item1').empty();

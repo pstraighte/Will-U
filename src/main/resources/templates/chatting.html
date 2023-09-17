@@ -305,9 +305,9 @@
 </body>
 <script>
     // 쿼리스트링 값 불러오기
-    urlSearch = new URLSearchParams(location.search);
+    let urlSearch = new URLSearchParams(location.search);
     // 채팅방 id
-    roomNumber = urlSearch.get('number')
+    const roomNumber = urlSearch.get('number')
     // 쿠키값에서 유저 값 가져오기
     let token1 = Cookies.get('Authorization');
     const payloads = JSON.parse(atob(token1.split(".")[1]));
@@ -321,7 +321,7 @@
         url: `/api/chat/chatRoom/${roomNumber}`, // 요청을 보낼 서버의 URL
         method: 'GET', // 요청 메소드 (GET, POST 등)
         success: function (response) {
-            console.log("responseresponseresponseresponse", response);
+
             for (var i = 0; i < response.chatContentList.length; i++) {
 
                 var formattedDateTime = makeDateFormat(response.chatContentList[i].createAt);
@@ -347,7 +347,7 @@
             $('#chatting').scrollTop($('#chatting').prop('scrollHeight'));
         },
         error: function (xhr, status, error) {
-            alert("채팅 내용 불러오기 실패")
+            alert("이전 채팅 내용을 불러오지 못했습니다.")
             console.log(xhr);
         }
     });

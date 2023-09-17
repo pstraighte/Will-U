@@ -1,14 +1,5 @@
-function googleLogin() {
-    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?client_id=645290605461-rr40njqgkvh758r32q783es0oflajmh2.apps.googleusercontent.com&redirect_uri=https://willuapp.com/api/users/login/oauth2/code/google&response_type=code&scope=email profile`
-}
-
-
 function kakaoLogin() {
     window.location.href = 'https://kauth.kakao.com/oauth/authorize?client_id=2f3499e63a763e115b8963e5669f7bdd&redirect_uri=https://willuapp.com/api/users/kakao/callback&response_type=code'
-}
-
-function naverLogin() {
-    window.location.href = 'https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=0St_ZZCyosLX1RyQHKhs&redirect_uri=https://willuapp.com/api/users/naver/callback&response_type=code;'
 }
 
 $(document).ready(function () {
