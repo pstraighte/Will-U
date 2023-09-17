@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  willu:
+    image: pstraighte/willu
+    container_name: willu
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"
