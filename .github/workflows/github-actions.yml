@@ -48,6 +48,9 @@ jobs:
       # gradlew 빌드
       - name: Build with Gradle
         run: ./gradlew clean build --exclude-task test
+      # DockerHub 로그아웃
+      - name: DockerHub Logout
+        run: docker logout
       # DockerHub 로그인
       - name: DockerHub Login
         uses: docker/login-action@v2
@@ -71,6 +74,7 @@ jobs:
           host: ${{ secrets.DEV_EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
+          port: 22
 
           script: |
             cd /home/ubuntu/
