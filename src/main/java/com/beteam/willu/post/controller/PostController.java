@@ -121,11 +121,8 @@ public class PostController {
         Sort sort = Sort.by(Sort.Order.desc("id"));
 
         Pageable pageable = PageRequest.of(page, size, sort); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-        if (keyword.length() < 2) {
+        if (keyword.length() == 1) {
             // 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
-            if (keyword.isEmpty()) {
-                return ResponseEntity.ok().body(postService.getPosts(pageable));
-            }
             return ResponseEntity.badRequest().build();
         }
         Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
