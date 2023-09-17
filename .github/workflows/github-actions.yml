@@ -19,7 +19,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
     - name: Properties 생성
-      shell: bash
+      # shell: bash
       run: |
         mkdir -p ./src/main/resources
         cd ./src/main/resources
