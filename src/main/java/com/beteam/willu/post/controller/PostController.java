@@ -133,4 +133,5 @@ public class PostController {
         return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
     }
 
+
 }

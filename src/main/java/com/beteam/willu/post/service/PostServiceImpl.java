@@ -164,7 +164,7 @@ public class PostServiceImpl implements PostService {
             System.out.println(post.getRecruitment());
         }
     }
-
+  
 	// 모집중 -> 모집완료로 변경
 	@Override
 	@Transactional
