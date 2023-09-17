@@ -1,13 +1,5 @@
 package com.beteam.willu.post.service;
 
-import java.util.Objects;
-import java.util.concurrent.RejectedExecutionException;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.hashtag.entity.BoardTagMap;
 import com.beteam.willu.hashtag.entity.Tag;
@@ -24,9 +16,15 @@ import com.beteam.willu.stomp.repository.ChatRoomRepository;
 import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
 import com.querydsl.core.types.Predicate;
-
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
+import java.util.concurrent.RejectedExecutionException;
 
 @Service
 @RequiredArgsConstructor
@@ -159,13 +157,13 @@ public class PostServiceImpl implements PostService {
 			throw new RejectedExecutionException("작성자만 변경 가능합니다.");
 		}
 
-		if (post.getRecruitment()) {
-			throw new RecruitmentStatusException();
-		} else {
-			post.setRecruitment(true); // 저장 안 됨
-			System.out.println(post.getRecruitment());
-		}
-	}
+        if (post.getRecruitment()) {
+            throw new RecruitmentStatusException("이미 모집중입니다.");
+        } else {
+            post.setRecruitment(true); // 저장 안 됨
+            System.out.println(post.getRecruitment());
+        }
+    }
 
 	// 모집중 -> 모집완료로 변경
 	@Override
