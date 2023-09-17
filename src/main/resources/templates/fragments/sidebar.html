@@ -28,14 +28,16 @@
 <body>
 <div class="headerTop" th:fragment="header">
     <header>
-        <img class="logo" src="/images/logo.png" onclick="window.location.href='/'">
+        <img class="logo"
+             src="https://willu-bucket.s3.ap-northeast-2.amazonaws.com/profile-images/1a1fe197-72ab-4d81-9f11-974ae1552b0a_heart_0914-14.png"
+             onclick="window.location.href='/'">
     </header>
 </div>
 <div th:fragment="sidebarFragment">
     <!--    사이드바 호출 버튼-->
     <button id="openSidebar" class="btn btn-primary" type="button" data-bs-toggle="offcanvas"
             data-bs-target="#offcanvasWithBothOptions"
-            aria-controls="offcanvasWithBothOptions">☰
+            aria-controls="offcanvasWithBothOptions"> >>>
     </button>
     <!--    사이드바 div-->
     <div class="offcanvas offcanvas-start" style="width: 300px" data-bs-scroll="true" tabindex="-1"
@@ -44,7 +46,8 @@
 
         <!--        내비게이션-->
         <div class="offcanvas-header">
-            <img id="logo" src="/images/logo.png"/>
+            <img id="logo"
+                 src="https://willu-bucket.s3.ap-northeast-2.amazonaws.com/profile-images/1a1fe197-72ab-4d81-9f11-974ae1552b0a_heart_0914-14.png"/>
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <!--        내비게이션 content-->

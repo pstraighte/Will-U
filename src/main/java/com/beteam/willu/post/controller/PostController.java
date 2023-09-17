@@ -1,8 +1,27 @@
 package com.beteam.willu.post.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.beteam.willu.common.ApiResponseDto;
 import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.common.security.UserDetailsImpl;
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
 import com.beteam.willu.post.dto.PostRequestDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.service.PostServiceImpl;
@@ -13,13 +32,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Post API", description = "게시글 제어 관련 API")
 @RestController
@@ -27,40 +39,40 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class PostController {
 
-    private final PostServiceImpl postService;
+	private final PostServiceImpl postService;
 
-    // 게시글 작성
-    @Operation(summary = "게시글 생성", description = "정해진 파라미터를 받은 후 게시글 데이터를 생성합니다.")
-    @Parameter(name = "title", required = true, schema = @Schema(type = "String"), description = "게시글 제목")
-    @Parameter(name = "content", required = true, schema = @Schema(type = "String"), description = "게시글 내용")
-    @Parameter(name = "promiseTime", required = true, schema = @Schema(type = "LocalDateTime", format = "date"), description = "약속 시간 - 게시글의 활성화 필드를 제어 할 정보")
-    @Parameter(name = "promiseArea", required = true, schema = @Schema(type = "String"), description = "지역")
-    @Parameter(name = "maxnum", required = true, schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
-    @Parameter(name = "category", required = true, schema = @Schema(type = "string"), description = "게시글 분류")
-    @PostMapping("/post")
-    public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto postRequestDto,
-                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        PostResponseDto post = postService.createPost(postRequestDto, userDetails.getUser());
-        return ResponseEntity.status(201).body(post);
-    }
+	// 게시글 작성
+	@Operation(summary = "게시글 생성", description = "정해진 파라미터를 받은 후 게시글 데이터를 생성합니다.")
+	@Parameter(name = "title", required = true, schema = @Schema(type = "String"), description = "게시글 제목")
+	@Parameter(name = "content", required = true, schema = @Schema(type = "String"), description = "게시글 내용")
+	@Parameter(name = "promiseTime", required = true, schema = @Schema(type = "LocalDateTime", format = "date"), description = "약속 시간 - 게시글의 활성화 필드를 제어 할 정보")
+	@Parameter(name = "promiseArea", required = true, schema = @Schema(type = "String"), description = "지역")
+	@Parameter(name = "maxnum", required = true, schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
+	@Parameter(name = "category", required = true, schema = @Schema(type = "string"), description = "게시글 분류")
+	@PostMapping("/post")
+	public ResponseEntity<PostResponseDto> createPost(@Valid @RequestBody PostRequestDto postRequestDto,
+		@AuthenticationPrincipal UserDetailsImpl userDetails) {
+		PostResponseDto post = postService.createPost(postRequestDto, userDetails.getUser());
+		return ResponseEntity.status(201).body(post);
+	}
 
-    @Operation(summary = "게시글 전체 조회", description = "게시글의 목록을 페이징에 관련된 정보와 함께 조회 합니다.")
-    @GetMapping("/posts")
-    public ResponseEntity<Page<PostResponseDto>> getPosts(
-            @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
-            @RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
-    ) {
-        Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-        Page<PostResponseDto> posts = postService.getPosts(pageable);
-        return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
-    }
+	@Operation(summary = "게시글 전체 조회", description = "게시글의 목록을 페이징에 관련된 정보와 함께 조회 합니다.")
+	@GetMapping("/posts")
+	public ResponseEntity<Page<MinimalPostResponseDto>> getPosts(
+		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
+		@RequestParam(value = "size", defaultValue = "10") int size // 페이지당 항목 수 파라미터 (기본값: 10)
+	) {
+		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+		Page<MinimalPostResponseDto> posts = postService.getPosts(pageable);
+		return ResponseEntity.ok().body(posts); // 게시글 목록 view 이름 (html)
+	}
 
-    // 게시글 상세 조회
-    @Operation(summary = "게시글 개별 조회", description = "PathVariable 형태의 id 값을 이용해 id에 해당하는 게시글의 데이터를 조회한다.")
-    @GetMapping("/posts/{id}")
-    public PostResponseDto getPost(@PathVariable Long id) {
-        return postService.getPost(id);
-    }
+	// 게시글 상세 조회
+	@Operation(summary = "게시글 개별 조회", description = "PathVariable 형태의 id 값을 이용해 id에 해당하는 게시글의 데이터를 조회한다.")
+	@GetMapping("/posts/{id}")
+	public PostResponseDto getPost(@PathVariable Long id) {
+		return postService.getPost(id);
+	}
 
     //
     //게시글 수정
@@ -72,9 +84,10 @@ public class PostController {
     @Parameter(name = "maxnum", schema = @Schema(type = "Long"), description = "게시글 최대 모집인원 수")
     @Parameter(name = "category", schema = @Schema(type = "string"), description = "게시글 분류")
     @PutMapping("/posts/{id}")
-    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id, @Valid @RequestBody PostRequestDto postRequestDto,
+    public ResponseEntity<PostResponseDto> updatePost(@PathVariable Long id,
+                                                      @Valid @RequestBody PostRequestDto postRequestDto,
                                                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-	postService.deleteOldTagMap(id);
+        postService.deleteOldTagMap(id);
         PostResponseDto result = postService.updatePost(id, postRequestDto, userDetails.getUsername());
         return ResponseEntity.status((HttpStatus.OK)).body(result);
     }
@@ -84,14 +97,8 @@ public class PostController {
     @DeleteMapping("/posts/{id}")
     public ResponseEntity<ApiResponseDto> deletePost(@PathVariable Long id,
                                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        //TODO 후에 전역 예외처리로 try catch 제거 필요
-        try {
-            postService.deletePost(id, userDetails.getUser());
-
-            return ResponseEntity.ok().body(new ApiResponseDto("게시글이 삭제되었습니다", 200));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
-        }
+        postService.deletePost(id, userDetails.getUser());
+        return ResponseEntity.ok().body(new ApiResponseDto("게시글이 삭제되었습니다", 200));
     }
 
     // 모집완료 -> 모집중
@@ -99,14 +106,8 @@ public class PostController {
     @PatchMapping("/posts/{id}/activate-recruitment")
     public ResponseEntity<ApiResponseDto> activateRecruitment(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                               @PathVariable Long id) {
-        try {
-            postService.activateRecruitment(id, userDetails.getUser());
-            return ResponseEntity.ok().body(new ApiResponseDto("모집중으로 변경", 200));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
-        } catch (RecruitmentStatusException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("이미 모집중입니다.", 400));
-        }
+        postService.activateRecruitment(id, userDetails.getUser());
+        return ResponseEntity.ok().body(new ApiResponseDto("모집중으로 변경", 200));
     }
 
     // 모집중 -> 모집완료
@@ -114,42 +115,32 @@ public class PostController {
     @PatchMapping("/posts/{id}/complete-recruitment")
     public ResponseEntity<ApiResponseDto> completeRecruitment(@AuthenticationPrincipal UserDetailsImpl userDetails,
                                                               @PathVariable Long id) {
-        try {
-            postService.completeRecruitment(id, userDetails.getUser());
-            return ResponseEntity.ok().body(new ApiResponseDto("모집완료", 200));
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("게시글을 찾을 수 없습니다.", 400));
-        } catch (RecruitmentStatusException e) {
-            return ResponseEntity.badRequest().body(new ApiResponseDto("이미 모집완료 되었습니다.", 400));
-        }
+        postService.completeRecruitment(id, userDetails.getUser());
+        return ResponseEntity.ok().body(new ApiResponseDto("모집완료", 200));
     }
 
     // 게시글 검색
     // TODO 파라매터 받아오는 방법 프론트엔드와 연결 시 확정 가능할 듯
     // size를 선택할 수 있는 기능이 필요한가? ex) 10개, 20개, 30개
-    @Operation(summary = "게시글 검색", description = "정해진 파라미터를 받은 후 파라미터의 데이터에 맞는 게시글의 정보를 조회한다.")
-    @Parameter(name = "keyword", schema = @Schema(type = "String"), description = "검색 키워드")
-    @Parameter(name = "criteria", schema = @Schema(type = "String"), description = "검색 조건(제목, 사용자이름, 게시글 내용)")
-    @Parameter(name = "recruitment", schema = @Schema(type = "boolean"), description = "게시글의 모집중 상태")
     @GetMapping("/search/posts")
     public ResponseEntity<Page<PostResponseDto>> searchPosts(
-            @RequestParam("keyword") String keyword, // 검색 키워드 파라미터
-            @RequestParam("criteria") String criteria, // 검색 조건 파라미터 (title, username, content 중 하나)
-            @RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
-            @RequestParam(value = "size", defaultValue = "10") int size, // 페이지당 항목 수 파라미터 (기본값: 10)
-            @RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment // 모집중인 게시글만 검색할 것인가?
+            @RequestParam("keyword") String keyword,
+            @RequestParam("criteria") String criteria,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "recruitment", defaultValue = "false") boolean recruitment
     ) {
-		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-		if (keyword.length() < 2) {
-			// 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
-			if (keyword.isEmpty()) {
-				return ResponseEntity.ok().body(postService.getPosts(pageable));
-			}
-			return ResponseEntity.badRequest().build();
-		}
-		Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
-			pageable); // 서비스를 통해 검색 실행
-		return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
-	}
+        // 정렬 방식 지정 (id 필드를 내림차순으로 정렬)
+        Sort sort = Sort.by(Sort.Order.desc("id"));
+
+        Pageable pageable = PageRequest.of(page, size, sort); // 페이지와 항목 수를 기반으로 페이징 정보 생성
+        if (keyword.length() == 1) {
+            // 검색어 길이가 2자 미만일 경우 에러 응답을 반환하거나, 다른 처리를 할 수 있습니다.
+            return ResponseEntity.badRequest().build();
+        }
+        Page<PostResponseDto> searchResultPage = postService.searchPosts(keyword, criteria, recruitment,
+                pageable); // 서비스를 통해 검색 실행
+        return ResponseEntity.ok().body(searchResultPage); // 검색 결과를 응답에 담아 반환
+    }
 
 }

@@ -1,11 +1,16 @@
 package com.beteam.willu.stomp.service;
 
+import com.beteam.willu.common.exception.RecruitmentStatusException;
 import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.notification.dto.NotificationEvent;
 import com.beteam.willu.notification.entity.NotificationType;
 import com.beteam.willu.post.entity.Post;
 import com.beteam.willu.post.repository.PostRepository;
-import com.beteam.willu.stomp.dto.*;
+import com.beteam.willu.stomp.dto.ChatRoomNameResponseDto;
+import com.beteam.willu.stomp.dto.ChatRoomsResponseDto;
+import com.beteam.willu.stomp.dto.ChatSaveRequestDto;
+import com.beteam.willu.stomp.dto.ChatroomJoinRequestDto;
+import com.beteam.willu.stomp.dto.ChatsResponseDto;
 import com.beteam.willu.stomp.entity.Chat;
 import com.beteam.willu.stomp.entity.ChatRoom;
 import com.beteam.willu.stomp.entity.UserChatRoom;
@@ -14,17 +19,18 @@ import com.beteam.willu.stomp.repository.ChatRoomRepository;
 import com.beteam.willu.stomp.repository.UserChatRoomsRepository;
 import com.beteam.willu.user.entity.User;
 import com.beteam.willu.user.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.RejectedExecutionException;
 
 @Service
 @Slf4j(topic = "ChatRoomService")
@@ -95,7 +101,7 @@ public class ChatRoomService {
         Optional<ChatRoom> chatRoom = chatRoomRepository.findById(id);
 
         if (!chatRoom.isPresent()) {
-            throw new IllegalArgumentException("해당 채팅방이 존재하지 않습니다.");
+            throw new EntityNotFoundException("해당 채팅방이 존재하지 않습니다.");
         }
 
         // ChatRoomNameResponseDto 는 채팅방 제목과 활성화 상태를 반환
@@ -153,9 +159,9 @@ public class ChatRoomService {
         //중복참여 방지
         User user = userDetails.getUser();
         if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
-            throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
+            throw new RecruitmentStatusException("모집 인원이 다 찼습니다.");
         } else if (userChatRoomsRepository.existsByUserAndChatRooms(user, chatRoom)) {
-            throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
+            throw new RecruitmentStatusException("이미 참여하고 있는 방입니다.");
         }
 
         //		유저 채팅방 초대
@@ -180,15 +186,15 @@ public class ChatRoomService {
 
         //중복참여 방지
         Long userId = requestDto.getUserId();
-        User joiner = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
+        User joiner = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저가 존재하지 않습니다."));
         if (!Objects.equals(loginUser.getId(), post.getUser().getId())) {
-            throw new IllegalArgumentException("게시글 작성자가 아닙니다. 유저를 참가시킬 권한이 없습니다.");
+            throw new RejectedExecutionException("게시글 작성자가 아닙니다. 유저를 참가시킬 권한이 없습니다.");
         }
         log.info("현재 정원:" + chatRoom.getUserChatRoomList().size());
         if (chatRoom.getUserChatRoomList().size() >= post.getMaxnum()) {
-            throw new IllegalArgumentException("모집 인원이 다 찼습니다.");
+            throw new RecruitmentStatusException("모집 인원이 다 찼습니다.");
         } else if (userChatRoomsRepository.existsByUserAndChatRooms(joiner, chatRoom)) {
-            throw new IllegalArgumentException("이미 참여하고 있는 방입니다.");
+            throw new RecruitmentStatusException("이미 참여하고 있는 방입니다.");
         }
 
         UserChatRoom guestChatRoom = UserChatRoom.builder().user(joiner).chatRooms(chatRoom).role("GUEST").build();
@@ -228,7 +234,7 @@ public class ChatRoomService {
         Optional<UserChatRoom> adminUserChack = userChatRoomsRepository.findByChatRoomsIdAndUserId(chatid, adminUserId);
 
         if (!adminUserChack.isPresent()) {
-            throw new IllegalArgumentException("채팅방의 방장이 아닙니다.");
+            throw new RejectedExecutionException("채팅방의 방장이 아닙니다.");
         }
 
         // 강퇴할 사용자의 id를 가지고 조회하는데 추가적으로 해당 채팅방 id 와 같이
@@ -246,7 +252,7 @@ public class ChatRoomService {
         Optional<UserChatRoom> chatRoom = userChatRoomsRepository.findByChatRoomsIdAndUserId(id, userId);
 
         if (chatRoom.isEmpty()) {
-            throw new IllegalArgumentException("채팅방이 존재하지 않습니다.");
+            throw new EntityNotFoundException("채팅방이 존재하지 않습니다.");
         }
 
         userChatRoomsRepository.delete(chatRoom.get());
@@ -270,17 +276,22 @@ public class ChatRoomService {
     }
 
     private Post findPost(Long id) {
-        return postRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
+        return postRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
     }
 
     private ChatRoom findChatRoom(Long id) {
-        return chatRoomRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
+        return chatRoomRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방 입니다."));
     }
 
     @Transactional
     public int findChatRoomByPostIdAndGetCount(Long postId) {
         ChatRoom chatRoom = chatRoomRepository.findByPostId(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방 입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 채팅방 입니다."));
         return chatRoom.getUserChatRoomList().size();
+    }
+
+    public long findChatRoomByPostId(Long postId) {
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomByPost_IdAndActivatedIsTrue(postId).orElseThrow(() -> new IllegalArgumentException("활성화된 채팅방이 존재하지 않습니다."));
+        return chatRoom.getId();
     }
 }

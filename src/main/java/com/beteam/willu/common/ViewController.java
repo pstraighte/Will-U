@@ -23,6 +23,7 @@ import com.beteam.willu.common.security.UserDetailsImpl;
 import com.beteam.willu.interest.dto.InterestResponseDto;
 import com.beteam.willu.interest.entity.Interest;
 import com.beteam.willu.interest.repository.InterestRepository;
+import com.beteam.willu.post.dto.MinimalPostResponseDto;
 import com.beteam.willu.post.dto.PostResponseDto;
 import com.beteam.willu.post.repository.PostRepository;
 import com.beteam.willu.post.service.PostService;
@@ -62,7 +63,7 @@ public class ViewController {
 		@RequestParam(value = "page", defaultValue = "0") int page, // 페이지 번호 파라미터 (기본값: 0)
 		@RequestParam(value = "size", defaultValue = "10") int size) {
 		Pageable pageable = PageRequest.of(page, size); // 페이지와 항목 수를 기반으로 페이징 정보 생성
-		Page<PostResponseDto> posts = postService.getPosts(pageable);
+		Page<MinimalPostResponseDto> posts = postService.getPosts(pageable);
 
 		model.addAttribute("posts", posts);
 		return "index"; //출력 html
@@ -91,6 +92,8 @@ public class ViewController {
 
 		int userCount = chatRoomService.findChatRoomByPostIdAndGetCount(postId);
 		model.addAttribute("currentNum", userCount);
+		long chatRoomId = chatRoomService.findChatRoomByPostId(postId);
+		model.addAttribute("chatRoomId", chatRoomId);
 
 		return "detailPost";
 	}
