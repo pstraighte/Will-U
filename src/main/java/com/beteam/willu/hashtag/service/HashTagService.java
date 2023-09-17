@@ -36,7 +36,6 @@ public class HashTagService {
 
         List<Post> postList = new ArrayList<>();
         for (BoardTagMap boardTagMap : boardTagMapList) {
-
             if (!recruitmentTag) {
                 if (boardTagMap.getPost().getRecruitment()) {
                     postList.add(boardTagMap.getPost());

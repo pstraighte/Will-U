@@ -167,6 +167,9 @@
         <button onclick="arrayAdd()">태그 작성</button>
 
         <br><br>
+        <label for="promiseArea">약속 장소</label>
+        <input type="text" id="promiseArea" name="promiseArea" readonly>
+        <div id="map" style="width: 100%; height: 400px;"></div>
         <button id="chooseLocation">약속 장소 선택</button>
         <div id="locationModal" class="modal">
             <div class="modal-content">
@@ -179,12 +182,6 @@
                 <div id="modalLocationResults"></div>
             </div>
         </div>
-        
-        <div id="map" style="width: 100%; height: 400px;"></div>
-        <label for="promiseArea">약속 장소</label>
-        <input type="text" id="promiseArea" name="promiseArea" readonly>
-
-
         <div class="buttons">
             <button onclick="createPost()">작성</button>
             <button type="button" id="back">취소</button>
