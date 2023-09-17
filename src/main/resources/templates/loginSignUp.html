@@ -267,6 +267,13 @@
             }
         }
 
+        #socialLoginDiv {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+        }
+
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
 </head>
@@ -308,14 +315,14 @@
                         <input type="submit" onclick="login()" value="로그인">
                     </div>
                 </div>
-                <button id="login-kakao-btn"
-                        onclick="kakaoLogin()">
-                    카카오로 로그인하기
-                </button>
-                <button id="login-google-btn"
-                        onclick="googleLogin()">
-                    구글 로그인하기
-                </button>
+                <div id="socialLoginDiv">
+                    <a id="custom-kakao-login-btn" onclick="kakaoLogin()">
+                        <img src="https://willu-bucket.s3.ap-northeast-2.amazonaws.com/profile-images/kakao_login_medium_narrow.png">
+                    </a>
+                    <a id="custom-google-login-btn" onclick="googleLogin()">
+                        <img src="https://willu-bucket.s3.ap-northeast-2.amazonaws.com/profile-images/btn_google_signin_light_normal_web.png">
+                    </a>
+                </div>
                 <!--                <button id="login-naver-btn"-->
                 <!--                        onclick="naverLogin()">-->
                 <!--                    네이버 로그인하기-->
