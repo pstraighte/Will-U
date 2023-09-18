@@ -40,7 +40,8 @@
 
 ### 🛠 서비스 아키텍처
 
-![할래 아키텍처.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/182f19c9-43e9-4f68-9073-da43faf966c4/572d4bb0-e6b6-4939-8c4d-0128dd63d5d7/%ED%95%A0%EB%9E%98_%EC%95%84%ED%82%A4%ED%85%8D%EC%B2%98.png)
+![할래 아키텍처](https://github.com/Team-available/Will-U/assets/131872877/8b49be94-da60-4b9f-b1d0-b9c5b76ffe60)
+
 
 ## ✨기능 소개
 
@@ -140,7 +141,8 @@
 
 ## 📄ERD
 
-![Untitled.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/182f19c9-43e9-4f68-9073-da43faf966c4/99b76537-3826-4ba2-9242-fac5a5a92509/Untitled.png)
+![Untitled](https://github.com/Team-available/Will-U/assets/131872877/a58f1684-829d-40ae-b477-4fa7d8824d93)
+
 
 ---
 
