@@ -1,4 +1,4 @@
-# Workflow 이름
+# Workflow 이름 
 name: Spring Boot & Gradle CI/CD
 # 
 # 어떤 이벤트가 발생하면 workflow 실행할 지 명시
