@@ -1,0 +1,25 @@
+# codedeploy가 어떻게 실행하는지 지시하는 파일
+
+version: 0.0
+os: linux
+files:
+  - source:  /
+    # ↓S3에 업로드한 zip의 EC2 이동 위치
+    destination: /home/ubuntu/cicdtest
+
+# 압축해제 후 소유자 지정, 미지정시 root
+permissions:
+  - object: /home/ubuntu
+    pattern: "**"
+    owner: ubuntu
+    group: ubuntu
+    
+# 압축해제 후 수행 할 스크립트 파일 그리고 사용자 지정
+# 앱 배포 전 수행 할 deploy-before.sh 과 
+hooks:
+  BeforeInstall:
+    - location: deploy-before.sh
+      runas: ubuntu
+  ApplicationStart:
+    - location: deploy.sh
+      runas: ubuntu
