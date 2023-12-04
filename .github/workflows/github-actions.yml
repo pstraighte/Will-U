@@ -58,9 +58,9 @@ jobs:
     - name: Deploy
       run: |
         aws deploy create-deployment \
-        --application-name willu \
+        --application-name $PROJECT_NAME \
         --deployment-config-name CodeDeployDefault.OneAtATime \
         --deployment-group-name cicdtest \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=cicdtest-buket,bundleType=zip,$PROJECT_NAME/cicdfile.zip \
+        --s3-location bucket=cicdtest-buket,bundleType=zip,key=$PROJECT_NAME/cicdfile.zip \
         --region ap-northeast-2 \
