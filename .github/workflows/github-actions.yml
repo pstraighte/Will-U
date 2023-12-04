@@ -58,7 +58,7 @@ jobs:
     - name: Deploy
       run: |
         aws deploy create-deployment \
-        --application-name $PROJECT_NAME \
+        --application-name cicdtest \
         --deployment-config-name CodeDeployDefault.OneAtATime \
         --deployment-group-name cicdtest \
         --file-exists-behavior OVERWRITE \
