@@ -67,8 +67,8 @@ jobs:
       run: |
         aws deploy create-deployment \
         --application-name willu \
-        --deployment-config-name CodeDeployDefault.AllAtOnce \
-        --deployment-group-name Code Deploy 그룹 이름 \
+        --deployment-config-name CodeDeployDefault.OneAtATime \
+        --deployment-group-name cicdtest \
         --file-exists-behavior OVERWRITE \
-        --s3-location bucket=S3 cicdtest-buket,bundleType=zip,key=concert-calendar/ConcertCalendar.zip \
+        --s3-location bucket=cicdtest-buket,bundleType=zip,$PROJECT_NAME/cicdfile.zip \
         --region ap-northeast-2 \
