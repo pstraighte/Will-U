@@ -63,6 +63,10 @@ dependencies {
     // Batch
     implementation 'org.springframework.boot:spring-boot-starter-batch'
 
+    // gradle
+    implementation 'org.springframework.boot:spring-boot-gradle-plugin:3.1.2'
+
+
     //Spring Doc
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2"
 
@@ -84,3 +88,8 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+jar {
+    enabled = false
+}
+
