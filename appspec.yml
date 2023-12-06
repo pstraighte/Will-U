@@ -18,7 +18,9 @@ permissions:
 # 압축해제 후 수행 할 스크립트 파일 그리고 사용자 지정
 # 앱 배포 전 수행 할 deploy.sh 파일 작성
 hooks:
-  ApplicationStart:
-    - location: deploy.sh
+  AfterInstall:
+    - location: scripts/stop.sh
       timeout: 60
-      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/start.sh
+      timeout: 60
