@@ -19,8 +19,8 @@ permissions:
 # 앱 배포 전 수행 할 deploy.sh 파일 작성
 hooks:
   AfterInstall:
-    - location: scripts/stop.sh
+    - location: stop.sh
       timeout: 60
   ApplicationStart:
-    - location: scripts/start.sh
+    - location: start.sh
       timeout: 60
