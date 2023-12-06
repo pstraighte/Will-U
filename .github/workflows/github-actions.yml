@@ -3,7 +3,9 @@ name: Java CICD with Gradle
 
 on:
   push:
-    branches: [ "CICD_test" ]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 permissions:
   contents: read
